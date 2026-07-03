@@ -27,6 +27,11 @@ export default async function handler(req, res) {
   delete headers['content-length'];
   delete headers['transfer-encoding'];
   
+  // Preserve the client's original authorization token in a custom header
+  if (req.headers.authorization) {
+    headers['x-user-token'] = req.headers.authorization;
+  }
+  
   // Inject the Hugging Face Authorization token securely on the server
   headers['authorization'] = `Bearer ${hfToken}`;
 

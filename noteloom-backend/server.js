@@ -35,6 +35,16 @@ connectDB(); // Connect to MongoDB
 
 // --- GLOBAL MIDDLEWARE ---
 app.use(express.json());
+
+// Secure Proxy Token Mapping: Restores the user session token forwarded by Vercel
+app.use((req, res, next) => {
+  const userToken = req.headers['x-user-token'] || req.headers['x-authorization'];
+  if (userToken) {
+    req.headers.authorization = userToken.startsWith('Bearer ') ? userToken : `Bearer ${userToken}`;
+  }
+  next();
+});
+
 const allowedOrigins = [
   'http://localhost:3000', 
   'http://localhost:5173', 
