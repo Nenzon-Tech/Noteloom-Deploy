@@ -1,8 +1,13 @@
 // Global Configuration
 
-export const API_BASE = import.meta.env.VITE_API_BASE !== undefined && import.meta.env.VITE_API_BASE !== null 
+const rawApiBase = import.meta.env.VITE_API_BASE !== undefined && import.meta.env.VITE_API_BASE !== null 
   ? import.meta.env.VITE_API_BASE 
-  : 'http://localhost:4000';
+  : (import.meta.env.PROD ? '' : 'http://localhost:4000');
+
+// Strip accidental wrapping quotes (like double quotes entered in Vercel UI)
+export const API_BASE = typeof rawApiBase === 'string' 
+  ? rawApiBase.replace(/^['"]|['"]$/g, '') 
+  : '';
 
 export const COLLEGE_CONFIG = {
   // Default values
