@@ -6,8 +6,19 @@ export default async function handler(req, res) {
     return res.status(500).json({ error: "HF_TOKEN environment variable is missing on Vercel." });
   }
 
+  // Parse the query parameters from the request URL
+  const parsedUrl = new URL(req.url, 'http://localhost');
+  const originalPath = parsedUrl.searchParams.get('path');
+
+  if (!originalPath) {
+    return res.status(400).json({ error: "Missing 'path' parameter in proxy request." });
+  }
+
+  // Remove the 'path' parameter so it isn't forwarded to the backend
+  parsedUrl.searchParams.delete('path');
+
   // Construct the target URL pointing to your private Hugging Face Space
-  const targetUrl = `${hfSpaceUrl}${req.url}`;
+  const targetUrl = `${hfSpaceUrl}${originalPath}${parsedUrl.search}`;
 
   // Copy incoming headers and clean up host-specific headers
   const headers = { ...req.headers };
