@@ -94,7 +94,7 @@ const PDFDocumentArea = React.memo(({ fileUrl, pageNumber, scale, onDocumentLoad
   );
 });
 
-const ModernPDFViewer = ({ fileUrl, isDarkMode, isStandalone = false }) => {
+const ModernPDFViewer = ({ fileUrl, isDarkMode, isStandalone = false, allowDownload = true }) => {
   const [numPages, setNumPages] = useState(null);
   const [pageNumber, setPageNumber] = useState(1);
   const [scale, setScale] = useState(1.0);
@@ -152,6 +152,7 @@ const ModernPDFViewer = ({ fileUrl, isDarkMode, isStandalone = false }) => {
         }
       }
       
+      // eslint-disable-next-line react-hooks/exhaustive-deps
       setIsSearching(false);
     }, 500); 
 
@@ -278,14 +279,14 @@ const ModernPDFViewer = ({ fileUrl, isDarkMode, isStandalone = false }) => {
              />
              <div className="flex items-center gap-1 border-l border-gray-500/30 pl-2">
                {isSearching ? <Loader2 className="w-4 h-4 animate-spin text-blue-500"/> : (
-                 <>
-                   <span className="text-xs opacity-60 font-mono min-w-[30px]">
-                     {searchResults.length > 0 ? `${currentResultIndex + 1}/${searchResults.length}` : '0'}
-                   </span>
-                   <button onClick={prevMatch} className="p-1 hover:text-blue-500"><ArrowUp className="w-4 h-4"/></button>
-                   <button onClick={nextMatch} className="p-1 hover:text-blue-500"><ArrowDown className="w-4 h-4"/></button>
-                   <button onClick={() => { setIsSearchOpen(false); setSearchText(''); }} className="p-1 hover:text-red-500"><X className="w-4 h-4"/></button>
-                 </>
+                  <>
+                    <span className="text-xs opacity-60 font-mono min-w-[30px]">
+                      {searchResults.length > 0 ? `${currentResultIndex + 1}/${searchResults.length}` : '0'}
+                    </span>
+                    <button onClick={prevMatch} className="p-1 hover:text-blue-500"><ArrowUp className="w-4 h-4"/></button>
+                    <button onClick={nextMatch} className="p-1 hover:text-blue-500"><ArrowDown className="w-4 h-4"/></button>
+                    <button onClick={() => { setIsSearchOpen(false); setSearchText(''); }} className="p-1 hover:text-red-500"><X className="w-4 h-4"/></button>
+                  </>
                )}
              </div>
           </div>
@@ -311,19 +312,23 @@ const ModernPDFViewer = ({ fileUrl, isDarkMode, isStandalone = false }) => {
 
           <div className="h-6 w-px bg-white/20 mx-1"></div>
 
-          <button onClick={handleDirectPrint} className={glassButton} title="Print">
-            <Printer className="w-5 h-5"/>
-          </button>
+          {allowDownload && (
+            <button onClick={handleDirectPrint} className={glassButton} title="Print">
+              <Printer className="w-5 h-5"/>
+            </button>
+          )}
 
-          {!isStandalone && (
+          {!isStandalone && allowDownload && (
             <button onClick={handleOpenNewTab} className={glassButton} title="Open in New Tab">
               <ExternalLink className="w-5 h-5"/>
             </button>
           )}
 
-          <button onClick={handleDirectDownload} className={glassButton} title="Download">
-            <Download className="w-5 h-5"/>
-          </button>
+          {allowDownload && (
+            <button onClick={handleDirectDownload} className={glassButton} title="Download">
+              <Download className="w-5 h-5"/>
+            </button>
+          )}
           
           <button 
              onClick={() => { setIsFullscreen(!isFullscreen); setScale(isFullscreen ? 1.0 : 1.25); }} 

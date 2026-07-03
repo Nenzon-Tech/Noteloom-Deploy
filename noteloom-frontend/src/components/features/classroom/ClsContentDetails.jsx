@@ -38,15 +38,23 @@ const ClsContentDetails = () => {
   const [activeTab, setActiveTab] = useState('discussion');
   
   // 1. Data Retrieval
-  const contentItem = state?.contentItem || null;
+  const locationContentItem = state?.contentItem || null;
+  const contentItem = content || locationContentItem;
   const classroomName = state?.className || "Classroom";
   const moduleTitle = state?.moduleTitle || "Module";
 
   // 2. State
   const [allowDownload, setAllowDownload] = useState(contentItem?.allowDownload ?? true);
   const [isCompleted, setIsCompleted] = useState(false);
-  const [loading, setLoading] = useState(false); // To prevent double-clicks
+  const [loading, setLoading] = useState(!state?.contentItem); // To prevent double-clicks
   const role = localStorage.getItem('userRole'); 
+  
+  // Update allowDownload if contentItem changes
+  useEffect(() => {
+    if (contentItem) {
+      setAllowDownload(contentItem.allowDownload ?? true);
+    }
+  }, [contentItem]);
 
   // 3. Data Normalization (Attachments)
   const getAttachments = () => {
@@ -114,6 +122,7 @@ useEffect(() => {
           const data = await res.json();
           setContent(data);
           setIsCompleted(data.isCompleted); // Sync status from DB
+          setAllowDownload(data.allowDownload);
         }
       } catch (error) {
         console.error("Failed to fetch data", error);
@@ -193,7 +202,13 @@ useEffect(() => {
     return true;
   };
 
-  if (!contentItem) return null;
+  if (!contentItem) {
+    return (
+      <div className={`min-h-screen flex items-center justify-center ${isDarkMode ? 'bg-gray-900 text-white' : 'bg-gray-100 text-gray-900'}`}>
+        <Loader2 className="w-10 h-10 animate-spin text-blue-500" />
+      </div>
+    );
+  }
 
   return (
     <div className={`min-h-screen flex flex-col ${isDarkMode ? 'bg-gray-900 text-white' : 'bg-[#F2F4F7] text-gray-900'}`}>
@@ -271,6 +286,7 @@ useEffect(() => {
                          fileUrl={activeFile.fileUrl.startsWith('/') ? activeFile.fileUrl : `/${activeFile.fileUrl}`} 
                          isDarkMode={isDarkMode} 
                          fileType={getFileType(activeFile)}
+                         allowDownload={canDownloadFile(activeFile)}
                       />
                    </div>
                 )}
