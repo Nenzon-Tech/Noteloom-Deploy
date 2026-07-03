@@ -24,6 +24,8 @@ export default async function handler(req, res) {
   const headers = { ...req.headers };
   delete headers.host;
   delete headers.connection;
+  delete headers['content-length'];
+  delete headers['transfer-encoding'];
   
   // Inject the Hugging Face Authorization token securely on the server
   headers['authorization'] = `Bearer ${hfToken}`;
