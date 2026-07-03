@@ -38,7 +38,7 @@ exports.getLeaveHistory = async (req, res) => {
         const targetUserId = req.params.userId;
         
         // Security check: Users can only view their own leave history unless they are college admin
-        if (req.role !== 'college_admin' && req.user.id !== targetUserId) {
+        if (req.role !== 'college_admin' && req.user.id.toString() !== targetUserId.toString()) {
             return res.status(403).json({ error: "Unauthorized access to leave history" });
         }
 
