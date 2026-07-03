@@ -51,8 +51,13 @@ export default async function handler(req, res) {
     // Forward the response status and headers
     res.status(response.status);
     response.headers.forEach((value, key) => {
-      // Avoid header duplicate conflicts
-      if (key.toLowerCase() !== 'content-encoding') {
+      const lowerKey = key.toLowerCase();
+      // Avoid content-encoding, content-length, and transfer-encoding mismatches
+      if (
+        lowerKey !== 'content-encoding' &&
+        lowerKey !== 'content-length' &&
+        lowerKey !== 'transfer-encoding'
+      ) {
         res.setHeader(key, value);
       }
     });
