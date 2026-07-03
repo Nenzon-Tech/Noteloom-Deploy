@@ -1,0 +1,181 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Custom styles */
+html, body, #root { height: 100%; }
+
+/* =========================
+   THEME VARIABLES
+========================= */
+@layer base {
+  :root {
+    /* Primary Purple */
+    --primary-50:  #F5F3FF;
+    --primary-100: #EDE9FE;
+    --primary-300: #C4B5FD;
+    --primary-500: #7C3AED;
+    --primary-600: #6D28D9;
+    --primary-700: #5B21B6;
+    --header-bg: rgba(255, 255, 255, 0.7);
+--header-border: rgba(124, 58, 237, 0.15);
+
+
+    /* Backgrounds */
+--bg-main:  #F4F6FB;   /* main app background */
+--bg-card:  #FAFBFF;   /* cards / panels */
+    --bg-muted: #F3F4F6;
+
+    /* Borders */
+    --border: #E5E7EB;
+
+    /* Text */
+    --text-primary:   #111827;
+    --text-secondary: #4B5563;
+    --text-muted:     #9CA3AF;
+
+    /* Status */
+    --success: #22C55E;
+    --warning: #F59E0B;
+    --danger:  #EF4444;
+  }
+
+  .dark {
+    --bg-main:  #0F172A;
+    --bg-card:  #111827;
+    --bg-muted: #1F2937;
+
+    --border: #1F2933;
+
+    --text-primary:   #E5E7EB;
+    --text-secondary: #CBD5E1;
+    --text-muted:     #94A3B8;
+
+    --primary-500: #A78BFA;
+    --primary-600: #8B5CF6;
+
+    --header-bg: rgba(17, 24, 39, 0.7);
+--header-border: rgba(139, 92, 246, 0.25);
+
+  }
+}
+
+@layer components {
+  .dashboard-bg {
+    background-color: var(--bg-main);
+    color: var(--text-primary);
+  }
+
+  .app-header {
+  background: var(--header-bg);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border-bottom: 1px solid var(--header-border);
+  position: sticky;
+  top: 0;
+  z-index: 50;
+}
+
+
+  .dashboard-card {
+    background-color: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 1rem;
+    padding: 1.5rem;
+    transition: all 0.25s ease;
+    box-shadow: 0 8px 24px rgba(124, 58, 237, 0.06);
+  }
+
+  .dashboard-card:hover {
+    transform: translateY(-6px) scale(1.02);
+    box-shadow: 0 16px 40px rgba(124, 58, 237, 0.18);
+  }
+
+  .icon-box {
+    width: 3.5rem;
+    height: 3.5rem;
+    border-radius: 0.875rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(
+      135deg,
+      var(--primary-500),
+      var(--primary-600)
+    );
+    color: white;
+    transition: transform 0.25s ease;
+  }
+
+  .dashboard-card:hover .icon-box {
+    transform: rotate(-3deg) scale(1.1);
+  }
+
+  .btn-primary {
+    background: linear-gradient(
+      135deg,
+      var(--primary-500),
+      var(--primary-600)
+    );
+    color: white;
+    border-radius: 0.75rem;
+    padding: 0.6rem 1.2rem;
+    font-weight: 600;
+    transition: all 0.2s ease;
+  }
+
+  .btn-primary:hover {
+    filter: brightness(1.1);
+    transform: translateY(-1px);
+  }
+}
+
+/* ===== PDF SEARCH HIGHLIGHT (FIXED) ===== */
+/* Native PDF.js highlight */
+.textLayer .highlight {
+  background-color: rgba(144, 238, 144, 0.55) !important; /* light green */
+}
+
+.textLayer .highlight.selected {
+  background-color: rgba(72, 187, 120, 0.75) !important;
+}
+
+@media print {
+  @page {
+    size: A4;
+    margin: 12mm;
+  }
+
+  body * {
+    visibility: hidden;
+  }
+
+  .print-area,
+  .print-area * {
+    visibility: visible;
+  }
+
+  .print-area {
+    position: absolute;
+    top: 0;
+    left: 0;
+
+    display: grid;
+    grid-template-columns: repeat(3, 1fr); /* 3 columns */
+    grid-template-rows: repeat(3, auto);  /* 3 rows */
+
+    gap: 12mm;
+    width: 100%;
+  }
+
+  .print-area > div {
+    page-break-inside: avoid;
+    height: auto;
+  }
+}
+
+
+
+
+
+

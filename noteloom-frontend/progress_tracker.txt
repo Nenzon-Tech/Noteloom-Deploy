@@ -1,0 +1,41 @@
+=========================================
+NOTE LOOM - SECURITY & REMEDIATION PROGRESS
+=========================================
+
+Tasks checklist:
+
+[x] Task 1: Third-Party Sanitization Dependency
+    - Action: Install 'dompurify' and add it to package.json dependencies. (Completed)
+
+[x] Task 2: Core Security Route Guards
+    - Action: Create src/components/common/ProtectedRoute.jsx (Completed)
+    - Action: Create src/components/common/ITProtectedRoute.jsx (Completed)
+
+[x] Task 3: AI Mermaid Mindmap Renderer Security
+    - Action: Update src/components/features/ai/NoteloomAi.jsx to use securityLevel: 'strict' and sanitize SVG using DOMPurify. (Completed)
+
+[x] Task 4: Disable Production Source Maps
+    - Action: Update vite.config.js to set build.sourcemap and build.cssSourcemap to false. (Completed)
+
+[x] Task 5: App Routing & Optimizations (App.jsx)
+    - Action: Convert static page imports to lazy-loaded dynamic imports. (Completed)
+    - Action: Wrap the routes tree in a Suspense boundary with fallback loading spinner. (Completed)
+    - Action: Wrap protected routes with ProtectedRoute or ITProtectedRoute. (Completed)
+    - Action: Remove unused import 'react-player'. (Completed)
+
+[x] Task 6: Lightweight CSS/SVG Loading Spinner
+    - Action: Create src/components/common/LoadingSpinner.jsx (Completed)
+    - Action: Replace the heavy 354KB LoadingMan.gif with LoadingSpinner across all dashboard pages:
+      * src/components/features/coe/FacultyQuestionBank.jsx (Completed)
+      * src/pages/dashboard/TimetableDashboard.jsx (Completed)
+      * src/pages/dashboard/SemesterFeedback.jsx (Completed)
+      * src/pages/dashboard/UniversityMarks.jsx (Completed)
+      * src/pages/dashboard/MyCourses.jsx (Completed)
+      * src/pages/dashboard/MyClasses.jsx (Completed)
+      * src/pages/dashboard/ManageDepartments.jsx (Completed)
+      * src/pages/dashboard/ExamForm.jsx (Completed)
+      * src/pages/dashboard/CollegeDashboard.jsx (Completed)
+      * src/pages/dashboard/AdmitCard.jsx (Completed)
+
+[x] Task 7: Session Null Guards
+    - Action: Add null checks for sessionData/sessionData.user inside dashboards to prevent white screen crashes (e.g. TimetableDashboard.jsx). (Completed)

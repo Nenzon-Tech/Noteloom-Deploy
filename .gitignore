@@ -1,0 +1,65 @@
+# Node modules
+node_modules/
+**/node_modules/
+
+# Env files
+.env
+**/.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# Diagnostic/Temporary files
+test_verify.js
+test_http.js
+watch_verify.js
+
+# Build/Dist output
+dist/
+**/dist/
+build/
+**/build/
+.next/
+**/out/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Archive/Compressed files
+*.zip
+*.tar.gz
+*.rar
+
+# Media/Upload files
+*.mp4
+*.mov
+*.avi
+*.mkv
+*.mp3
+*.wav
+**/public/webdata/uploads/
+**/uploads/
+
+# Documents/Report files
+*.docx
+*.pdf
+generate_report.py
+project_report.md
+remaining-issues.txt
+architecture_diagram.md
+data_flow_diagram.md
+use_case_diagram.md
+noteloom_code_issue_report
+backend-restructuring
+backend-restructuring/
