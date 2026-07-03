@@ -9,6 +9,14 @@
       "destination": "/api/proxy?path=/session/:path*"
     },
     {
+      "source": "/it-admin/:path*",
+      "destination": "/api/proxy?path=/it-admin/:path*"
+    },
+    {
+      "source": "/it-auth/:path*",
+      "destination": "/api/proxy?path=/it-auth/:path*"
+    },
+    {
       "source": "/webdata/:path*",
       "destination": "/api/proxy?path=/webdata/:path*"
     },
