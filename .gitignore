@@ -54,12 +54,14 @@ Thumbs.db
 # Documents/Report files
 *.docx
 *.pdf
+**/diagrams and report/
 generate_report.py
 project_report.md
 remaining-issues.txt
 architecture_diagram.md
 data_flow_diagram.md
 use_case_diagram.md
-noteloom_code_issue_report
-backend-restructuring
+noteloom-restructuring
 backend-restructuring/
+hf-deploy/
+

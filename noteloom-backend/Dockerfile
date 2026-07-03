@@ -16,9 +16,9 @@ RUN npm ci --only=production
 COPY . .
 
 # Hugging Face Spaces runs with a non-root user (UID 1000)
-# Create a user and grant access to the /app directory
-RUN useradd -m -u 1000 user && chown -R user:user /app
-USER user
+# Reuse the existing 'node' user (which has UID 1000) and grant access to /app
+RUN chown -R node:node /app
+USER node
 
 # Expose the Hugging Face port
 EXPOSE 7860

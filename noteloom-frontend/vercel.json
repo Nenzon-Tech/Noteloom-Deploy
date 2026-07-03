@@ -1,6 +1,22 @@
 {
   "rewrites": [
     {
+      "source": "/api/:path*",
+      "destination": "/api/proxy"
+    },
+    {
+      "source": "/session/:path*",
+      "destination": "/api/proxy"
+    },
+    {
+      "source": "/webdata/:path*",
+      "destination": "/api/proxy"
+    },
+    {
+      "source": "/health",
+      "destination": "/api/proxy"
+    },
+    {
       "source": "/(.*)",
       "destination": "/index.html"
     }
