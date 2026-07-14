@@ -25,6 +25,34 @@
       "destination": "/api/proxy?path=/health"
     },
     {
+      "source": "/sitemap.xml",
+      "destination": "/api/proxy?path=/sitemap.xml"
+    },
+    {
+      "source": "/",
+      "destination": "/api/render"
+    },
+    {
+      "source": "/pricing",
+      "destination": "/api/render"
+    },
+    {
+      "source": "/blog",
+      "destination": "/api/render"
+    },
+    {
+      "source": "/blog/:slug",
+      "destination": "/api/render?blogSlug=:slug"
+    },
+    {
+      "source": "/comparison/google-classroom-notion",
+      "destination": "/api/render?comparison=google-classroom-notion"
+    },
+    {
+      "source": "/institutes/:slug",
+      "destination": "/api/render?instituteSlug=:slug"
+    },
+    {
       "source": "/(.*)",
       "destination": "/index.html"
     }

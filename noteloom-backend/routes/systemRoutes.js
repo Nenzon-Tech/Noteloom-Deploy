@@ -36,4 +36,26 @@ router.get('/dashboard/menu', setTenantContext, async (req, res) => {
   } catch (err) { res.status(500).json({ error: 'Failed' }); }
 });
 
+// Get Public Institute details by slug
+router.get('/api/institutes/:slug', async (req, res) => {
+  try {
+    const Tenant = require('../models/Tenant');
+    const institute = await Tenant.findOne({
+      slug: req.params.slug,
+      type: 'college',
+      status: 'active',
+      isPublished: true
+    }).select('name logoUrl category location featured updatedAt');
+
+    if (!institute) {
+      return res.status(404).json({ error: 'Institute not found or unpublished' });
+    }
+
+    res.json(institute);
+  } catch (error) {
+    console.error('Error fetching institute details:', error);
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
 module.exports = router;

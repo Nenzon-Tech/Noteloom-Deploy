@@ -4,6 +4,7 @@ import { Sparkles, Shield, Users, Mail, Phone, Calendar } from "lucide-react";
 import { useTheme } from "@/context/ThemeContext.jsx";
 import { useErrorPopup } from "@/context/ErrorPopupContext.jsx";
 import FAQItem from "@/components/features/landing/FAQItem.jsx";
+import { trackEvent } from "@/utils/trackEvent";
 
 const ContactSection = () => {
   const { isDarkMode } = useTheme();
@@ -19,6 +20,7 @@ const ContactSection = () => {
   const handleContactSubmit = (e) => {
     e.preventDefault();
     console.log("Contact form submitted:", contactForm);
+    trackEvent('demo_request_click', { subject: contactForm.subject });
     triggerPopup("Thank you for your interest! The contact messaging service is under maintenance. We will reach out to you shortly.", "success", 6000);
     setContactForm({ name: "", email: "", subject: "", message: "" });
   };

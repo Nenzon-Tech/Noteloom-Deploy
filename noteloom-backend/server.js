@@ -24,6 +24,7 @@ const libraryRoutes = require('./routes/libraryRoutes');
 const { PhysicalBook } = require('./models/Library');
 const attendanceRoutes = require('./routes/attendanceRoutes');
 const { sendOverdueBookEmail } = require('./services/emailService');
+const sitemapRoute = require('./routes/sitemap.route');
 
 
 // --- MIDDLEWARE IMPORT ---
@@ -122,6 +123,7 @@ app.use('/api/notices', noticeRoutes);
 // 7. Exam, System & Leaves
 app.use('/api/coe', coeRoutes);
 app.use('/', systemRoutes);
+app.use('/', sitemapRoute);
 app.use('/api/leave', leaveRoutes);
 
 // --- SCHEDULED TASKS (Vercel Cron) ---
