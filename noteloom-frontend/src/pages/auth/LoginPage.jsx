@@ -14,6 +14,7 @@ import ThemeToggle from '@/components/common/ThemeToggle.jsx';
 import LogoWithFallback from '@/components/common/LogoWithFallback.jsx';
 import CollegeMismatchWarning from '@/pages/auth/CollegeMismatchWarning.jsx';
 import { useErrorPopup } from '@/context/ErrorPopupContext.jsx';
+import { trackEvent } from '@/utils/trackEvent';
 
 
 
@@ -562,6 +563,7 @@ const LoginPage = () => {
       const data = await response.json();
       
       if (response.ok) {
+        trackEvent('signup_completed', { role: role, collegeCode: storedCode, institute_slug: storedCode });
         // ✅ NEW: Capture the generated UID (e.g., 100190000001) so we can show it in Step 4
         if (data.uid) {
           sessionStorage.setItem('registeredUid', data.uid);
@@ -1601,7 +1603,14 @@ const LoginPage = () => {
 </button>
 
               <div className="text-center space-y-3 pt-4">
-                <button type="button" onClick={() => { setIsLogin(!isLogin); setCurrentStep(1); setErrors({}); }} className="text-sm font-medium text-blue-500 hover:text-blue-400 transition-colors">
+                <button type="button" onClick={() => { 
+                  if (isLogin) {
+                    trackEvent('signup_click');
+                  }
+                  setIsLogin(!isLogin); 
+                  setCurrentStep(1); 
+                  setErrors({}); 
+                }} className="text-sm font-medium text-blue-500 hover:text-blue-400 transition-colors">
                   {isLogin ? "Need an account? Sign up" : "Already have an account? Sign in"}
                 </button>
                 {isLogin && (

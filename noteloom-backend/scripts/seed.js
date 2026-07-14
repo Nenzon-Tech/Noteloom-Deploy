@@ -177,8 +177,10 @@ async function seedData() {
       { 
         type: 'college',
         subdomain: 'iem-kolkata',
+        slug: 'iem-kolkata',
         logoUrl: 'webdata/clg-logo/IEM-Kolkata.png',
-        collegeCode: '1001'
+        collegeCode: '1001',
+        isPublished: true
       },
       { upsert: true, new: true }
     );
@@ -189,7 +191,9 @@ async function seedData() {
       { 
         type: 'college',
         subdomain: 'sys-admin',
-        status: 'active'
+        slug: 'sys-admin',
+        status: 'active',
+        isPublished: false
       },
       { upsert: true, new: true }
     );

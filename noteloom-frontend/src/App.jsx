@@ -102,6 +102,11 @@ const LandingPage = lazy(() => import('@/pages/public/LandingPage.jsx'));
 const CollegeSelection = lazy(() => import('@/pages/auth/CollegeSelection.jsx'));
 const LoginPage = lazy(() => import('@/pages/auth/LoginPage.jsx'));
 const ITLoginPage = lazy(() => import('@/pages/auth/ITLoginPage.jsx'));
+const InstituteLandingPage = lazy(() => import('@/pages/public/InstituteLandingPage.jsx'));
+const PricingPage = lazy(() => import('@/pages/public/PricingPage.jsx'));
+const BlogIndexPage = lazy(() => import('@/pages/public/BlogIndexPage.jsx'));
+const BlogPostPage = lazy(() => import('@/pages/public/BlogPostPage.jsx'));
+const ComparisonPage = lazy(() => import('@/pages/public/ComparisonPage.jsx'));
 
 // IT Portal
 const ITAdminDashboard = lazy(() => import('@/pages/admin/ITAdminDashboard.jsx'));
@@ -1886,6 +1891,26 @@ const App = () => {
             <Route 
               path="/" 
               element={<LandingPage navigate={navigate} />} 
+            />
+            <Route 
+              path="/pricing" 
+              element={<PricingPage />} 
+            />
+            <Route 
+              path="/blog" 
+              element={<BlogIndexPage />} 
+            />
+            <Route 
+              path="/blog/:slug" 
+              element={<BlogPostPage />} 
+            />
+            <Route 
+              path="/comparison/google-classroom-notion" 
+              element={<ComparisonPage />} 
+            />
+            <Route 
+              path="/institutes/:slug" 
+              element={<InstituteLandingPage />} 
             />
             <Route 
               path="/college-selection" 
