@@ -8,8 +8,8 @@ import {
 } from 'lucide-react';
 import { useTheme } from '@/context/ThemeContext.jsx';
 import GlassHeader from '@/components/common/GlassHeader.jsx';
-
-
+import { useSessionManager } from '@/hooks/useSessionManager.js';
+import { useErrorPopup } from '@/context/ErrorPopupContext.jsx';
 
 const NoticeCard = ({ notice, currentUser, currentRole, refresh }) => {
   const { isDarkMode } = useTheme();
@@ -129,7 +129,7 @@ const NoticeCard = ({ notice, currentUser, currentRole, refresh }) => {
             <Heart className="w-5 h-5"/> <span>{notice.reactions?.length || 0}</span>
           </button>
           <button onClick={() => setShowComments(!showComments)} className={`flex items-center space-x-2 text-sm font-bold ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
-            <MessageSquare className="w-5 h-5"/> <span>{notice.comments?.length || 0}</span>
+            <MessageSquare className="w-5 h-5"/> <span>{notice.reactions?.length || 0}</span>
           </button>
         </div>
 
@@ -200,10 +200,12 @@ const NoticeCard = ({ notice, currentUser, currentRole, refresh }) => {
 const NoticeBoard = ({ type }) => {
   const { isDarkMode } = useTheme();
   const navigate = useNavigate();
+  const { user, profile, loading: sessionLoading } = useSessionManager();
+  const { triggerPopup } = useErrorPopup();
+  
   const [notices, setNotices] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showCreate, setShowCreate] = useState(false);
-  const [user, setUser] = useState(null);
   const [formData, setFormData] = useState({ title: "", content: "", department: "", videoConfig: "mini" });
   const [selectedFiles, setSelectedFiles] = useState([]);
 
@@ -213,27 +215,23 @@ const NoticeBoard = ({ type }) => {
       const res = await fetch(`${API_BASE}/api/notices/${type}`, { 
         headers: { 'Authorization': `Bearer ${localStorage.getItem('sessionToken')}` } 
       });
-      if (res.ok) setNotices(await res.json());
+      if (res.ok) {
+        setNotices(await res.json());
+      } else {
+        triggerPopup("Failed to load notice feed", "error");
+      }
     } catch (error) {
       console.error("Error fetching notices:", error);
+      triggerPopup("Network error loading notice feed", "error");
     }
     setLoading(false);
   };
 
   useEffect(() => {
-    const init = async () => {
-      try {
-        const res = await fetch(`${API_BASE}/session/info`, { 
-          headers: { 'Authorization': `Bearer ${localStorage.getItem('sessionToken')}` } 
-        });
-        if (res.ok) setUser(await res.json());
-        fetchNotices();
-      } catch (error) {
-        console.error("Session check failed", error);
-      }
-    };
-    init();
-  }, [type]);
+    if (!sessionLoading) {
+      fetchNotices();
+    }
+  }, [type, sessionLoading]);
 
   const handlePost = async (e) => {
     e.preventDefault();
@@ -271,7 +269,7 @@ const NoticeBoard = ({ type }) => {
             </button>
             <h1 className="text-xl font-bold capitalize">{type?.replace('_', ' ') || 'Notice'} Newsroom</h1>
           </div>
-          {((type === 'staff' && user?.role === 'college_admin') || (type === 'departmental' && user?.role === 'faculty')) && (
+          {((type === 'staff' && profile?.role === 'college_admin') || (type === 'departmental' && profile?.role === 'faculty')) && (
             <button onClick={() => setShowCreate(true)} className="bg-blue-600 text-white px-6 py-2.5 rounded-full text-sm font-bold shadow-lg flex items-center hover:bg-blue-700 transition-colors">
               <Plus className="w-4 h-4 mr-2"/> Create Post
             </button>
@@ -333,8 +331,8 @@ const NoticeBoard = ({ type }) => {
               <NoticeCard 
                 key={n._id} 
                 notice={n} 
-                currentUser={user?.user} 
-                currentRole={user?.role} 
+                currentUser={user} 
+                currentRole={profile?.role} 
                 refresh={fetchNotices} 
               />
             ))

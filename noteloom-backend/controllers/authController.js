@@ -206,6 +206,13 @@ exports.signin = async (req, res) => {
       expiresAt
     });
 
+    res.cookie('sessionToken', sessionToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      maxAge: 24 * 60 * 60 * 1000 // 24 hours
+    });
+
     res.json({
       message: 'Login successful',
       sessionToken,
@@ -225,8 +232,15 @@ exports.signin = async (req, res) => {
 // 6. SIGNOUT
 exports.signout = async (req, res) => {
   try {
-    const token = req.header('Authorization')?.replace('Bearer ', '');
+    const token = req.cookies?.sessionToken || req.header('Authorization')?.replace('Bearer ', '');
     if (token) await Session.findOneAndDelete({ sessionToken: token });
+    
+    res.clearCookie('sessionToken', {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax'
+    });
+    
     res.json({ message: 'Signed out successfully' });
   } catch (error) {
     res.status(500).json({ error: 'Signout failed' });
@@ -235,7 +249,7 @@ exports.signout = async (req, res) => {
 
 // 7. VERIFY TOKEN
 exports.verifyToken = async (req, res) => {
-  const token = req.header('Authorization')?.replace('Bearer ', '');
+  const token = req.cookies?.sessionToken || req.header('Authorization')?.replace('Bearer ', '');
   if (!token) return res.status(401).json({ error: 'No token' });
 
   try {

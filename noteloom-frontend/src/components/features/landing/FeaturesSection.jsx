@@ -138,7 +138,7 @@ const FeaturesSection = ({ activeCardIndex, setActiveCardIndex }) => {
         <motion.div 
           animate={{ x: ["-50%", "0%"] }}
           transition={{ duration: 40, repeat: Infinity, ease: "linear" }}
-          className={`flex items-center gap-32 w-[200%] transition-colors duration-700 ${isDarkMode ? 'text-indigo-400/[0.18]' : 'text-indigo-900/[0.04]'}`}
+          className={`flex items-center gap-32 w-[200%] transition-colors duration-700 ${isDarkMode ? 'text-indigo-400/[0.18]' : 'text-indigo-900/[0.15]'}`}
         >
           {[...Array(24)].map((_, i) => <GraduationCap key={`r1-${i}`} size={80} className="rotate-[15deg] shrink-0" />)}
         </motion.div>
@@ -147,7 +147,7 @@ const FeaturesSection = ({ activeCardIndex, setActiveCardIndex }) => {
         <motion.div 
           animate={{ x: ["0%", "-50%"] }}
           transition={{ duration: 50, repeat: Infinity, ease: "linear" }}
-          className={`flex items-center gap-40 w-[200%] transition-colors duration-700 ${isDarkMode ? 'text-purple-400/[0.18]' : 'text-purple-900/[0.04]'}`}
+          className={`flex items-center gap-40 w-[200%] transition-colors duration-700 ${isDarkMode ? 'text-purple-400/[0.18]' : 'text-purple-900/[0.15]'}`}
         >
           {[...Array(20)].map((_, i) => <Library key={`r2-${i}`} size={110} className="-rotate-[10deg] shrink-0" />)}
         </motion.div>
@@ -156,7 +156,7 @@ const FeaturesSection = ({ activeCardIndex, setActiveCardIndex }) => {
         <motion.div 
           animate={{ x: ["-50%", "0%"] }}
           transition={{ duration: 35, repeat: Infinity, ease: "linear" }}
-          className={`flex items-center gap-36 w-[200%] transition-colors duration-700 ${isDarkMode ? 'text-emerald-400/[0.18]' : 'text-emerald-900/[0.04]'}`}
+          className={`flex items-center gap-36 w-[200%] transition-colors duration-700 ${isDarkMode ? 'text-emerald-400/[0.18]' : 'text-emerald-900/[0.15]'}`}
         >
           {[...Array(24)].map((_, i) => <Sparkles key={`r3-${i}`} size={70} className="rotate-[30deg] shrink-0" />)}
         </motion.div>

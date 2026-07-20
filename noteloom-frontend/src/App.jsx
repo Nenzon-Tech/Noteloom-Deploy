@@ -88,6 +88,7 @@ import NoteloomAi from '@/components/features/ai/NoteloomAi';
 import axios from 'axios';
 import { ErrorPopupProvider } from '@/context/ErrorPopupContext.jsx';
 import SessionExpiredPage from '@/components/common/SessionExpiredPage.jsx';
+import CookieConsent from '@/components/common/CookieConsent';
 
 // Route Guards & Reusable Components
 import ProtectedRoute from '@/components/common/ProtectedRoute';
@@ -2050,8 +2051,16 @@ const App = () => {
             <Route 
               path="/dashboard/coe-manage" 
               element={
-                <ProtectedRoute allowedRoles={["college_admin"]}>
+                <ProtectedRoute allowedRoles={["college_admin", "faculty"]}>
                   <COEManager />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/dashboard/upload-marks" 
+              element={
+                <ProtectedRoute allowedRoles={["faculty", "college_admin"]}>
+                  <COEManager defaultModule="marks" />
                 </ProtectedRoute>
               } 
             />
@@ -2189,6 +2198,7 @@ const App = () => {
           </Routes>
         </Suspense>
         <NoteloomAi />
+        <CookieConsent />
       </ErrorPopupProvider>
     </ThemeProvider>
   );

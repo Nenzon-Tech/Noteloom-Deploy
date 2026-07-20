@@ -20,7 +20,7 @@ const { getSystemUserDTO, getStandardUserDTO } = require('../utils/userDTO');
 // 1. SESSION INFO ROUTE (Existing)
 // ==========================================
 router.get('/info', async (req, res) => {
-  const token = req.header('Authorization')?.replace('Bearer ', '');
+  const token = req.cookies?.sessionToken || req.header('Authorization')?.replace('Bearer ', '');
   if (!token) return res.status(401).json({ error: 'No token' });
 
   try {
@@ -91,7 +91,7 @@ router.get('/info', async (req, res) => {
 // 2. MENU FILTERING ROUTE (The Missing Link)
 // ==========================================
 router.get('/menu', async (req, res) => {
-  const token = req.header('Authorization')?.replace('Bearer ', '');
+  const token = req.cookies?.sessionToken || req.header('Authorization')?.replace('Bearer ', '');
   if (!token) return res.status(401).json({ error: 'No token' });
 
   try {

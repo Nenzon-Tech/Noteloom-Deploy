@@ -3,7 +3,7 @@ const Membership = require('../models/Membership');
 
 // 1. Middleware for Tenant Context (Students, Faculty, College Admin)
 const setTenantContext = async (req, res, next) => {
-  const sessionToken = req.headers.authorization?.replace('Bearer ', '');
+  const sessionToken = req.cookies?.sessionToken || req.headers.authorization?.replace('Bearer ', '');
   if (!sessionToken) {
     return res.status(401).json({ error: 'No session token provided' });
   }
@@ -67,7 +67,7 @@ const setTenantContext = async (req, res, next) => {
 
 // 2. Middleware for IT Admin Context (IT Portal)
 const setITContext = async (req, res, next) => {
-  const sessionToken = req.headers.authorization?.replace('Bearer ', '');
+  const sessionToken = req.cookies?.sessionToken || req.headers.authorization?.replace('Bearer ', '');
   if (!sessionToken) {
     return res.status(401).json({ error: 'No session token provided' });
   }

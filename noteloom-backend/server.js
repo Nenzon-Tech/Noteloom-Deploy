@@ -26,6 +26,8 @@ const attendanceRoutes = require('./routes/attendanceRoutes');
 const { sendOverdueBookEmail } = require('./services/emailService');
 
 
+const cookieParser = require('cookie-parser');
+
 // --- MIDDLEWARE IMPORT ---
 const { setTenantContext } = require('./middleware/authMiddleware');
 
@@ -35,6 +37,7 @@ connectDB(); // Connect to MongoDB
 
 // --- GLOBAL MIDDLEWARE ---
 app.use(express.json());
+app.use(cookieParser());
 
 // Secure Proxy Token Mapping: Restores the user session token forwarded by Vercel
 app.use((req, res, next) => {
@@ -44,7 +47,6 @@ app.use((req, res, next) => {
   }
   next();
 });
-
 const allowedOrigins = [
   'http://localhost:3000', 
   'http://localhost:5173', 

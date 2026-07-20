@@ -91,6 +91,13 @@ exports.login = async (req, res) => {
       expiresAt: new Date(Date.now() + 12 * 60 * 60 * 1000)
     });
 
+    res.cookie('sessionToken', sessionToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      maxAge: 12 * 60 * 60 * 1000 // 12 hours
+    });
+
     res.json({
       sessionToken,
       user: {
@@ -109,10 +116,17 @@ exports.login = async (req, res) => {
 
 exports.signout = async (req, res) => {
   try {
-    const token = req.header('Authorization')?.replace('Bearer ', '');
+    const token = req.cookies?.sessionToken || req.header('Authorization')?.replace('Bearer ', '');
     if (token) {
       await Session.findOneAndDelete({ sessionToken: token });
     }
+    
+    res.clearCookie('sessionToken', {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax'
+    });
+    
     res.json({ success: true, message: 'Signed out successfully' });
   } catch (error) {
     console.error('Signout Error:', error);

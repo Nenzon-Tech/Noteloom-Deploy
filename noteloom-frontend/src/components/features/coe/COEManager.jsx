@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { 
-  ArrowLeft, Wifi, ChevronRight, FileText, Trash2, Filter, Search, Download,
+  ArrowLeft, Wifi, ChevronRight, FileText, Trash2, Filter, Search, Download, Upload,
   File, Calendar, Eye, X, BookOpen, Layers, Users, ClipboardList, PenTool, Plus, CreditCard,
   Printer, UserCheck, Settings
 } from 'lucide-react';
@@ -312,22 +312,386 @@ const SessionManager = ({ isDarkMode }) => {
 };
 
 // --- B. MARKS MANAGER (Shared) ---
-const MarksManager = ({ isDarkMode }) => (
-    <div className={`p-10 rounded-3xl shadow-sm border text-center animate-fade-in ${isDarkMode ? 'bg-gray-800/50 border-gray-700' : 'bg-white border-gray-200'}`}>
-        <div className="max-w-2xl mx-auto">
-            <h3 className={`text-2xl font-bold mb-3 ${isDarkMode ? 'text-gray-100' : 'text-gray-900'}`}>Marks Entry & Publishing</h3>
-            <p className="text-sm opacity-60 mb-8">Faculty can enter internal marks here. Final publishing is reserved for the COE Admin.</p>
-            <div className={`group cursor-pointer border-2 border-dashed p-12 rounded-3xl my-10 transition-all ${isDarkMode ? 'bg-gray-900/30 border-gray-600 hover:border-gray-500' : 'bg-gray-50 border-gray-300 hover:border-blue-400'}`}>
-                <PenTool className="w-10 h-10 mx-auto mb-4 text-blue-500"/>
-                <p className="font-bold">Enter Marks Manually or Upload CSV</p>
+const MarksManager = ({ isDarkMode }) => {
+    const { triggerPopup } = useErrorPopup();
+    const [departments, setDepartments] = useState([]);
+    const [batches, setBatches] = useState([]);
+    const [students, setStudents] = useState([]);
+    const [subjects, setSubjects] = useState([]);
+    
+    const [selectedDept, setSelectedDept] = useState('');
+    const [selectedBatchId, setSelectedBatchId] = useState('');
+    const [selectedSubjectCode, setSelectedSubjectCode] = useState('');
+    
+    const [studentMarks, setStudentMarks] = useState({}); // { [studentId]: { marks: '', total: 100 } }
+    const [isLoading, setIsLoading] = useState(false);
+    const [isSubmitting, setIsSubmitting] = useState(false);
+
+    // Load departments on mount
+    useEffect(() => {
+        const fetchDepts = async () => {
+            const token = localStorage.getItem('sessionToken');
+            try {
+                const res = await axios.get(`${API_BASE}/api/departments`, { headers: { Authorization: `Bearer ${token}` } });
+                setDepartments(res.data);
+            } catch (err) { console.error(err); }
+        };
+        fetchDepts();
+    }, []);
+
+    const handleDeptChange = async (deptId) => {
+        setSelectedDept(deptId);
+        setSelectedBatchId('');
+        setSelectedSubjectCode('');
+        setStudents([]);
+        setSubjects([]);
+        setStudentMarks({});
+        
+        if (!deptId) return;
+
+        try {
+            const token = localStorage.getItem('sessionToken');
+            const subRes = await axios.get(`${API_BASE}/api/departments/${deptId}/subjects`, { headers: { Authorization: `Bearer ${token}` } });
+            setSubjects(subRes.data.filter(s => s.isActive));
+
+            const batchRes = await axios.get(`${API_BASE}/api/batches`, { headers: { Authorization: `Bearer ${token}` } });
+            setBatches(batchRes.data.filter(b => b.departmentId?._id === deptId && !b.isAlumni));
+        } catch (err) { 
+            triggerPopup("Error loading department data", "error");
+        }
+    };
+
+    const handleBatchChange = async (batchId) => {
+        setSelectedBatchId(batchId);
+        setSelectedSubjectCode('');
+        setStudents([]);
+        setStudentMarks({});
+        if (!batchId) return;
+
+        setIsLoading(true);
+        try {
+            const token = localStorage.getItem('sessionToken');
+            const res = await axios.get(`${API_BASE}/api/batches/${batchId}/students`, { headers: { Authorization: `Bearer ${token}` } });
+            setStudents(res.data);
+            
+            // Initialize empty marks
+            const initialMarks = {};
+            res.data.forEach(s => {
+                initialMarks[s._id] = { marks: '', total: 100 };
+            });
+            setStudentMarks(initialMarks);
+        } catch (err) { 
+            triggerPopup("Error loading batch students", "error");
+        }
+        setIsLoading(false);
+    };
+
+    const handleMarkChange = (studentId, field, value) => {
+        setStudentMarks(prev => ({
+            ...prev,
+            [studentId]: {
+                ...prev[studentId],
+                [field]: value === '' ? '' : Number(value)
+            }
+        }));
+    };
+
+    // CSV Template Download
+    const downloadCSVTemplate = () => {
+        if (students.length === 0) return;
+        let csvContent = "data:text/csv;charset=utf-8,Roll Number,Student Name,Marks Obtained,Total Marks\n";
+        students.forEach(s => {
+            csvContent += `"${s.rollNo || s.username || ''}","${s.name || ''}",,100\n`;
+        });
+        const encodedUri = encodeURI(csvContent);
+        const link = document.createElement("a");
+        link.setAttribute("href", encodedUri);
+        link.setAttribute("download", `Marks_Template_${selectedSubjectCode || 'Subject'}.csv`);
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    };
+
+    // CSV Parser
+    const handleCSVUpload = (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = (event) => {
+            const text = event.target.result;
+            const lines = text.split('\n');
+            const parsedResults = {};
+            
+            lines.forEach((line, index) => {
+                if (index === 0) return; // skip header
+                const parts = line.split(',');
+                if (parts.length >= 2) {
+                    const rollNo = parts[0].replace(/"/g, '').trim();
+                    const marksVal = parts[2] ? parts[2].replace(/"/g, '').trim() : '';
+                    const totalVal = parts[3] ? parts[3].replace(/"/g, '').trim() : '100';
+                    
+                    if (rollNo) {
+                        parsedResults[rollNo] = {
+                            marks: marksVal === '' ? '' : parseFloat(marksVal),
+                            total: isNaN(parseFloat(totalVal)) ? 100 : parseFloat(totalVal)
+                        };
+                    }
+                }
+            });
+
+            // Apply to students
+            setStudentMarks(prev => {
+                const updated = { ...prev };
+                students.forEach(s => {
+                    const studentRoll = s.rollNo || s.username;
+                    if (parsedResults[studentRoll]) {
+                        updated[s._id] = {
+                            marks: parsedResults[studentRoll].marks,
+                            total: parsedResults[studentRoll].total
+                        };
+                    }
+                });
+                return updated;
+            });
+            triggerPopup("CSV parsed successfully! Check the values below before saving.", "success");
+        };
+        reader.readAsText(file);
+    };
+
+    const handleSave = async () => {
+        if (!selectedBatchId || !selectedSubjectCode) return;
+        
+        // Validate marks
+        const results = [];
+        let hasError = false;
+        
+        for (const s of students) {
+            const entry = studentMarks[s._id];
+            if (!entry || entry.marks === '' || isNaN(entry.marks)) {
+                triggerPopup(`Please enter valid marks for ${s.name}`, "error");
+                hasError = true;
+                break;
+            }
+            if (entry.marks < 0 || entry.marks > entry.total) {
+                triggerPopup(`Marks for ${s.name} must be between 0 and ${entry.total}`, "error");
+                hasError = true;
+                break;
+            }
+            results.push({
+                rollNo: s.rollNo || s.username,
+                marks: entry.marks,
+                total: entry.total
+            });
+        }
+
+        if (hasError) return;
+
+        setIsSubmitting(true);
+        try {
+            const token = localStorage.getItem('sessionToken');
+            const batchObj = batches.find(b => b._id === selectedBatchId);
+            
+            const payload = {
+                batch: selectedBatchId,
+                semester: batchObj?.currentTerm || 1,
+                subjectCode: selectedSubjectCode,
+                results
+            };
+
+            await axios.post(`${API_BASE}/api/coe/upload-marks`, payload, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            
+            triggerPopup("Marks saved and uploaded successfully!", "success");
+        } catch (e) {
+            console.error(e);
+            triggerPopup(e.response?.data?.error || "Failed to upload marks", "error");
+        }
+        setIsSubmitting(false);
+    };
+
+    // Filter subjects by batch currentTerm
+    const selectedBatchObj = batches.find(b => b._id === selectedBatchId);
+    const filteredSubjects = subjects.filter(s => s.semester === (selectedBatchObj?.currentTerm || 0));
+
+    return (
+        <div className={`p-8 rounded-3xl shadow-sm border animate-fade-in ${isDarkMode ? 'bg-gray-800/50 border-gray-700 backdrop-blur-sm' : 'bg-white border-gray-200 shadow-gray-200/50'}`}>
+            <div className="flex items-center gap-3 mb-6">
+                <div className={`p-3 rounded-2xl ${isDarkMode ? 'bg-blue-500/20 text-blue-400' : 'bg-blue-50 text-blue-600'}`}><PenTool className="w-6 h-6"/></div>
+                <div>
+                    <h3 className="text-xl font-bold">Marks Entry</h3>
+                    <p className="text-sm opacity-60">Enter student marks manually or upload CSV. Draft marks must be published by COE Admin.</p>
+                </div>
             </div>
-            <div className="flex gap-4 justify-center">
-                <button className={`px-8 py-3 rounded-xl border font-bold ${isDarkMode ? 'border-gray-600 text-gray-300' : 'border-gray-300 text-gray-700'}`}>Download Template</button>
-                <button className="bg-blue-600 text-white px-8 py-3 rounded-xl font-bold shadow-lg hover:bg-blue-500">Save Draft</button>
+
+            {/* SELECTION ROW */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                {/* Department Dropdown */}
+                <div>
+                    <label className={`block text-xs font-bold uppercase tracking-wider mb-2 ml-1 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>Department</label>
+                    <div className="relative">
+                        <select 
+                            className={`w-full p-4 pr-10 rounded-xl border appearance-none outline-none font-medium cursor-pointer transition-all ${isDarkMode ? 'bg-gray-900/50 border-gray-600 text-white' : 'bg-gray-50 border-gray-200 text-gray-800'}`}
+                            value={selectedDept}
+                            onChange={(e) => handleDeptChange(e.target.value)}
+                        >
+                            <option value="">Select Department</option>
+                            {departments.map(d => <option key={d._id} value={d._id}>{d.name}</option>)}
+                        </select>
+                        <ChevronRight className="w-5 h-5 absolute right-4 top-1/2 -translate-y-1/2 opacity-50 rotate-90 pointer-events-none text-gray-500"/>
+                    </div>
+                </div>
+
+                {/* Batch Dropdown */}
+                <div>
+                    <label className={`block text-xs font-bold uppercase tracking-wider mb-2 ml-1 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>Batch</label>
+                    <div className="relative">
+                        <select 
+                            className={`w-full p-4 pr-10 rounded-xl border appearance-none outline-none font-medium cursor-pointer transition-all ${isDarkMode ? 'bg-gray-900/50 border-gray-600 text-white' : 'bg-gray-50 border-gray-200 text-gray-800'}`}
+                            value={selectedBatchId}
+                            onChange={(e) => handleBatchChange(e.target.value)}
+                            disabled={!selectedDept}
+                        >
+                            <option value="">Select Batch</option>
+                            {batches.map(b => (
+                                <option key={b._id} value={b._id}>
+                                    {b.batchName} (Term {b.currentTerm})
+                                </option>
+                            ))}
+                        </select>
+                        <ChevronRight className="w-5 h-5 absolute right-4 top-1/2 -translate-y-1/2 opacity-50 rotate-90 pointer-events-none text-gray-500"/>
+                    </div>
+                </div>
+
+                {/* Subject Dropdown */}
+                <div>
+                    <label className={`block text-xs font-bold uppercase tracking-wider mb-2 ml-1 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>Subject</label>
+                    <div className="relative">
+                        <select 
+                            className={`w-full p-4 pr-10 rounded-xl border appearance-none outline-none font-medium cursor-pointer transition-all ${isDarkMode ? 'bg-gray-900/50 border-gray-600 text-white' : 'bg-gray-50 border-gray-200 text-gray-800'}`}
+                            value={selectedSubjectCode}
+                            onChange={(e) => setSelectedSubjectCode(e.target.value)}
+                            disabled={!selectedBatchId}
+                        >
+                            <option value="">Select Subject</option>
+                            {filteredSubjects.map(s => (
+                                <option key={s._id} value={s.code}>
+                                    {s.code} - {s.name}
+                                </option>
+                            ))}
+                        </select>
+                        <ChevronRight className="w-5 h-5 absolute right-4 top-1/2 -translate-y-1/2 opacity-50 rotate-90 pointer-events-none text-gray-500"/>
+                    </div>
+                </div>
             </div>
+
+            {/* MARKS ENTRY AREA */}
+            {!selectedSubjectCode ? (
+                <div className="text-center py-20 opacity-50 border-2 border-dashed rounded-3xl">
+                    <PenTool className="w-16 h-16 mx-auto mb-4 text-gray-400 animate-pulse"/>
+                    <h4 className="text-lg font-bold">Configure Selections</h4>
+                    <p className="text-sm mt-1">Please select Department, Batch, and Subject to start entering marks.</p>
+                </div>
+            ) : isLoading ? (
+                <div className="text-center py-20 opacity-50">
+                    <div className="w-10 h-10 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+                    <p className="text-sm">Loading student records...</p>
+                </div>
+            ) : (
+                <div className="animate-fade-in space-y-6">
+                    {/* CSV Upload / Template Controls */}
+                    <div className={`p-5 rounded-2xl border flex flex-col sm:flex-row justify-between items-center gap-4 ${isDarkMode ? 'bg-gray-900/30 border-gray-700' : 'bg-gray-50 border-gray-200'}`}>
+                        <div>
+                            <h4 className="font-bold text-sm">CSV Operations</h4>
+                            <p className="text-xs opacity-60 mt-0.5">Upload a pre-filled CSV or download a blank template.</p>
+                        </div>
+                        <div className="flex items-center gap-3">
+                            <button 
+                                onClick={downloadCSVTemplate}
+                                className={`px-4 py-2 text-xs rounded-xl font-bold border transition-colors ${isDarkMode ? 'border-gray-600 hover:bg-gray-800 text-gray-300' : 'border-gray-300 hover:bg-white hover:shadow-sm text-gray-700'}`}
+                            >
+                                <Download size={14} className="inline mr-1" /> Template
+                            </button>
+                            <label className="cursor-pointer bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded-xl text-xs font-bold shadow-md transition-colors flex items-center gap-1">
+                                <Upload size={14} /> Upload CSV
+                                <input type="file" accept=".csv" className="hidden" onChange={handleCSVUpload} />
+                            </label>
+                        </div>
+                    </div>
+
+                    {/* Students Marks List */}
+                    <div className="border rounded-2xl overflow-hidden divide-y divide-gray-200 dark:divide-gray-700 dark:border-gray-700">
+                        <div className={`p-4 font-bold text-xs uppercase tracking-wider grid grid-cols-12 gap-4 ${isDarkMode ? 'bg-gray-900/50' : 'bg-gray-50'}`}>
+                            <span className="col-span-5 sm:col-span-6">Student details</span>
+                            <span className="col-span-4 sm:col-span-3 text-center">Marks Obtained</span>
+                            <span className="col-span-3 text-center">Total Marks</span>
+                        </div>
+
+                        {students.map(s => {
+                            const entry = studentMarks[s._id] || { marks: '', total: 100 };
+                            return (
+                                <div key={s._id} className="p-4 grid grid-cols-12 gap-4 items-center hover:bg-gray-50 dark:hover:bg-gray-800/30 transition-colors">
+                                    <div className="col-span-5 sm:col-span-6 min-w-0">
+                                        <h5 className="font-bold text-sm truncate">{s.name}</h5>
+                                        <p className="text-xs opacity-50 font-mono mt-0.5 truncate">{s.rollNo || s.username}</p>
+                                    </div>
+                                    <div className="col-span-4 sm:col-span-3 flex justify-center">
+                                        <input 
+                                            type="number" 
+                                            min="0"
+                                            max={entry.total}
+                                            placeholder="Marks"
+                                            value={entry.marks}
+                                            onChange={e => handleMarkChange(s._id, 'marks', e.target.value)}
+                                            className={`w-24 p-2 rounded-lg border text-center outline-none focus:ring-2 focus:ring-blue-500/50 font-bold ${isDarkMode ? 'bg-gray-800 border-gray-700 text-white' : 'bg-white border-gray-300 text-gray-800'}`}
+                                        />
+                                    </div>
+                                    <div className="col-span-3 flex justify-center">
+                                        <input 
+                                            type="number" 
+                                            min="1"
+                                            placeholder="Total"
+                                            value={entry.total}
+                                            onChange={e => handleMarkChange(s._id, 'total', e.target.value)}
+                                            className={`w-20 p-2 rounded-lg border text-center outline-none focus:ring-2 focus:ring-blue-500/50 font-medium ${isDarkMode ? 'bg-gray-800 border-gray-700 text-white' : 'bg-white border-gray-300 text-gray-800'}`}
+                                        />
+                                    </div>
+                                </div>
+                            );
+                        })}
+
+                        {students.length === 0 && (
+                            <div className="text-center py-10 opacity-50">No students enrolled in this batch.</div>
+                        )}
+                    </div>
+
+                    {/* Actions footer */}
+                    {students.length > 0 && (
+                        <div className="flex justify-end pt-4">
+                            <button 
+                                onClick={handleSave}
+                                disabled={isSubmitting}
+                                className={`bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-8 py-3.5 rounded-xl font-bold shadow-lg shadow-blue-500/30 hover:scale-[1.01] active:scale-95 transition-all flex items-center gap-2 ${isSubmitting ? 'opacity-70 cursor-wait' : ''}`}
+                            >
+                                {isSubmitting ? (
+                                    <>
+                                        <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                                        Uploading...
+                                    </>
+                                ) : (
+                                    <>
+                                        Save & Upload Marks
+                                        <ChevronRight size={18}/>
+                                    </>
+                                )}
+                            </button>
+                        </div>
+                    )}
+                </div>
+            )}
         </div>
-    </div>
-);
+    );
+};
 
 // ==========================================
 // REPLACE THE EXISTING SubjectAllocator COMPONENT
@@ -1314,7 +1678,7 @@ const QuestionBankManager = ({ data, setData, setPdfViewer, isDarkMode, user, pr
 // 2. MAIN PARENT COMPONENT
 // ==========================================
 
-const COEManager = () => {
+const COEManager = ({ defaultModule }) => {
   const navigate = useNavigate();
   const { isDarkMode } = useTheme();
   const { user, profile } = useSessionManager();
@@ -1325,7 +1689,7 @@ const COEManager = () => {
 
   // -- STATE --
   // **MODIFICATION 1: Default to 'allocation' for Faculty**
-  const [activeModule, setActiveModule] = useState(isFaculty ? 'allocation' : 'session'); 
+  const [activeModule, setActiveModule] = useState(defaultModule || (isFaculty ? 'allocation' : 'session')); 
 
   const [qbData, setQbData] = useState({ departments: [], subjects: [], files: [], filters: { dept: '', subject: '', year: new Date().getFullYear() }, isLoading: false, hasFetched: false });
   const [pdfViewer, setPdfViewer] = useState({ isOpen: false, url: null, title: '' });
