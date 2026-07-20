@@ -208,6 +208,11 @@ app.get('/health', (req, res) => {
   res.json({ status: 'Backend is working!', timestamp: new Date() });
 });
 
+// --- GOOGLE SITE VERIFICATION ---
+app.get('/google6836b51f5084ff38.html', (req, res) => {
+  res.send('google-site-verification: google6836b51f5084ff38.html');
+});
+
 // --- SCHEDULED TASKS ---
 // Cleanup expired email verification codes every hour
 // setInterval(async () => {
