@@ -19,10 +19,13 @@
         "foregroundImage": "./assets/android-icon-foreground.png"
       },
       "permissions": [
-        "CAMERA",
-        "READ_EXTERNAL_STORAGE",
-        "WRITE_EXTERNAL_STORAGE",
-        "USE_BIOMETRIC"
+        "android.permission.CAMERA",
+        "android.permission.READ_EXTERNAL_STORAGE",
+        "android.permission.WRITE_EXTERNAL_STORAGE",
+        "android.permission.USE_BIOMETRIC",
+        "android.permission.USE_FINGERPRINT",
+        "android.permission.RECORD_AUDIO",
+        "android.permission.INTERNET"
       ]
     },
     "plugins": [
@@ -41,13 +44,24 @@
         }
       ],
       "expo-sharing",
-      ["expo-image-picker", { "photosPermission": "NoteLoom accesses your photos to let you share them with your friends." }],
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "NoteLoom accesses your photos to let you share them with your friends."
+        }
+      ],
       "expo-document-picker",
       "expo-file-system"
     ],
     "web": {
       "bundler": "metro",
       "favicon": "./assets/favicon.png"
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "46a78645-0e68-4a05-b363-2dc5a7bfa5e2"
+      }
     }
   }
 }
