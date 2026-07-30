@@ -19,8 +19,9 @@ jobs:
       - run: npm install --legacy-peer-deps
       - name: Build APK via EAS
         run: |
-          npm install -g eas-cli
-          eas build -p android --profile preview --non-interactive --wait --output app-release.apk
+          npx eas-cli whoami 2>&1 || echo "whoami failed"
+          npx eas-cli build:list --json --limit=1 2>&1 || echo "build:list failed"
+          npx eas-cli build -p android --profile preview --non-interactive --wait --output app-release.apk 2>&1
         env:
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
       - name: Upload to Release
