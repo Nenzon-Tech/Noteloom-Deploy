@@ -80,6 +80,11 @@ app.use(cors({
       return callback(null, true);
     }
 
+    // MOBILE APP RULE: Allow Expo Go development and production mobile app custom schemes
+    if (/^(?:exp|noteloom):\/\//.test(origin)) {
+      return callback(null, true);
+    }
+
     // Block all other origins
     return callback(new Error('Blocked by CORS policy'), false);
   },
