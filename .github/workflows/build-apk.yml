@@ -17,11 +17,26 @@ jobs:
         with:
           node-version: 22
       - run: npm install --legacy-peer-deps
-      - name: Build APK via EAS
+      - name: Debug - check env & npm
+        shell: bash
         run: |
-          npx eas-cli whoami 2>&1 || echo "whoami failed"
-          npx eas-cli build:list --json --limit=1 2>&1 || echo "build:list failed"
-          npx eas-cli build -p android --profile preview --non-interactive --wait --output app-release.apk 2>&1
+          echo "EXPO_TOKEN length: ${#EXPO_TOKEN}"
+          echo "Node: $(node -v)"
+          echo "NPM: $(npm -v)"
+          npm install -g eas-cli 2>&1
+          echo "EAS CLI installed"
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+
+      - name: Debug - EAS whoami
+        shell: bash
+        run: eas whoami 2>&1; echo "exit code: $?"
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+
+      - name: Build APK
+        shell: bash
+        run: eas build -p android --profile preview --non-interactive --wait --output app-release.apk 2>&1
         env:
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
       - name: Upload to Release
