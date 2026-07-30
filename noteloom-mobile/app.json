@@ -1,0 +1,53 @@
+{
+  "expo": {
+    "name": "NoteLoom",
+    "slug": "noteloom",
+    "version": "1.0.0",
+    "scheme": "noteloom",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "automatic",
+    "ios": {
+      "supportsTablet": false,
+      "bundleIdentifier": "com.nenzontech.noteloom"
+    },
+    "android": {
+      "package": "com.nenzontech.noteloom",
+      "versionCode": 1,
+      "adaptiveIcon": {
+        "backgroundColor": "#1f2937",
+        "foregroundImage": "./assets/android-icon-foreground.png"
+      },
+      "permissions": [
+        "CAMERA",
+        "READ_EXTERNAL_STORAGE",
+        "WRITE_EXTERNAL_STORAGE",
+        "USE_BIOMETRIC"
+      ]
+    },
+    "plugins": [
+      "expo-router",
+      "expo-secure-store",
+      [
+        "expo-local-authentication",
+        {
+          "faceIDPermission": "Use Face ID to unlock NoteLoom"
+        }
+      ],
+      [
+        "expo-notifications",
+        {
+          "color": "#9333ea"
+        }
+      ],
+      "expo-sharing",
+      ["expo-image-picker", { "photosPermission": "NoteLoom accesses your photos to let you share them with your friends." }],
+      "expo-document-picker",
+      "expo-file-system"
+    ],
+    "web": {
+      "bundler": "metro",
+      "favicon": "./assets/favicon.png"
+    }
+  }
+}
