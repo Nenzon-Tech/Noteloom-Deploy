@@ -15,10 +15,8 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
-          cache: npm
-          cache-dependency-path: noteloom-mobile/package-lock.json
-      - run: npm ci
+          node-version: 22
+      - run: npm install --legacy-peer-deps
       - name: Build APK via EAS
         run: |
           npm install -g eas-cli
