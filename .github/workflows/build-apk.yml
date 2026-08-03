@@ -38,11 +38,24 @@ jobs:
 
       - name: Build APK
         shell: bash
-        run: 'eas build -p android --profile preview --non-interactive --wait --output app-release.apk 2>&1'
+        run: 'eas build -p android --profile preview --non-interactive --wait 2>&1'
         env:
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+
+      - name: Download APK artifact
+        shell: bash
+        run: |
+          BUILDS=$(eas build:list --platform android --limit 1 --non-interactive --json 2>/dev/null)
+          URL=$(node -e "const d=JSON.parse(process.argv[1]); const b=d.find(x=>x.status==='finished' && x.artifacts?.buildUrl); console.log(b?.artifacts?.buildUrl ?? '')" "$BUILDS")
+          if [ -z "$URL" ]; then echo "::error::No finished build artifact found"; exit 1; fi
+          curl -fL "$URL" -o app-release.apk
+          ls -la app-release.apk
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+
       - name: Upload to Release
+        if: startsWith(github.ref, 'refs/tags/')
         uses: softprops/action-gh-release@v2
         with:
-          files: noteloom-mobile/app-release.apk
+          files: app-release.apk
           generate_release_notes: true
