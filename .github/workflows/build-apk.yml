@@ -30,13 +30,13 @@ jobs:
 
       - name: Debug - EAS whoami
         shell: bash
-        run: eas whoami 2>&1; echo "exit code: $?"
+        run: 'eas whoami 2>&1; echo "exit code: $?"'
         env:
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
 
       - name: Build APK
         shell: bash
-        run: eas build -p android --profile preview --non-interactive --wait --output app-release.apk 2>&1
+        run: 'eas build -p android --profile preview --non-interactive --wait --output app-release.apk 2>&1'
         env:
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
       - name: Upload to Release
