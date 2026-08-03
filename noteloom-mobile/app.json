@@ -2,6 +2,7 @@
   "expo": {
     "name": "NoteLoom",
     "slug": "noteloom",
+    "owner": "noteloom",
     "version": "1.0.0",
     "scheme": "noteloom",
     "orientation": "portrait",
