@@ -36,6 +36,12 @@ jobs:
         env:
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
 
+      - name: Init EAS project
+        shell: bash
+        run: 'eas init --account nenzon-technology --non-interactive --force 2>&1'
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+
       - name: Build APK
         shell: bash
         run: 'eas build -p android --profile preview --non-interactive --wait 2>&1'
