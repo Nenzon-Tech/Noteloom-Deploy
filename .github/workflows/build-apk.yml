@@ -44,17 +44,16 @@ jobs:
 
       - name: Build APK
         shell: bash
-        run: 'eas build -p android --profile preview --non-interactive --wait 2>&1'
+        run: 'eas build -p android --profile preview --non-interactive --wait --json > build.json 2>build.log; cat build.log; echo "---"; cat build.json'
         env:
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
 
       - name: Download APK artifact
         shell: bash
         run: |
-          BUILDS=$(eas build:list --platform android --limit 1 --non-interactive --json 2>/dev/null)
-          URL=$(node -e "const d=JSON.parse(process.argv[1]); const b=d.find(x=>x.status==='finished' && x.artifacts?.buildUrl); console.log(b?.artifacts?.buildUrl ?? '')" "$BUILDS")
-          if [ -z "$URL" ]; then echo "::error::No finished build artifact found"; exit 1; fi
-          curl -fL "$URL" -o app-release.apk
+          URL=$(node -e "const d=JSON.parse(require('fs').readFileSync('build.json','utf8')); const b=Array.isArray(d)?d[0]:d; console.log(b.artifacts?.buildUrl ?? '')")
+          if [ -z "$URL" ]; then echo "::error::No buildUrl in build.json"; cat build.json; exit 1; fi
+          curl -fL -H "Authorization: Bearer $EXPO_TOKEN" "$URL" -o app-release.apk
           ls -la app-release.apk
         env:
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
