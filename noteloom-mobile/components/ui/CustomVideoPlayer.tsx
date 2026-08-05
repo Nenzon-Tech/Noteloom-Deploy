@@ -1,8 +1,9 @@
-import React, { useState, useRef } from 'react';
+import React, { useState } from 'react';
 import {
-  View, Text, TouchableOpacity, StyleSheet, Dimensions, StatusBar, ActivityIndicator,
+  View, Text, TouchableOpacity, StyleSheet, Dimensions, ActivityIndicator,
 } from 'react-native';
 import { Play, RotateCcw, Maximize } from 'lucide-react-native';
+import { NativeVideoPlayer } from './NativeVideoPlayer';
 
 interface CustomVideoPlayerProps {
   videoUrl: string;
@@ -13,24 +14,14 @@ interface CustomVideoPlayerProps {
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 const PLAYER_HEIGHT = (SCREEN_WIDTH * 9) / 16;
 
-let ExpoAVModule: any = null;
-try {
-  ExpoAVModule = require('expo-av');
-} catch {}
-
-const NativeVideoPlayer = ExpoAVModule
-  ? React.lazy(() => import('./NativeVideoPlayer').then((m) => ({ default: m.NativeVideoPlayer })))
-  : null;
-
 const WebViewVideoPlayer = React.lazy(() =>
   import('./WebViewVideoPlayer').then((m) => ({ default: m.WebViewVideoPlayer }))
 );
 
 export const CustomVideoPlayer = (props: CustomVideoPlayerProps) => {
   const [useFallback, setUseFallback] = useState(false);
-  const [loadError, setLoadError] = useState(false);
 
-  if (loadError || useFallback) {
+  if (useFallback) {
     return (
       <React.Suspense fallback={<LoadingFallback />}>
         <WebViewVideoPlayer {...props} />
@@ -38,17 +29,9 @@ export const CustomVideoPlayer = (props: CustomVideoPlayerProps) => {
     );
   }
 
-  if (NativeVideoPlayer) {
-    return (
-      <React.Suspense fallback={<LoadingFallback />}>
-        <NativeVideoPlayer {...props} onError={() => setUseFallback(true)} />
-      </React.Suspense>
-    );
-  }
-
   return (
     <React.Suspense fallback={<LoadingFallback />}>
-      <WebViewVideoPlayer {...props} />
+      <NativeVideoPlayer {...props} onError={() => setUseFallback(true)} />
     </React.Suspense>
   );
 };

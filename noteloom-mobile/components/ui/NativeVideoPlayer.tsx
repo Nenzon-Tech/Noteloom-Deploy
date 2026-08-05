@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import {
   View, Text, TouchableOpacity, StyleSheet, Dimensions, StatusBar,
 } from 'react-native';
-import { ResizeMode, Video, Audio } from 'expo-av';
+import { useVideoPlayer, VideoView } from 'expo-video';
 import {
   Play, Pause, RotateCcw, Volume2, VolumeX,
   Maximize, Minimize, Download, Loader2,
@@ -22,21 +22,48 @@ const PLAYER_HEIGHT = (SCREEN_WIDTH * 9) / 16;
 const SPEED_OPTIONS = [0.5, 0.75, 1, 1.25, 1.5, 2];
 
 export const NativeVideoPlayer = ({ videoUrl, title = 'Video', allowDownload = true, onError }: Props) => {
-  const videoRef = useRef<Video>(null);
-  const [status, setStatus] = useState<any>({});
+  const player = useVideoPlayer(videoUrl, (p) => {
+    p.loop = false;
+  });
   const [isPlaying, setIsPlaying] = useState(false);
+  const [isBuffering, setIsBuffering] = useState(false);
+  const [positionMs, setPositionMs] = useState(0);
+  const [durationMs, setDurationMs] = useState(0);
+  const [isMuted, setIsMuted] = useState(false);
   const [showControls, setShowControls] = useState(true);
   const [playbackSpeed, setPlaybackSpeed] = useState(1);
   const [showSpeedMenu, setShowSpeedMenu] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [isDownloading, setIsDownloading] = useState(false);
 
-  const { positionMillis = 0, durationMillis = 0, isBuffering, isMuted } = status;
-  const progress = durationMillis ? positionMillis / durationMillis : 0;
-
   useEffect(() => {
-    Audio.setAudioModeAsync({ playsInSilentModeIOS: true }).catch(() => {});
-  }, []);
+    player.timeUpdateEventInterval = 0.25;
+    const statusSub = player.addListener('statusChange', ({ status, error }) => {
+      setShowControls(true);
+      if (status === 'loading') setIsBuffering(true);
+      else setIsBuffering(false);
+      if (status === 'error' && error) {
+        onError?.();
+      }
+    });
+    const playingSub = player.addListener('playingChange', ({ isPlaying: playing }) => {
+      setIsPlaying(playing);
+    });
+    const timeSub = player.addListener('timeUpdate', ({ currentTime }) => {
+      setPositionMs(currentTime * 1000);
+    });
+    const sourceSub = player.addListener('sourceLoad', ({ duration }) => {
+      setDurationMs(duration * 1000);
+    });
+    return () => {
+      statusSub.remove();
+      playingSub.remove();
+      timeSub.remove();
+      sourceSub.remove();
+    };
+  }, [player, onError]);
+
+  const progress = durationMs ? positionMs / durationMs : 0;
 
   useEffect(() => {
     let timeout: ReturnType<typeof setTimeout>;
@@ -44,34 +71,29 @@ export const NativeVideoPlayer = ({ videoUrl, title = 'Video', allowDownload = t
     return () => clearTimeout(timeout);
   }, [isPlaying, showControls]);
 
-  const togglePlay = async () => {
-    if (!videoRef.current) return;
-    if (isPlaying) { await videoRef.current.pauseAsync(); } else { await videoRef.current.playAsync(); }
-    setIsPlaying(!isPlaying);
-    setShowControls(true);
+  const togglePlay = () => {
+    if (isPlaying) player.pause();
+    else player.play();
   };
 
-  const skip = async (seconds: number) => {
-    if (!videoRef.current) return;
-    const newPos = Math.max(0, Math.min((positionMillis || 0) + seconds * 1000, durationMillis || 0));
-    await videoRef.current.setPositionAsync(newPos);
+  const skip = (seconds: number) => {
+    player.seekBy(seconds);
   };
 
-  const onSeek = async (value: number) => {
-    if (!videoRef.current || !durationMillis) return;
-    await videoRef.current.setPositionAsync(value * durationMillis);
+  const onSeek = (value: number) => {
+    if (!durationMs) return;
+    player.currentTime = value * (durationMs / 1000);
   };
 
-  const changeSpeed = async (speed: number) => {
-    if (!videoRef.current) return;
-    await videoRef.current.setRateAsync(speed, true);
+  const changeSpeed = (speed: number) => {
+    player.playbackRate = speed;
     setPlaybackSpeed(speed);
     setShowSpeedMenu(false);
   };
 
-  const toggleMute = async () => {
-    if (!videoRef.current) return;
-    await videoRef.current.setIsMutedAsync(!isMuted);
+  const toggleMute = () => {
+    player.muted = !isMuted;
+    setIsMuted(!isMuted);
   };
 
   const handleDownload = async () => {
@@ -95,13 +117,12 @@ export const NativeVideoPlayer = ({ videoUrl, title = 'Video', allowDownload = t
     <View style={[styles.wrapper, isFullscreen && StyleSheet.absoluteFill]}>
       {isFullscreen && <StatusBar hidden />}
       <TouchableOpacity activeOpacity={1} onPress={() => setShowControls(!showControls)} style={[styles.playerContainer, isFullscreen && { height: '100%' }]}>
-        <Video
-          ref={videoRef}
-          source={{ uri: videoUrl }}
+        <VideoView
+          player={player}
           style={styles.video}
-          resizeMode={ResizeMode.CONTAIN}
-          onPlaybackStatusUpdate={(s) => { setStatus(s); if ('isPlaying' in s) setIsPlaying(s.isPlaying); }}
-          onError={onError}
+          contentFit="contain"
+          nativeControls={false}
+          surfaceType="surfaceView"
         />
 
         {isBuffering && (
@@ -127,7 +148,7 @@ export const NativeVideoPlayer = ({ videoUrl, title = 'Video', allowDownload = t
                 <TouchableOpacity onPress={() => skip(-10)} style={styles.btn}><RotateCcw size={18} color="white" /></TouchableOpacity>
                 <TouchableOpacity onPress={() => skip(10)} style={styles.btn}><View style={{ transform: [{ scaleX: -1 }] }}><RotateCcw size={18} color="white" /></View></TouchableOpacity>
                 <TouchableOpacity onPress={toggleMute} style={styles.btn}>{isMuted ? <VolumeX size={18} color="white" /> : <Volume2 size={18} color="white" />}</TouchableOpacity>
-                <Text style={styles.time}>{formatTime(positionMillis)} / {formatTime(durationMillis)}</Text>
+                <Text style={styles.time}>{formatTime(positionMs)} / {formatTime(durationMs)}</Text>
               </View>
               <View style={styles.right}>
                 <TouchableOpacity onPress={() => setShowSpeedMenu(!showSpeedMenu)} style={styles.speedBtn}><Text style={styles.speedText}>{playbackSpeed}x</Text></TouchableOpacity>

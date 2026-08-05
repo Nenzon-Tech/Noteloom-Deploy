@@ -3,7 +3,7 @@
     "name": "NoteLoom",
     "slug": "noteloom",
     "owner": "nenzon-technology",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "scheme": "noteloom",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -14,7 +14,7 @@
     },
     "android": {
       "package": "com.nenzontech.noteloom",
-      "versionCode": 1,
+      "versionCode": 2,
       "adaptiveIcon": {
         "backgroundColor": "#1f2937",
         "foregroundImage": "./assets/android-icon-foreground.png"
@@ -52,7 +52,8 @@
         }
       ],
       "expo-document-picker",
-      "expo-file-system"
+      "expo-file-system",
+      "expo-video"
     ],
     "web": {
       "bundler": "metro",
