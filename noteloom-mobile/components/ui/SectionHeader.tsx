@@ -21,10 +21,14 @@ export const SectionHeader = ({ title, action, onAction, style }: SectionHeaderP
       </View>
       {onAction ? (
         <Pressable onPress={onAction} hitSlop={8}>
-          <Text style={styles.link}>{action}</Text>
+          {typeof action === 'string' ? (
+            <Text style={[styles.link, { color: theme.violet }]}>{action}</Text>
+          ) : (
+            action
+          )}
         </Pressable>
       ) : (
-        action && <View>{action}</View>
+        action && (typeof action === 'string' ? <Text style={[styles.link, { color: theme.violet }]}>{action}</Text> : <View>{action}</View>)
       )}
     </View>
   );
@@ -40,7 +44,7 @@ const styles = StyleSheet.create({
   titleWrap: { flexDirection: 'row', alignItems: 'center', gap: 8 },
   swatch: { width: 8, height: 20, borderRadius: 4 },
   title: { fontSize: 16, fontWeight: '700', letterSpacing: -0.2 },
-  link: { fontSize: 12, fontWeight: '600', color: '#7c3aed' },
+  link: { fontSize: 12, fontWeight: '600' },
 });
 
 export default SectionHeader;

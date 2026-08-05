@@ -6,11 +6,14 @@ import { useTheme } from '../../contexts/ThemeContext';
 interface ScreenProps extends ScrollViewProps {
   children: ReactNode;
   contentContainerStyle?: object;
+  hasHeader?: boolean;
 }
 
-export const Screen = ({ children, refreshControl, contentContainerStyle, ...rest }: ScreenProps) => {
+export const Screen = ({ children, refreshControl, contentContainerStyle, hasHeader = true, ...rest }: ScreenProps) => {
   const { theme } = useTheme();
   const insets = useSafeAreaInsets();
+
+  const topPadding = hasHeader ? 0 : insets.top + 14;
 
   return (
     <View style={[styles.root, { backgroundColor: theme.bg }]}>
@@ -19,7 +22,7 @@ export const Screen = ({ children, refreshControl, contentContainerStyle, ...res
         showsVerticalScrollIndicator={false}
         contentContainerStyle={[
           styles.content,
-          { paddingTop: insets.top + 14, paddingBottom: insets.bottom + 100 },
+          { paddingTop: topPadding, paddingBottom: insets.bottom + 80 },
           contentContainerStyle,
         ]}
         refreshControl={refreshControl}

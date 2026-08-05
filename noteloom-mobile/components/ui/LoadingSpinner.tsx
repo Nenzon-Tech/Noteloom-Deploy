@@ -1,5 +1,5 @@
-import React from 'react';
-import { View, Text, ActivityIndicator, StyleSheet } from 'react-native';
+import React, { useEffect, useRef } from 'react';
+import { View, Text, ActivityIndicator, StyleSheet, Animated, Easing } from 'react-native';
 import { useTheme } from '../../contexts/ThemeContext';
 
 interface LoadingSpinnerProps {
@@ -8,22 +8,66 @@ interface LoadingSpinnerProps {
 }
 
 export const LoadingSpinner = ({ message = 'Loading...', fullScreen = true }: LoadingSpinnerProps) => {
-  const { isDarkMode } = useTheme();
+  const { isDarkMode, theme } = useTheme();
+  const rotateAnim = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    const animation = Animated.loop(
+      Animated.timing(rotateAnim, {
+        toValue: 1,
+        duration: 1800,
+        easing: Easing.linear,
+        useNativeDriver: true,
+      })
+    );
+    animation.start();
+    return () => animation.stop();
+  }, [rotateAnim]);
+
+  const spinClockwise = rotateAnim.interpolate({
+    inputRange: [0, 1],
+    outputRange: ['0deg', '360deg'],
+  });
+
+  const spinCounterClockwise = rotateAnim.interpolate({
+    inputRange: [0, 1],
+    outputRange: ['360deg', '0deg'],
+  });
 
   const content = (
     <View style={styles.container}>
       <View style={styles.spinnerContainer}>
-        <View style={[styles.outerRing, { borderColor: isDarkMode ? '#3b82f6' : '#3b82f6', borderLeftColor: 'transparent' }]} />
-        <View style={[styles.innerRing, { borderTopColor: isDarkMode ? '#a78bfa' : '#a78bfa', borderLeftColor: 'transparent', borderBottomColor: 'transparent', borderRightColor: 'transparent' }]} />
-        <ActivityIndicator size="small" color="#3b82f6" style={styles.centerIcon} />
+        <Animated.View
+          style={[
+            styles.outerRing,
+            {
+              borderColor: theme.violet,
+              borderLeftColor: 'transparent',
+              transform: [{ rotate: spinClockwise }],
+            },
+          ]}
+        />
+        <Animated.View
+          style={[
+            styles.innerRing,
+            {
+              borderTopColor: theme.blue,
+              borderLeftColor: 'transparent',
+              borderBottomColor: 'transparent',
+              borderRightColor: 'transparent',
+              transform: [{ rotate: spinCounterClockwise }],
+            },
+          ]}
+        />
+        <ActivityIndicator size="small" color={theme.violet} style={styles.centerIcon} />
       </View>
-      <Text style={[styles.message, { color: isDarkMode ? '#9ca3af' : '#6b7280' }]}>{message}</Text>
+      <Text style={[styles.message, { color: theme.faint }]}>{message}</Text>
     </View>
   );
 
   if (fullScreen) {
     return (
-      <View style={[styles.fullScreen, { backgroundColor: isDarkMode ? '#0f172a' : '#f8fafc' }]}>
+      <View style={[styles.fullScreen, { backgroundColor: theme.bg }]}>
         {content}
       </View>
     );

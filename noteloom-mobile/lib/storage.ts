@@ -15,3 +15,11 @@ export const removeSecure = async (key: string) => {
 export const saveSessionToken = (token: string) => setSecure('sessionToken', token);
 export const getSessionToken = () => getSecure('sessionToken');
 export const clearSessionToken = () => removeSecure('sessionToken');
+
+const BIOMETRIC_KEY = 'biometricEnabled';
+export const isBiometricEnabled = async (): Promise<boolean> => {
+  const value = await getSecure(BIOMETRIC_KEY);
+  return value === 'true';
+};
+export const setBiometricEnabled = (enabled: boolean) => setSecure(BIOMETRIC_KEY, String(enabled));
+export const clearBiometricEnabled = () => removeSecure(BIOMETRIC_KEY);

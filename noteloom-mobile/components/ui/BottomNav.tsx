@@ -5,6 +5,8 @@ import { usePathname, useRouter } from 'expo-router';
 import { Home, BookOpen, Bell, Bot, User, ClipboardCheck, Users, Server, Ticket, Shield, FileText } from 'lucide-react-native';
 import { useTheme } from '../../contexts/ThemeContext';
 
+import { useSession } from '../../hooks/useSession';
+
 export type TabRoute = {
   key: string;
   label: string;
@@ -44,20 +46,29 @@ export const ROLE_TABS: Record<string, TabRoute[]> = {
 };
 
 interface BottomNavProps {
-  role: string;
+  role?: string;
 }
 
 export const BottomNav = ({ role }: BottomNavProps) => {
   const { theme } = useTheme();
+  const { profile } = useSession();
   const insets = useSafeAreaInsets();
   const pathname = usePathname();
   const router = useRouter();
 
-  const tabs = ROLE_TABS[role] || ROLE_TABS.student;
+  const activeRole = role || profile?.role || 'student';
+  const tabs = ROLE_TABS[activeRole] || ROLE_TABS.student;
 
   const isActive = (route: string) => {
     const base = route.replace('/(app)', '');
-    return pathname === base || (base !== '/dashboard' && pathname.startsWith(base + '/'));
+    const current = (pathname || '').replace('/(app)', '');
+    if (base === '/dashboard') {
+      return current === '/dashboard' || current === '/' || current === '';
+    }
+    if (base === '/my-classes') {
+      return current === '/my-classes' || current.startsWith('/classroom/');
+    }
+    return current === base || current.startsWith(base + '/');
   };
 
   return (
@@ -106,7 +117,7 @@ const styles = StyleSheet.create({
     elevation: 10,
   },
   item: { flex: 1, alignItems: 'center', gap: 3, paddingVertical: 4, minHeight: 52, justifyContent: 'center' },
-  label: { fontSize: 10, fontWeight: '600', maxWidth: 60 },
+  label: { fontSize: 10, fontWeight: '600', maxWidth: 68, textAlign: 'center' },
   ind: { width: 26, height: 3, borderRadius: 2 },
 });
 

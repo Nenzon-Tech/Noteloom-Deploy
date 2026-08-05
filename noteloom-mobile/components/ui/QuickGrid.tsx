@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, Pressable, StyleSheet } from 'react-native';
+import { View, Text, Pressable, StyleSheet, useWindowDimensions } from 'react-native';
 import { useTheme } from '../../contexts/ThemeContext';
 import { Gradient } from './Gradient';
 import { Gradient as GradientTuple } from '../../lib/theme';
@@ -15,16 +15,21 @@ interface QuickItem {
 
 export const QuickGrid = ({ items, columns = 4 }: { items: QuickItem[]; columns?: number }) => {
   const { theme } = useTheme();
+  const { width: screenWidth } = useWindowDimensions();
+
+  const gap = 10;
+  const horizontalPadding = 32; // 16px on each side of Screen
+  const itemWidth = Math.floor((screenWidth - horizontalPadding - gap * (columns - 1)) / columns);
 
   return (
-    <View style={[styles.grid, { gap: 10 }]}>
+    <View style={[styles.grid, { gap }]}>
       {items.map(item => (
         <Pressable
           key={item.key}
           onPress={item.onPress}
           style={({ pressed }) => [
             styles.cell,
-            { width: `${100 / columns - (columns > 4 ? 0.7 : 0.7)}%`, backgroundColor: theme.surface, borderColor: theme.border, ...theme.elev1 },
+            { width: itemWidth, backgroundColor: theme.surface, borderColor: theme.border, ...theme.elev1 },
             pressed && { transform: [{ scale: 0.94 }] },
           ]}
         >

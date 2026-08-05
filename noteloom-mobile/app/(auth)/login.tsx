@@ -1,17 +1,19 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, TouchableOpacity, ScrollView, ActivityIndicator, StyleSheet, KeyboardAvoidingView, Platform, Pressable } from 'react-native';
 import { useRouter, useLocalSearchParams } from 'expo-router';
-import { Mail, Lock, Eye, EyeOff, ArrowLeft, Building2, GraduationCap, Users, ShieldCheck, Settings, CheckCircle, AlertCircle, ChevronRight } from 'lucide-react-native';
+import { Mail, Lock, Eye, EyeOff, ArrowLeft, Building2, GraduationCap, Users, ShieldCheck, Settings, CheckCircle, AlertCircle, ChevronRight, Fingerprint } from 'lucide-react-native';
 import { useTheme } from '../../contexts/ThemeContext';
 import { useErrorPopup } from '../../contexts/ErrorPopupContext';
 import { useSession } from '../../hooks/useSession';
 import { API_BASE } from '../../lib/constants';
-import { authHeaders } from '../../lib/api';
+import { authHeaders, publicHeaders } from '../../lib/api';
+import { isBiometricEnabled, removeSecure } from '../../lib/storage';
 import { Gradient } from '../../components/ui/Gradient';
-import { GradButton } from '../../components/ui/GradButton';
+import { GradButton, GhostButton } from '../../components/ui/GradButton';
 import { RoleCard } from '../../components/ui/RoleCard';
 import { Field } from '../../components/ui/Field';
 import OtpInput from '../../components/ui/OtpInput';
+import { BiometricSetupModal } from '../../components/ui/BiometricSetupModal';
 
 interface RoleDef {
   value: string;
@@ -37,11 +39,15 @@ const CREDS: Record<string, string> = {
 export default function LoginPage() {
   const { theme } = useTheme();
   const { triggerPopup } = useErrorPopup();
-  const { login } = useSession();
+  const { login, validateSession, authenticateWithBiometrics } = useSession();
   const router = useRouter();
   const params = useLocalSearchParams();
 
   const codeParam = params.code as string || '';
+
+  const [biometricEnabled, setBiometricEnabledState] = useState(false);
+  const [showBiometricSetup, setShowBiometricSetup] = useState(false);
+  const [biometricRestoring, setBiometricRestoring] = useState(false);
 
   const [selectedCollege, setSelectedCollege] = useState('');
   const [email, setEmail] = useState('');
@@ -69,6 +75,15 @@ export default function LoginPage() {
   });
 
   useEffect(() => {
+    let mounted = true;
+    (async () => {
+      const enabled = await isBiometricEnabled();
+      if (mounted) setBiometricEnabledState(enabled);
+    })();
+    return () => { mounted = false; };
+  }, []);
+
+  useEffect(() => {
     if (!codeParam) {
       setCollegeNotFoundError(true);
       setIsFetchingCollege(false);
@@ -76,7 +91,7 @@ export default function LoginPage() {
     }
     const fetchCollege = async () => {
       try {
-        const response = await fetch(`${API_BASE}/api/auth/public/colleges`, { headers: authHeaders() });
+        const response = await fetch(`${API_BASE}/api/auth/public/colleges`, { headers: publicHeaders() });
         if (response.ok) {
           const allColleges = await response.json();
           const current = allColleges.find((c: any) => c.collegeCode === codeParam);
@@ -142,7 +157,7 @@ export default function LoginPage() {
     try {
       setLoading(true);
       const response = await fetch(`${API_BASE}/api/auth/send-verification`, {
-        method: 'POST', headers: authHeaders(),
+        method: 'POST', headers: publicHeaders(),
         body: JSON.stringify({ email, name: fullName, collegeName: selectedCollege, role, type: 'signup' }),
       });
       const data = await response.json();
@@ -166,7 +181,7 @@ export default function LoginPage() {
       else Object.assign(payload, { adminLevel: formData.adminLevel, responsibilities: formData.responsibilities, employeeId: formData.employeeId });
 
       const response = await fetch(`${API_BASE}/api/auth/role-signup`, {
-        method: 'POST', headers: authHeaders(),
+        method: 'POST', headers: publicHeaders(),
         body: JSON.stringify(payload),
       });
       const data = await response.json();
@@ -185,7 +200,7 @@ export default function LoginPage() {
     try {
       setLoading(true);
       const verifyResponse = await fetch(`${API_BASE}/api/auth/verify-email`, {
-        method: 'POST', headers: authHeaders(),
+        method: 'POST', headers: publicHeaders(),
         body: JSON.stringify({ email, code: verificationCode.join(''), type: 'signup' }),
       });
       if (verifyResponse.ok) {
@@ -211,18 +226,50 @@ export default function LoginPage() {
     setLoading(true);
     try {
       const response = await fetch(`${API_BASE}/api/auth/signin`, {
-        method: 'POST', headers: authHeaders(),
+        method: 'POST', headers: publicHeaders(),
         body: JSON.stringify({ email: email.trim(), password, collegeCode: codeParam, role }),
       });
       const data = await response.json();
       setLoading(false);
       if (response.ok) {
         await login(data.sessionToken);
-        router.replace('/(app)');
+        const enabled = await isBiometricEnabled();
+        setBiometricEnabledState(enabled);
+        if (!enabled) {
+          setShowBiometricSetup(true);
+        } else {
+          router.replace('/(app)/dashboard');
+        }
       } else {
         triggerPopup(data.error || 'Invalid credentials', 'error');
       }
     } catch { setLoading(false); triggerPopup('Server not responding', 'error'); }
+  };
+
+  const handleFingerprint = async () => {
+    if (biometricRestoring) return;
+    setBiometricRestoring(true);
+    try {
+      const ok = await authenticateWithBiometrics();
+      if (!ok) return;
+      const valid = await validateSession();
+      if (valid) {
+        router.replace('/(app)');
+      } else {
+        triggerPopup('Session expired. Please sign in again.', 'error');
+      }
+    } catch {
+      triggerPopup('Biometrics unavailable. Please sign in manually.', 'error');
+    } finally {
+      setBiometricRestoring(false);
+    }
+  };
+
+  const handleChooseCollege = async () => {
+    await removeSecure('sessionToken');
+    await removeSecure('selectedCollegeCode');
+    await removeSecure('selectedCollegeName');
+    router.replace('/college-selection');
   };
 
   const pickRole = (r: string) => {
@@ -367,8 +414,9 @@ export default function LoginPage() {
   }
 
   return (
-    <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={[styles.container, { backgroundColor: theme.bg }]}>
-      <ScrollView contentContainerStyle={styles.scrollContent} keyboardShouldPersistTaps="handled">
+    <>
+      <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={[styles.container, { backgroundColor: theme.bg }]}>
+        <ScrollView contentContainerStyle={styles.scrollContent} keyboardShouldPersistTaps="handled">
         <View style={styles.backRow}>
           <Pressable onPress={() => router.back()} style={[styles.backBtn, { backgroundColor: theme.surface2, borderColor: theme.border }]}>
             <ArrowLeft size={18} color={theme.fg} />
@@ -426,6 +474,30 @@ export default function LoginPage() {
             <GradButton fullWidth size="lg" onPress={handleLogin} loading={loading} icon={<Mail size={17} color="#fff" />}>
               Sign In
             </GradButton>
+
+            {biometricEnabled && (
+              <View style={styles.bioArea}>
+                <View style={styles.bioDivider}>
+                  <View style={[styles.bioLine, { backgroundColor: theme.border }]} />
+                  <Text style={[styles.bioOr, { color: theme.faint }]}>OR</Text>
+                  <View style={[styles.bioLine, { backgroundColor: theme.border }]} />
+                </View>
+                <GradButton
+                  fullWidth
+                  size="lg"
+                  colors={['#0ea5e9', '#7c3aed']}
+                  onPress={handleFingerprint}
+                  loading={biometricRestoring}
+                  icon={<Fingerprint size={17} color="#fff" />}
+                >
+                  {biometricRestoring ? 'Verifying…' : 'Sign in with Fingerprint'}
+                </GradButton>
+                <Pressable onPress={handleChooseCollege} style={styles.chooseCollege}>
+                  <Text style={[styles.chooseText, { color: theme.blue }]}>Choose a different college</Text>
+                </Pressable>
+              </View>
+            )}
+
             <Text style={[styles.authSec, { color: theme.faint }]}>Protected by Institute of Engineering & Management · Demo build 1.0</Text>
           </View>
         ) : (
@@ -445,7 +517,7 @@ export default function LoginPage() {
             {errors.general && <Text style={styles.errorText}>{errors.general}</Text>}
             {renderSignupStep()}
 
-            <TouchableOpacity onPress={nextStep} disabled={loading} style={[styles.submitBtn, { opacity: loading ? 0.7 : 1 }]} activeOpacity={0.8}>
+            <TouchableOpacity onPress={nextStep} disabled={loading} style={[styles.submitBtn, { backgroundColor: theme.violet, opacity: loading ? 0.7 : 1 }]} activeOpacity={0.8}>
               {loading ? (
                 <ActivityIndicator color="white" />
               ) : (
@@ -466,7 +538,20 @@ export default function LoginPage() {
           </Text>
         </TouchableOpacity>
       </ScrollView>
-    </KeyboardAvoidingView>
+      </KeyboardAvoidingView>
+      <BiometricSetupModal
+        visible={showBiometricSetup}
+        onAccept={async () => {
+          setBiometricEnabledState(true);
+          setShowBiometricSetup(false);
+          router.replace('/(app)/dashboard');
+        }}
+        onDecline={() => {
+          setShowBiometricSetup(false);
+          router.replace('/(app)/dashboard');
+        }}
+      />
+    </>
   );
 }
 
@@ -517,6 +602,12 @@ const styles = StyleSheet.create({
   eye: { position: 'absolute', right: 12, top: 15, zIndex: 2 },
   roleGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginVertical: 16 },
   authSec: { fontSize: 10, textAlign: 'center', marginTop: 18 },
+  bioArea: { marginTop: 14 },
+  bioDivider: { flexDirection: 'row', alignItems: 'center', gap: 10, marginBottom: 14 },
+  bioLine: { flex: 1, height: 1 },
+  bioOr: { fontSize: 11, fontWeight: '600' },
+  chooseCollege: { alignItems: 'center', marginTop: 14 },
+  chooseText: { fontSize: 13, fontWeight: '600' },
   formContainer: { borderRadius: 20, borderWidth: 1, padding: 20 },
   formHeader: { marginBottom: 20 },
   backBtnSmall: { alignSelf: 'flex-start', padding: 6, marginBottom: 8 },
@@ -543,7 +634,7 @@ const styles = StyleSheet.create({
   successTitle: { fontSize: 22, fontWeight: '700' },
   successSubtitle: { fontSize: 14, textAlign: 'center' },
   uidText: { fontSize: 13, fontFamily: 'monospace', paddingHorizontal: 16, paddingVertical: 6, borderRadius: 8, overflow: 'hidden' },
-  submitBtn: { backgroundColor: '#7c3aed', paddingVertical: 15, borderRadius: 12, alignItems: 'center', justifyContent: 'center', marginTop: 8 },
+  submitBtn: { paddingVertical: 15, borderRadius: 12, alignItems: 'center', justifyContent: 'center', marginTop: 8 },
   submitRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
   submitText: { color: 'white', fontSize: 15, fontWeight: '600' },
   switchBtn: { alignItems: 'center', marginTop: 18 },

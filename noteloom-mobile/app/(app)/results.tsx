@@ -10,6 +10,7 @@ import { StatGrid } from '../../components/ui/StatGrid';
 import { RecRow } from '../../components/ui/RecRow';
 import { Pill } from '../../components/ui/Pill';
 import { EmptyState } from '../../components/ui/EmptyState';
+import { BottomNav } from '../../components/ui/BottomNav';
 
 interface ExamRecord {
   _id: string;
@@ -84,6 +85,7 @@ export default function Results() {
           })
         )}
       </Screen>
+      <BottomNav />
     </View>
   );
 }

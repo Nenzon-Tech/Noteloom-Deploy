@@ -66,7 +66,7 @@ export const Wordmark = ({ dark }: { dark?: boolean }) => {
   const { theme } = useTheme();
   return (
     <View style={styles.wordmark}>
-      <Text style={[styles.wordmarkText, { color: theme.indigo }]}>Note Loom</Text>
+      <Text style={[styles.wordmarkText, { color: theme.indigo }]}>NoteLoom</Text>
       <View style={styles.beta}>
         <Text style={styles.betaText}>Beta</Text>
       </View>

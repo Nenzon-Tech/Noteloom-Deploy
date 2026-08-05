@@ -61,7 +61,7 @@ export default function AdminHome() {
         <AprRow initial="P" name="Priyanka Saha" meta="New admission · CSE · 2h ago" />
         <AprRow initial="N" name="Dr. N. Bhattacharya" meta="New faculty · ME Dept · 1d ago" gradient={['#3b82f6', '#6366f1']} />
       </Screen>
-      <BottomNav role="college_admin" />
+      <BottomNav />
     </View>
   );
 }

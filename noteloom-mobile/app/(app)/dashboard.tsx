@@ -16,15 +16,19 @@ import { LearnCard } from '../../components/ui/LearnCard';
 import { NoticeMini } from '../../components/ui/NoticeMini';
 import { SectionHeader } from '../../components/ui/SectionHeader';
 import { BottomNav } from '../../components/ui/BottomNav';
+import * as LocalAuthentication from 'expo-local-authentication';
+import { BiometricSetupModal } from '../../components/ui/BiometricSetupModal';
+import { getSecure, setSecure, setBiometricEnabled } from '../../lib/storage';
 
 export default function StudentHome() {
   const { theme, isDarkMode, toggleTheme } = useTheme();
-  const { user, profile, logout } = useSession();
+  const { user, profile, logout, authenticateWithBiometrics } = useSession();
   const router = useRouter();
   const [refreshing, setRefreshing] = useState(false);
   const [notices, setNotices] = useState<any[]>([]);
   const [classes, setClasses] = useState<any[]>([]);
   const [loaded, setLoaded] = useState(false);
+  const [showBiometricModal, setShowBiometricModal] = useState(false);
 
   const loadData = useCallback(async () => {
     try {
@@ -39,6 +43,41 @@ export default function StudentHome() {
   }, []);
 
   useEffect(() => { loadData(); }, [loadData]);
+
+  useEffect(() => {
+    const checkBiometrics = async () => {
+      try {
+        const asked = await getSecure('biometricSetupAsked');
+        if (asked === 'true') return;
+
+        const hasHardware = await LocalAuthentication.hasHardwareAsync();
+        const isEnrolled = await LocalAuthentication.isEnrolledAsync();
+        if (hasHardware && isEnrolled) {
+          setTimeout(() => setShowBiometricModal(true), 1200);
+        } else {
+          await setSecure('biometricSetupAsked', 'true');
+        }
+      } catch {}
+    };
+    checkBiometrics();
+  }, []);
+
+  const handleAcceptBiometrics = async () => {
+    setShowBiometricModal(false);
+    await setSecure('biometricSetupAsked', 'true');
+    const success = await authenticateWithBiometrics();
+    if (success) {
+      await setBiometricEnabled(true);
+    } else {
+      await setBiometricEnabled(false);
+    }
+  };
+
+  const handleDeclineBiometrics = async () => {
+    setShowBiometricModal(false);
+    await setSecure('biometricSetupAsked', 'true');
+    await setBiometricEnabled(false);
+  };
 
   const onRefresh = useCallback(async () => { setRefreshing(true); await loadData(); setRefreshing(false); }, [loadData]);
 
@@ -100,7 +139,7 @@ export default function StudentHome() {
         )}
 
         <SectionHeader title="Continue Learning" action="See all" onAction={() => router.push('/(app)/my-classes')} />
-        <LearnCard {...learnItem} onPress={() => router.push(`/(app)/classroom/${classes[0]?._id || ''}` as any)} />
+        <LearnCard {...learnItem} onPress={() => { if (classes[0]?._id) { router.push(`/(app)/classroom/${classes[0]._id}` as any); } else { router.push('/(app)/my-classes'); } }} />
 
         <SectionHeader title="Latest Notices" action="See all" onAction={() => router.push('/(app)/notice-board')} />
         {notices.length === 0 ? (
@@ -139,7 +178,12 @@ export default function StudentHome() {
           ))
         )}
       </Screen>
-      <BottomNav role="student" />
+      <BottomNav />
+      <BiometricSetupModal
+        visible={showBiometricModal}
+        onAccept={handleAcceptBiometrics}
+        onDecline={handleDeclineBiometrics}
+      />
     </View>
   );
 }

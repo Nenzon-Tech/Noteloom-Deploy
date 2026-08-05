@@ -8,18 +8,39 @@ const api = axios.create({
   headers: { 'Content-Type': 'application/json' },
 });
 
-export const authHeaders = (token?: string | null): Record<string, string> => {
+// The backend Space is private. Every request must carry the HF access token
+// in the Authorization header so Hugging Face lets the request through.
+// The app's own session token is sent in x-user-token and the backend maps it
+// to its internal authorization (see server.js proxy-token middleware).
+const gateHeaders = (): Record<string, string> => {
   const headers: Record<string, string> = { 'Content-Type': 'application/json' };
-  if (HF_TOKEN) headers.Authorization = `Bearer ${HF_TOKEN}`;
-  if (token) headers['x-user-token'] = `Bearer ${token}`;
+  if (HF_TOKEN) {
+    headers.Authorization = `Bearer ${HF_TOKEN}`;
+  }
   return headers;
 };
+
+export const publicHeaders = (): Record<string, string> => gateHeaders();
+
+export const authHeaders = (token?: string | null): Record<string, string> => {
+  const headers: Record<string, string> = gateHeaders();
+  if (token) {
+    headers['x-user-token'] = token;
+  }
+  return headers;
+};
+
+export const hfHeaders = (): Record<string, string> => gateHeaders();
 
 api.interceptors.request.use(async (config) => {
   try {
     const token = await getSecure('sessionToken');
-    if (HF_TOKEN) config.headers.Authorization = `Bearer ${HF_TOKEN}`;
-    if (token) config.headers['x-user-token'] = `Bearer ${token}`;
+    if (HF_TOKEN) {
+      config.headers.Authorization = `Bearer ${HF_TOKEN}`;
+    }
+    if (token) {
+      config.headers['x-user-token'] = token;
+    }
   } catch {}
   return config;
 });
@@ -45,3 +66,4 @@ export const apiPost = async <T>(url: string, data?: any): Promise<T> => {
 };
 
 export default api;
+

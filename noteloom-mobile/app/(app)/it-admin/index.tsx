@@ -95,7 +95,7 @@ export default function ITAdminHome() {
           />
         ))}
       </Screen>
-      <BottomNav role="it" />
+      <BottomNav />
     </View>
   );
 }

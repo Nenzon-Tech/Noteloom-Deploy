@@ -43,6 +43,7 @@ export const GradButton = ({
       disabled={loading}
       style={({ pressed }) => [
         { alignSelf: fullWidth ? 'stretch' : 'auto' },
+        fullWidth && styles.full,
         pressed && { transform: [{ scale: 0.96 }] },
       ]}
     >

@@ -11,6 +11,7 @@ import { FilterChips } from '../../components/ui/FilterChips';
 import { RecRow } from '../../components/ui/RecRow';
 import { EmptyState } from '../../components/ui/EmptyState';
 import { Gradient } from '../../components/ui/Gradient';
+import { BottomNav } from '../../components/ui/BottomNav';
 
 type Day = 'mon' | 'tue' | 'wed' | 'thu' | 'fri';
 
@@ -82,6 +83,7 @@ export default function Timetable() {
           })
         )}
       </Screen>
+      <BottomNav />
     </View>
   );
 }

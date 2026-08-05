@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import * as LocalAuthentication from 'expo-local-authentication';
 import api, { authHeaders } from '../lib/api';
-import { saveSessionToken, getSessionToken, clearSessionToken } from '../lib/storage';
+import { saveSessionToken, getSessionToken, clearSessionToken, removeSecure } from '../lib/storage';
 import { API_BASE } from '../lib/constants';
 
 interface User {
@@ -126,6 +126,8 @@ export function useSession() {
       }
     } catch {}
     await clearSessionToken();
+    await removeSecure('selectedCollegeCode');
+    await removeSecure('selectedCollegeName');
     setUser(null);
     setProfile(null);
     setMenuItems([]);

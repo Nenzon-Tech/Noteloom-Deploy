@@ -9,6 +9,7 @@ import { Screen } from '../../components/ui/Screen';
 import { SubHeader } from '../../components/ui/SubHeader';
 import { FilterChips } from '../../components/ui/FilterChips';
 import { EmptyState } from '../../components/ui/EmptyState';
+import { BottomNav } from '../../components/ui/BottomNav';
 
 type LibFilter = 'all' | 'syllabus' | 'pyqs' | 'slides' | 'notes';
 
@@ -17,6 +18,7 @@ export default function LibraryScreen() {
   const [books, setBooks] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<LibFilter>('all');
+  const [downloadingId, setDownloadingId] = useState<string | null>(null);
 
   useEffect(() => { fetchBooks(); }, []);
 
@@ -32,6 +34,13 @@ export default function LibraryScreen() {
     finally { setLoading(false); }
   };
 
+  const handleDownload = (doc: any) => {
+    setDownloadingId(doc._id);
+    setTimeout(() => {
+      setDownloadingId(null);
+    }, 1200);
+  };
+
   const fallback = [
     { _id: 'l1', title: 'DBMS Syllabus — Sem 6', category: 'syllabus', meta: 'PDF · 3rd Year CSE', icon: <FileText size={19} color="#7c3aed" />, bg: 'rgba(124,58,237,0.1)' },
     { _id: 'l2', title: 'PYQ 2020–2025 · Computer Networks', category: 'pyqs', meta: 'PDF · Combined', icon: <GraduationCap size={19} color="#2563eb" />, bg: 'rgba(59,130,246,0.1)' },
@@ -43,7 +52,7 @@ export default function LibraryScreen() {
 
   return (
     <View style={{ flex: 1, backgroundColor: theme.bg }}>
-      <Screen>
+      <Screen hasHeader={false}>
         <SubHeader title="Digital Library" />
         <FilterChips<LibFilter>
           options={[{ value: 'all', label: 'All' }, { value: 'syllabus', label: 'Syllabus' }, { value: 'pyqs', label: 'PYQs' }, { value: 'slides', label: 'Slides' }, { value: 'notes', label: 'Notes' }]}
@@ -62,13 +71,25 @@ export default function LibraryScreen() {
                 <Text style={[styles.title, { color: theme.fg }]} numberOfLines={1}>{d.title}</Text>
                 <Text style={[styles.meta, { color: theme.faint }]}>{d.meta}</Text>
               </View>
-              <Pressable style={[styles.dl, { backgroundColor: theme.surface2, borderColor: theme.border }]}>
-                <Download size={15} color={theme.violet} />
+              <Pressable
+                onPress={() => handleDownload(d)}
+                style={({ pressed }) => [
+                  styles.dl,
+                  { backgroundColor: theme.surface2, borderColor: theme.border },
+                  pressed && { transform: [{ scale: 0.92 }] },
+                ]}
+              >
+                {downloadingId === d._id ? (
+                  <ActivityIndicator size="small" color={theme.violet} />
+                ) : (
+                  <Download size={15} color={theme.violet} />
+                )}
               </Pressable>
             </View>
           ))
         )}
       </Screen>
+      <BottomNav />
     </View>
   );
 }

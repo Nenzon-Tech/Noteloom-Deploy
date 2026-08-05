@@ -110,7 +110,7 @@ export default function AIChat() {
                   style={[
                     styles.bubble,
                     msg.sender === 'user'
-                      ? [styles.userBubble, { backgroundColor: '#9333ea' }]
+                      ? [styles.userBubble, { backgroundColor: theme.violet }]
                       : [styles.botBubble, { backgroundColor: theme.surface, borderColor: theme.border }],
                   ]}
                 >
@@ -136,13 +136,13 @@ export default function AIChat() {
               onSubmitEditing={sendMessage}
               style={[styles.input, { color: theme.fg }]}
             />
-            <Pressable onPress={sendMessage} style={({ pressed }) => [styles.sendBtn, pressed && { transform: [{ scale: 0.9 }] }]}>
+            <Pressable onPress={sendMessage} style={({ pressed }) => [styles.sendBtn, { backgroundColor: theme.violet }, pressed && { transform: [{ scale: 0.9 }] }]}>
               {loading ? <ActivityIndicator color="#fff" size="small" /> : <Send size={17} color="#fff" />}
             </Pressable>
           </View>
         </Screen>
       </KeyboardAvoidingView>
-      <BottomNav role="student" />
+      <BottomNav />
     </View>
   );
 }
@@ -161,7 +161,7 @@ const styles = StyleSheet.create({
   tools: { flexDirection: 'row', gap: 8, marginBottom: 10 },
   tool: { flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6, paddingVertical: 11, borderRadius: 12, borderWidth: 1 },
   toolText: { fontSize: 11, fontWeight: '600' },
-  chatScroll: { flexGrow: 0, maxHeight: 340 },
+  chatScroll: { flex: 1, minHeight: 200, marginBottom: 10 },
   bubbleWrap: { flexDirection: 'row', marginBottom: 12 },
   userWrap: { justifyContent: 'flex-end' },
   botWrap: { justifyContent: 'flex-start' },
@@ -174,5 +174,5 @@ const styles = StyleSheet.create({
   typingDot: { width: 6, height: 6, borderRadius: 3, opacity: 0.4 },
   inputBar: { flexDirection: 'row', alignItems: 'center', gap: 8, padding: 8, borderRadius: 16, borderWidth: 1, marginTop: 'auto', ...{ shadowColor: 'rgba(17,24,39,0.08)', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.5, shadowRadius: 6, elevation: 2 } },
   input: { flex: 1, fontSize: 13, paddingVertical: 6, paddingHorizontal: 4 },
-  sendBtn: { width: 42, height: 42, borderRadius: 12, backgroundColor: '#9333ea', alignItems: 'center', justifyContent: 'center', shadowColor: 'rgba(147,51,234,0.4)', shadowOffset: { width: 0, height: 6 }, shadowOpacity: 0.8, shadowRadius: 14, elevation: 3 },
+  sendBtn: { width: 42, height: 42, borderRadius: 12, alignItems: 'center', justifyContent: 'center', shadowColor: 'rgba(147,51,234,0.4)', shadowOffset: { width: 0, height: 6 }, shadowOpacity: 0.8, shadowRadius: 14, elevation: 3 },
 });

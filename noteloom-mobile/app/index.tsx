@@ -13,9 +13,53 @@ export default function Index() {
   const router = useRouter();
   const [checking, setChecking] = useState(true);
 
+  const INITIAL_SPLASH_MS = 1600;
+
+  const pulseAnim = useRef(new Animated.Value(0.4)).current;
+  const dot1Anim = useRef(new Animated.Value(0.3)).current;
+  const dot2Anim = useRef(new Animated.Value(0.3)).current;
+  const dot3Anim = useRef(new Animated.Value(0.3)).current;
+
   const brandAnim = useRef(new Animated.Value(0)).current;
   const featsAnim = useRef(new Animated.Value(0)).current;
   const footAnim = useRef(new Animated.Value(0)).current;
+
+  // Pulse animation for splash halo ring
+  useEffect(() => {
+    if (!checking) return;
+    const pulseLoop = Animated.loop(
+      Animated.sequence([
+        Animated.timing(pulseAnim, { toValue: 1, duration: 1000, easing: Easing.ease, useNativeDriver: true }),
+        Animated.timing(pulseAnim, { toValue: 0.4, duration: 1000, easing: Easing.ease, useNativeDriver: true }),
+      ])
+    );
+    pulseLoop.start();
+
+    // 3-dot breathing indicator
+    const createDotLoop = (anim: Animated.Value, delay: number) =>
+      Animated.loop(
+        Animated.sequence([
+          Animated.delay(delay),
+          Animated.timing(anim, { toValue: 1, duration: 400, useNativeDriver: true }),
+          Animated.timing(anim, { toValue: 0.3, duration: 400, useNativeDriver: true }),
+        ])
+      );
+
+    const l1 = createDotLoop(dot1Anim, 0);
+    const l2 = createDotLoop(dot2Anim, 200);
+    const l3 = createDotLoop(dot3Anim, 400);
+
+    l1.start();
+    l2.start();
+    l3.start();
+
+    return () => {
+      pulseLoop.stop();
+      l1.stop();
+      l2.stop();
+      l3.stop();
+    };
+  }, [checking]);
 
   useEffect(() => {
     if (checking) return;
@@ -32,16 +76,19 @@ export default function Index() {
     transform: [{ translateY: anim.interpolate({ inputRange: [0, 1], outputRange: [10, 0] }) }],
   });
 
-
   useEffect(() => {
     const init = async () => {
-      const token = await getSessionToken();
-      const collegeCode = await getSecure('selectedCollegeCode');
+      const minSplash = new Promise(resolve => setTimeout(resolve, INITIAL_SPLASH_MS));
+      const [token, collegeCode] = await Promise.all([
+        getSessionToken(),
+        getSecure('selectedCollegeCode'),
+      ]);
+      await minSplash;
 
       if (token) {
-        router.replace('/(app)');
+        router.replace('/(app)/dashboard');
       } else if (collegeCode) {
-        router.replace('/(auth)/login');
+        router.replace(`/(auth)/login?code=${encodeURIComponent(collegeCode)}`);
       } else {
         setChecking(false);
       }
@@ -52,10 +99,38 @@ export default function Index() {
   if (checking) {
     return (
       <View style={[styles.splashContainer, { backgroundColor: theme.bg }]}>
-        <Gradient colors={theme.gradientBrand} angle={135} radius={20} style={styles.splashLogo}>
-          <GraduationCap size={34} color="#fff" />
-        </Gradient>
-        <Text style={[styles.splashText, { color: theme.muted }]}>Starting NoteLoom...</Text>
+        <View style={styles.splashScene}>
+          <Animated.View
+            style={[
+              styles.splashRing,
+              {
+                borderColor: theme.violet,
+                opacity: pulseAnim,
+                transform: [
+                  {
+                    scale: pulseAnim.interpolate({
+                      inputRange: [0.4, 1],
+                      outputRange: [0.95, 1.15],
+                    }),
+                  },
+                ],
+              },
+            ]}
+          />
+          <Gradient colors={theme.gradientBrand} angle={140} radius={28} style={styles.splashLogo}>
+            <GraduationCap size={44} color="#fff" />
+          </Gradient>
+        </View>
+
+        <Text style={[styles.splashTitle, { color: theme.fg }]}>NoteLoom</Text>
+
+        <View style={styles.dotsRow}>
+          <Animated.View style={[styles.dot, { backgroundColor: theme.violet, opacity: dot1Anim }]} />
+          <Animated.View style={[styles.dot, { backgroundColor: theme.indigo, opacity: dot2Anim }]} />
+          <Animated.View style={[styles.dot, { backgroundColor: theme.blue, opacity: dot3Anim }]} />
+        </View>
+
+        <Text style={[styles.splashText, { color: theme.faint }]}>Your campus, connected.</Text>
       </View>
     );
   }
@@ -69,12 +144,12 @@ export default function Index() {
   return (
     <View style={[styles.container, { backgroundColor: theme.bg }]}>
       <StatusBar barStyle={isDarkMode ? 'light-content' : 'dark-content'} />
-      <Screen>
+      <Screen hasHeader={false}>
         <Animated.View style={[styles.brand, fadeUp(brandAnim)]}>
-          <Gradient colors={theme.gradientBrand} angle={135} radius={20} style={styles.logo}>
-            <GraduationCap size={30} color="#fff" />
+          <Gradient colors={theme.gradientBrand} angle={135} radius={26} style={styles.logo}>
+            <GraduationCap size={40} color="#fff" />
           </Gradient>
-          <Text style={[styles.brandName, { color: theme.fg }]}>NoteLoom</Text>
+          <Text style={[styles.brandName, { color: theme.indigo }]}>NoteLoom</Text>
           <Text style={[styles.tagline, { color: theme.muted }]}>
             The all-in-one campus app for notes, attendance, notices, and AI help — trusted by 1,000+ colleges.
           </Text>
@@ -107,12 +182,40 @@ export default function Index() {
 
 const styles = StyleSheet.create({
   container: { flex: 1 },
-  splashContainer: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: 16 },
-  splashLogo: { width: 64, height: 64, alignItems: 'center', justifyContent: 'center' },
-  splashText: { fontSize: 14, fontWeight: '600', letterSpacing: 0.5 },
+  splashContainer: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: 14 },
+  splashScene: { position: 'relative', width: 140, height: 140, alignItems: 'center', justifyContent: 'center', marginBottom: 6 },
+  splashRing: { position: 'absolute', width: 130, height: 130, borderRadius: 65, borderWidth: 2 },
+  splashLogo: {
+    width: 86,
+    height: 86,
+    borderRadius: 26,
+    alignItems: 'center',
+    justifyContent: 'center',
+    shadowColor: 'rgba(124,58,237,0.5)',
+    shadowOffset: { width: 0, height: 14 },
+    shadowOpacity: 0.7,
+    shadowRadius: 28,
+    elevation: 12,
+  },
+  splashTitle: { fontSize: 32, fontWeight: '800', letterSpacing: -0.8 },
+  dotsRow: { flexDirection: 'row', alignItems: 'center', gap: 6, marginVertical: 4 },
+  dot: { width: 7, height: 7, borderRadius: 3.5 },
+  splashText: { fontSize: 13, fontWeight: '600', letterSpacing: 0.3 },
   brand: { alignItems: 'center', marginTop: 40, marginBottom: 28 },
-  logo: { width: 72, height: 72, borderRadius: 20, alignItems: 'center', justifyContent: 'center', marginBottom: 18, shadowColor: 'rgba(124,58,237,0.5)', shadowOffset: { width: 0, height: 12 }, shadowOpacity: 0.7, shadowRadius: 24, elevation: 10 },
-  brandName: { fontSize: 30, fontWeight: '800', letterSpacing: -0.8 },
+  logo: {
+    width: 86,
+    height: 86,
+    borderRadius: 26,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 18,
+    shadowColor: 'rgba(124,58,237,0.5)',
+    shadowOffset: { width: 0, height: 12 },
+    shadowOpacity: 0.7,
+    shadowRadius: 24,
+    elevation: 10,
+  },
+  brandName: { fontSize: 32, fontWeight: '800', letterSpacing: -0.8 },
   tagline: { fontSize: 13, lineHeight: 20, textAlign: 'center', marginTop: 10, paddingHorizontal: 18 },
   feats: { gap: 10, marginBottom: 28 },
   feat: { flexDirection: 'row', alignItems: 'center', gap: 12, padding: 14, borderRadius: 16, borderWidth: 1 },

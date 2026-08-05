@@ -12,6 +12,7 @@ import { FilterChips } from '../../components/ui/FilterChips';
 import { RecRow } from '../../components/ui/RecRow';
 import { Pill } from '../../components/ui/Pill';
 import { EmptyState } from '../../components/ui/EmptyState';
+import { BottomNav } from '../../components/ui/BottomNav';
 
 type Month = 'all' | 'jan' | 'feb' | 'mar';
 
@@ -59,7 +60,7 @@ export default function Attendance() {
 
   return (
     <View style={{ flex: 1, backgroundColor: theme.bg }}>
-      <Screen>
+      <Screen hasHeader={false}>
         <SubHeader title="My Attendance" />
         <StatGrid
           items={[
@@ -90,12 +91,13 @@ export default function Attendance() {
                 title={r.subject}
                 subtitle={`${new Date(r.date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} · Lecture`}
                 subtitleIcon={<Clock size={11} color={theme.faint} />}
-                trailing={<Pill color={meta.color}><Text style={{ color: meta.color === 'green' ? theme.emerald : meta.color === 'red' ? theme.red : theme.amberText }}>{meta.label}</Text></Pill>}
+                trailing={<Pill color={meta.color}>{meta.label}</Pill>}
               />
             );
           })
         )}
       </Screen>
+      <BottomNav />
     </View>
   );
 }

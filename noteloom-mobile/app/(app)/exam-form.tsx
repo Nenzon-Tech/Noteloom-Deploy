@@ -9,6 +9,7 @@ import { Screen } from '../../components/ui/Screen';
 import { SubHeader } from '../../components/ui/SubHeader';
 import { SrvRow } from '../../components/ui/SrvRow';
 import { EmptyState } from '../../components/ui/EmptyState';
+import { BottomNav } from '../../components/ui/BottomNav';
 
 export default function ExamForm() {
   const { theme } = useTheme();
@@ -53,6 +54,7 @@ export default function ExamForm() {
           ))
         )}
       </Screen>
+      <BottomNav />
     </View>
   );
 }

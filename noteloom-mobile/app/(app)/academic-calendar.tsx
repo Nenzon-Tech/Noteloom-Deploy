@@ -12,6 +12,7 @@ import { SectionHeader } from '../../components/ui/SectionHeader';
 import { SrvRow } from '../../components/ui/SrvRow';
 import { Pill } from '../../components/ui/Pill';
 import { EmptyState } from '../../components/ui/EmptyState';
+import { BottomNav } from '../../components/ui/BottomNav';
 
 export default function AcademicCalendar() {
   const { theme } = useTheme();
@@ -95,6 +96,7 @@ export default function AcademicCalendar() {
           })
         )}
       </Screen>
+      <BottomNav />
     </View>
   );
 }

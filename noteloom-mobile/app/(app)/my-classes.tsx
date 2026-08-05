@@ -64,10 +64,6 @@ export default function MyClasses() {
           title="My Courses"
           subtitle={showingDemo ? '6 subjects · Sem 6' : `${classes.length} subjects · Sem 6`}
         />
-        <View style={styles.titleBlock}>
-          <Text style={[styles.title, { color: theme.fg }]}>My Courses</Text>
-          <Text style={[styles.subtitle, { color: theme.faint }]}>{showingDemo ? '6 subjects · Sem 6' : `${classes.length} subjects · Sem 6`}</Text>
-        </View>
         <SearchBar value={query} onChangeText={setQuery} placeholder="Search courses..." />
 
         {loading ? (
@@ -88,7 +84,7 @@ export default function MyClasses() {
               ]}
               footerLeft={
                 <GradButton size="sm" style={styles.ghostBtn} onPress={() => router.push(`/(app)/classroom/${cls._id}` as any)}>
-                  <Text style={{ fontSize: 11, fontWeight: '600' }}>View Members</Text>
+                  <Text style={{ fontSize: 11, fontWeight: '600', color: theme.muted }}>Class Details</Text>
                 </GradButton>
               }
               footerRight={
@@ -105,7 +101,7 @@ export default function MyClasses() {
           ))
         )}
       </Screen>
-      <BottomNav role="student" />
+      <BottomNav />
     </View>
   );
 }

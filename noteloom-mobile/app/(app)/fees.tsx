@@ -10,6 +10,7 @@ import { SubHeader } from '../../components/ui/SubHeader';
 import { StatGrid } from '../../components/ui/StatGrid';
 import { SrvRow } from '../../components/ui/SrvRow';
 import { EmptyState } from '../../components/ui/EmptyState';
+import { BottomNav } from '../../components/ui/BottomNav';
 
 interface FeeRecord {
   _id: string;
@@ -87,6 +88,7 @@ export default function Fees() {
           })
         )}
       </Screen>
+      <BottomNav />
     </View>
   );
 }

@@ -9,6 +9,7 @@ import { Screen } from '../../components/ui/Screen';
 import { SubHeader } from '../../components/ui/SubHeader';
 import { GradButton } from '../../components/ui/GradButton';
 import { Gradient } from '../../components/ui/Gradient';
+import { BottomNav } from '../../components/ui/BottomNav';
 
 export default function SemesterFeedback() {
   const { theme } = useTheme();
@@ -107,6 +108,7 @@ export default function SemesterFeedback() {
           </>
         )}
       </Screen>
+      <BottomNav />
     </View>
   );
 }

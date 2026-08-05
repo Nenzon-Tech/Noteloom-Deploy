@@ -74,10 +74,6 @@ export default function NoticeBoard() {
     <View style={{ flex: 1, backgroundColor: theme.bg }}>
       <Screen>
         <GHeader title="Notice Board" subtitle="Campus updates & announcements" />
-        <View style={styles.titleBlock}>
-          <Text style={[styles.title, { color: theme.fg }]}>Notice Board</Text>
-          <Text style={[styles.subtitle, { color: theme.faint }]}>Campus updates & announcements</Text>
-        </View>
         <FilterChips<Filter> options={chips} value={filter} onChange={setFilter} />
 
         {loading ? (
@@ -101,7 +97,7 @@ export default function NoticeBoard() {
           ))
         )}
       </Screen>
-      <BottomNav role="student" />
+      <BottomNav />
     </View>
   );
 }

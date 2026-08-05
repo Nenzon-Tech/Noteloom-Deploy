@@ -5,6 +5,7 @@ import { ArrowLeft } from 'lucide-react-native';
 import { useTheme } from '../contexts/ThemeContext';
 import { API_BASE } from '../lib/constants';
 import { authHeaders } from '../lib/api';
+import { publicHeaders } from '../lib/api';
 import { setSecure } from '../lib/storage';
 import { Screen } from '../components/ui/Screen';
 import { GHeader } from '../components/ui/GHeader';
@@ -33,7 +34,7 @@ export default function CollegeSelection() {
   const fetchColleges = async () => {
     try {
       setLoading(true);
-      const response = await fetch(`${API_BASE}/it-auth/public/colleges`, { headers: authHeaders() });
+      const response = await fetch(`${API_BASE}/api/auth/public/colleges`, { headers: publicHeaders() });
       if (response.ok) {
         const data = await response.json();
         const formatted = data.map((c: any) => ({
@@ -68,7 +69,7 @@ export default function CollegeSelection() {
           </Pressable>
         }
       />
-      <Screen>
+      <Screen contentContainerStyle={{ paddingTop: 18 }}>
         <SearchBar value={searchTerm} onChangeText={setSearchTerm} placeholder="Search your college…" />
         {loading ? (
           <ActivityIndicator color={theme.violet} style={{ paddingVertical: 60 }} />

@@ -5,7 +5,7 @@ import { Bell, Library, ShieldCheck, Moon, Sun, MessageCircle, LogOut, ChevronRi
 import { useTheme } from '../../contexts/ThemeContext';
 import { useSession } from '../../hooks/useSession';
 import { Screen } from '../../components/ui/Screen';
-import { GHeader } from '../../components/ui/GHeader';
+import { GHeader, Wordmark } from '../../components/ui/GHeader';
 import { Gradient } from '../../components/ui/Gradient';
 import { SectionHeader } from '../../components/ui/SectionHeader';
 import { ListCard, LRow } from '../../components/ui/ListCard';
@@ -28,8 +28,7 @@ export default function Profile() {
     <View style={{ flex: 1, backgroundColor: theme.bg }}>
       <Screen>
         <GHeader
-          avatar={<View />}
-          title=""
+          left={<Wordmark />}
         />
         <Gradient colors={theme.gradientHero} angle={135} radius={20} style={styles.cover}>
           <View style={styles.coverDecor} />
@@ -79,7 +78,7 @@ export default function Profile() {
         </ListCard>
         <Text style={[styles.version, { color: theme.faint }]}>NoteLoom App v1.0.1 · Beta</Text>
       </Screen>
-      <BottomNav role="student" />
+      <BottomNav />
     </View>
   );
 }

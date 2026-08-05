@@ -61,7 +61,7 @@ export const HeroCard = ({ title, ringPercent, big, small, label, trend, chips, 
           </SvgText>
         </Svg>
         <View style={styles.meta}>
-          <Text style={styles.big}>{big}<Text style={styles.small}>/{small}</Text></Text>
+          <Text style={styles.big}>{big}<Text style={styles.small}>{small.startsWith('/') ? small : `/${small}`}</Text></Text>
           <Text style={styles.lbl}>{label}</Text>
           {trend && (
             <View style={styles.trendPill}>

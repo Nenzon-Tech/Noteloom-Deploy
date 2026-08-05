@@ -97,7 +97,7 @@ export default function FacultyHome() {
           />
         ))}
       </Screen>
-      <BottomNav role="faculty" />
+      <BottomNav />
     </View>
   );
 }

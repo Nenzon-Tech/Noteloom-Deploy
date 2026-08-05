@@ -34,7 +34,7 @@ export const NoticeMini = ({ avatar, title, meta, body, likes, comments, onPress
 
 const styles = StyleSheet.create({
   card: { borderRadius: 16, borderWidth: 1, padding: 14, flexDirection: 'row', gap: 12, marginBottom: 10 },
-  avatarBox: { transform: [{ rotate: '-3deg' }] },
+  avatarBox: { flexShrink: 0 },
   body: { flex: 1, minWidth: 0 },
   title: { fontSize: 13, fontWeight: '700' },
   meta: { fontSize: 9, fontWeight: '600', textTransform: 'uppercase', letterSpacing: 0.8, marginVertical: 2 },
