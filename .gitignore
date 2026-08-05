@@ -32,6 +32,22 @@ build/
 .next/
 **/out/
 
+# Expo / React Native mobile app
+.expo/
+.expo-shared/
+web-build/
+*.jks
+*.keystore
+*.p8
+*.p12
+*.key
+*.mobileprovision
+*.tsbuildinfo
+expo-env.d.ts
+nativewind-env.d.ts
+/eas.json.local
+**/eas.json.local
+
 # OS files
 .DS_Store
 Thumbs.db

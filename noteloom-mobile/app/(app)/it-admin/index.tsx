@@ -1,84 +1,110 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, StyleSheet, ActivityIndicator } from 'react-native';
+import React from 'react';
+import { View, Text, Pressable, StyleSheet } from 'react-native';
 import { useRouter } from 'expo-router';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { Shield, Settings, Users, BookOpen, LogOut, Building, FileCog, UserPlus } from 'lucide-react-native';
+import { Sun, Moon, LogOut, Server, Ticket, Users, FileText, Wifi, RefreshCw, AlertTriangle, Check } from 'lucide-react-native';
 import { useTheme } from '../../../contexts/ThemeContext';
 import { useSession } from '../../../hooks/useSession';
-import GlassHeader from '../../../components/ui/GlassHeader';
-import ITDashboardFooter from '../../../components/ui/ITDashboardFooter';
-import LoadingSpinner from '../../../components/ui/LoadingSpinner';
+import { Screen } from '../../../components/ui/Screen';
+import { GHeader } from '../../../components/ui/GHeader';
+import { Avatar } from '../../../components/ui/Avatar';
+import { BalanceCard } from '../../../components/ui/BalanceCard';
+import { QuickGrid } from '../../../components/ui/QuickGrid';
+import { SectionHeader } from '../../../components/ui/SectionHeader';
+import { RecRow } from '../../../components/ui/RecRow';
+import { Gradient } from '../../../components/ui/Gradient';
+import { BottomNav } from '../../../components/ui/BottomNav';
 
-const menuItems = [
-  { key: 'features', title: 'Feature Manager', icon: Settings, desc: 'Manage platform features', color: '#8b5cf6' },
-  { key: 'content', title: 'Content Manager', icon: BookOpen, desc: 'Add/Edit learning content', color: '#2563eb' },
-  { key: 'departments', title: 'Departments', icon: Building, desc: 'Manage departments', color: '#059669' },
-  { key: 'users', title: 'Users', icon: Users, desc: 'Manage system users', color: '#d97706' },
-  { key: 'roles', title: 'Role Manager', icon: UserPlus, desc: 'Manage roles & permissions', color: '#dc2626' },
-  { key: 'config', title: 'System Config', icon: FileCog, desc: 'Platform configuration', color: '#7c3aed' },
-];
-
-export default function ITAdminDashboard() {
-  const { isDarkMode } = useTheme();
-  const insets = useSafeAreaInsets();
+export default function ITAdminHome() {
+  const { theme, isDarkMode, toggleTheme } = useTheme();
+  const { user, logout } = useSession();
   const router = useRouter();
-  const { user, loading, isSessionValid, profile } = useSession();
 
-  const handleNavigate = (key: string) => {
-    const routes: Record<string, string> = {
-      features: '/it-admin/feature-manager',
-      content: '/it-admin/content/add',
-      departments: '/manage-departments',
-      users: '/manage-users',
-    };
-    router.push(routes[key] || '/' as any);
-  };
+  const handleSignOut = async () => { await logout(); router.replace('/college-selection'); };
 
-  if (loading) return <LoadingSpinner message="Loading IT Dashboard..." />;
+  const quick = [
+    { key: 'servers', label: 'Servers', sub: '8 online', gradient: ['#0ea5e9', '#0284c7'] as [string, string], icon: <Server size={18} color="#fff" />, onPress: () => router.push('/(app)/it-admin/servers') },
+    { key: 'tickets', label: 'Tickets', sub: '3 new', gradient: ['#f43f5e', '#e11d48'] as [string, string], icon: <Ticket size={18} color="#fff" />, onPress: () => router.push('/(app)/it-admin/tickets') },
+    { key: 'access', label: 'Access', sub: '1,204', gradient: ['#3b82f6', '#6366f1'] as [string, string], icon: <Users size={18} color="#fff" />, onPress: () => router.push('/(app)/it-admin/access') },
+    { key: 'audit', label: 'Audit Log', sub: 'Live', gradient: ['#a855f7', '#7c3aed'] as [string, string], icon: <FileText size={18} color="#fff" />, onPress: () => router.push('/(app)/it-admin/audit') },
+  ];
+
+  const actions = [
+    { key: 'wifi', icon: <Wifi size={17} color="#fff" />, grad: ['#0ea5e9', '#7c3aed'] as [string, string], title: 'Wi-Fi network check', meta: 'All access points · Campus-wide', act: 'Run', actColor: 'cta' as const },
+    { key: 'backup', icon: <RefreshCw size={17} color="#fff" />, grad: ['#16a34a', '#0ea5e9'] as [string, string], title: 'Daily backup', meta: 'NAS volume · Completed 02:00', act: 'Done', actColor: 'done' as const },
+    { key: 'mem', icon: <AlertTriangle size={17} color="#fff" />, grad: ['#f43f5e', '#a855f7'] as [string, string], title: 'High memory · LMS node', meta: 'prod-lms-02 · 92% usage', act: 'Fix', actColor: 'fix' as const },
+  ];
 
   return (
-    <View style={[styles.container, { backgroundColor: isDarkMode ? '#0f172a' : '#f8fafc' }]}>
-      <GlassHeader variant="dashboard">
-        <View style={[styles.headerInner, { paddingTop: insets.top + 8 }]}>
-          <Shield size={24} color="#7c3aed" />
-          <View>
-            <Text style={[styles.headerTitle, { color: isDarkMode ? 'white' : '#111827' }]}>IT Admin</Text>
-            <Text style={[styles.headerSub, { color: isDarkMode ? '#9ca3af' : '#6b7280' }]}>{user?.name || 'Admin'}</Text>
-          </View>
-        </View>
-      </GlassHeader>
+    <View style={{ flex: 1, backgroundColor: theme.bg }}>
+      <Screen>
+        <GHeader
+          avatar={<Avatar label="IK" gradient={['#0ea5e9', '#7c3aed']} />}
+          title={`Hello, ${user?.name || 'I. Kumar'}`}
+          subtitle="IT Admin · Network ops"
+          actions={
+            <>
+              <Pressable onPress={toggleTheme} style={[styles.iconBtn, { backgroundColor: theme.surface2, borderColor: theme.border }]}>
+                {isDarkMode ? <Sun size={19} color={theme.fg} /> : <Moon size={19} color={theme.fg} />}
+              </Pressable>
+              <Pressable onPress={handleSignOut} style={[styles.iconBtn, { backgroundColor: theme.surface2, borderColor: theme.border }]}>
+                <LogOut size={19} color={theme.red} />
+              </Pressable>
+            </>
+          }
+        />
 
-      <ScrollView contentContainerStyle={{ paddingTop: 80, padding: 16, gap: 12 }}>
-        <Text style={[styles.sectionTitle, { color: isDarkMode ? '#d1d5db' : '#4b5563' }]}>System Management</Text>
-        <View style={styles.grid}>
-          {menuItems.map((item) => {
-            const Icon = item.icon;
-            return (
-              <TouchableOpacity key={item.key} onPress={() => handleNavigate(item.key)} style={[styles.card, { backgroundColor: isDarkMode ? 'rgba(30,41,59,0.6)' : 'white', borderColor: isDarkMode ? '#374151' : '#e5e7eb' }]}>
-                <View style={[styles.iconBox, { backgroundColor: `${item.color}20` }]}>
-                  <Icon size={24} color={item.color} />
+        <BalanceCard
+          colors={['#0ea5e9', '#7c3aed']}
+          label="Infrastructure uptime"
+          pill="Last 30 days"
+          value="99.98"
+          valueSuffix="  %"
+          subLabel="Active incidents"
+          subPill="2 open"
+        />
+
+        <QuickGrid items={quick} />
+
+        <SectionHeader title="Quick actions" />
+        {actions.map(a => (
+          <RecRow
+            key={a.key}
+            dateBox={
+              <Gradient colors={a.grad} angle={135} radius={12} style={styles.actDate}>
+                {a.icon}
+              </Gradient>
+            }
+            title={a.title}
+            subtitle={a.meta}
+            trailing={
+              a.actColor === 'done' ? (
+                <View style={[styles.doneBtn, { backgroundColor: theme.surface2, borderColor: theme.border }]}>
+                  <Check size={13} color={theme.faint} />
+                  <Text style={[styles.doneText, { color: theme.faint }]}>{a.act}</Text>
                 </View>
-                <Text style={[styles.cardTitle, { color: isDarkMode ? 'white' : '#111827' }]}>{item.title}</Text>
-                <Text style={[styles.cardDesc, { color: isDarkMode ? '#9ca3af' : '#6b7280' }]}>{item.desc}</Text>
-              </TouchableOpacity>
-            );
-          })}
-        </View>
-      </ScrollView>
-      <ITDashboardFooter />
+              ) : a.actColor === 'fix' ? (
+                <Gradient colors={['#f43f5e', '#e11d48']} radius={10} style={styles.startBtn}>
+                  <Text style={styles.startText}>{a.act}</Text>
+                </Gradient>
+              ) : (
+                <Gradient colors={theme.gradientCta} radius={10} style={styles.startBtn}>
+                  <Text style={styles.startText}>{a.act}</Text>
+                </Gradient>
+              )
+            }
+          />
+        ))}
+      </Screen>
+      <BottomNav role="it" />
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1 },
-  headerInner: { flexDirection: 'row', alignItems: 'center', gap: 10, paddingHorizontal: 4, paddingBottom: 8 },
-  headerTitle: { fontSize: 18, fontWeight: '700' },
-  headerSub: { fontSize: 12 },
-  sectionTitle: { fontSize: 13, fontWeight: '700', textTransform: 'uppercase', letterSpacing: 1 },
-  grid: { flexDirection: 'row', flexWrap: 'wrap', gap: 12 },
-  card: { width: '47%', padding: 16, borderRadius: 16, borderWidth: 1, gap: 8 },
-  iconBox: { width: 44, height: 44, borderRadius: 12, alignItems: 'center', justifyContent: 'center' },
-  cardTitle: { fontSize: 14, fontWeight: '700' },
-  cardDesc: { fontSize: 11, lineHeight: 16 },
+  iconBtn: { width: 40, height: 40, borderRadius: 12, borderWidth: 1, alignItems: 'center', justifyContent: 'center' },
+  actDate: { width: 44, height: 44, alignItems: 'center', justifyContent: 'center' },
+  startBtn: { paddingHorizontal: 14, paddingVertical: 7 },
+  startText: { color: '#fff', fontSize: 11, fontWeight: '700' },
+  doneBtn: { flexDirection: 'row', alignItems: 'center', gap: 4, paddingHorizontal: 10, paddingVertical: 7, borderRadius: 10, borderWidth: 1 },
+  doneText: { fontSize: 11, fontWeight: '600' },
 });

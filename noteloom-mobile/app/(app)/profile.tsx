@@ -1,143 +1,101 @@
 import React, { useState } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, Switch, TextInput, StyleSheet, Alert } from 'react-native';
+import { View, Text, Pressable, Switch, StyleSheet } from 'react-native';
 import { useRouter } from 'expo-router';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { User, Mail, Shield, LogOut, Fingerprint, Bell, ShieldAlert, Trash2, AlertCircle, GraduationCap, Key, RotateCcw, Edit, X, CheckCircle } from 'lucide-react-native';
+import { Bell, Library, ShieldCheck, Moon, Sun, MessageCircle, LogOut, ChevronRight } from 'lucide-react-native';
 import { useTheme } from '../../contexts/ThemeContext';
 import { useSession } from '../../hooks/useSession';
-import GlassHeader from '../../components/ui/GlassHeader';
+import { Screen } from '../../components/ui/Screen';
+import { GHeader } from '../../components/ui/GHeader';
+import { Gradient } from '../../components/ui/Gradient';
+import { SectionHeader } from '../../components/ui/SectionHeader';
+import { ListCard, LRow } from '../../components/ui/ListCard';
+import { Pill } from '../../components/ui/Pill';
+import { BottomNav } from '../../components/ui/BottomNav';
 
 export default function Profile() {
-  const { isDarkMode } = useTheme();
-  const insets = useSafeAreaInsets();
-  const { user, profile, logout, authenticateWithBiometrics } = useSession();
+  const { theme, isDarkMode, toggleTheme } = useTheme();
+  const { user, profile, logout } = useSession();
   const router = useRouter();
   const [biometricEnabled, setBiometricEnabled] = useState(false);
-  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
-  const [deleteText, setDeleteText] = useState('');
 
-  const handleSignOut = async () => {
-    await logout();
-    router.replace('/college-selection');
-  };
+  const handleSignOut = async () => { await logout(); router.replace('/college-selection'); };
 
-  const getRoleBadge = () => {
-    switch (profile?.role) {
-      case 'student': return { label: 'Student', icon: GraduationCap, color: '#7c3aed' };
-      case 'faculty': return { label: 'Faculty', icon: Shield, color: '#2563eb' };
-      case 'college_admin': return { label: 'Admin', icon: ShieldAlert, color: '#dc2626' };
-      default: return { label: 'User', icon: User, color: '#6b7280' };
-    }
-  };
+  const name = user?.name || 'Arpan Maity';
+  const roleLabel = profile?.role === 'faculty' ? 'Faculty' : profile?.role === 'college_admin' ? 'Admin' : 'Student';
+  const uid = user?.uid || profile?.college || '2023CS0765';
 
-  const roleBadge = getRoleBadge();
-  const RoleIcon = roleBadge.icon;
-
-  return showDeleteConfirm ? (
-    <View style={[styles.deleteContainer, { backgroundColor: isDarkMode ? '#0f172a' : '#f9fafb' }]}>
-      <View style={[styles.deleteCard, { backgroundColor: isDarkMode ? 'rgba(239,68,68,0.1)' : 'rgba(254,202,202,0.7)', borderColor: isDarkMode ? 'rgba(239,68,68,0.5)' : 'rgba(239,68,68,0.3)' }]}>
-        <AlertCircle size={48} color="#ef4444" />
-        <Text style={[styles.deleteTitle, { color: isDarkMode ? 'white' : '#111827' }]}>Delete Account</Text>
-        <Text style={[styles.deleteWarning, { backgroundColor: isDarkMode ? 'rgba(239,68,68,0.15)' : 'rgba(239,68,68,0.1)' }]}>
-          This will permanently remove all your progress, certificates, and learning data.
-        </Text>
-        <Text style={[styles.deleteLabel, { color: isDarkMode ? '#e5e7eb' : '#374151' }]}>Type "DELETE" to confirm</Text>
-        <TextInput
-          value={deleteText}
-          onChangeText={setDeleteText}
-          placeholder="Type DELETE here"
-          placeholderTextColor={isDarkMode ? '#6b7280' : '#9ca3af'}
-          style={[styles.deleteInput, { backgroundColor: isDarkMode ? 'rgba(55,65,81,0.5)' : 'white', borderColor: isDarkMode ? '#4b5563' : '#d1d5db', color: isDarkMode ? 'white' : '#111827' }]}
+  return (
+    <View style={{ flex: 1, backgroundColor: theme.bg }}>
+      <Screen>
+        <GHeader
+          avatar={<View />}
+          title=""
         />
-        <TouchableOpacity onPress={() => Alert.alert('Delete Account', 'Account deletion request submitted.')} disabled={deleteText !== 'DELETE'} style={[styles.deleteBtn, { opacity: deleteText !== 'DELETE' ? 0.5 : 1 }]}>
-          <Text style={styles.deleteBtnText}>Permanently Delete Account</Text>
-        </TouchableOpacity>
-        <TouchableOpacity onPress={() => setShowDeleteConfirm(false)} style={[styles.cancelBtn, { backgroundColor: isDarkMode ? '#374151' : '#e5e7eb' }]}>
-          <Text style={{ color: isDarkMode ? 'white' : '#111827', fontWeight: '600' }}>Cancel</Text>
-        </TouchableOpacity>
-      </View>
-    </View>
-  ) : (
-    <View style={[styles.container, { backgroundColor: isDarkMode ? '#0f172a' : '#f8fafc' }]}>
-      <GlassHeader variant="dashboard">
-        <View style={[styles.header, { paddingTop: insets.top + 8 }]}>
-          <Text style={[styles.headerTitle, { color: isDarkMode ? 'white' : '#111827' }]}>Profile</Text>
-          <TouchableOpacity onPress={handleSignOut} style={styles.logoutBtn}>
-            <LogOut size={18} color="white" />
-          </TouchableOpacity>
-        </View>
-      </GlassHeader>
-
-      <ScrollView contentContainerStyle={{ paddingTop: 80, padding: 16 }}>
-        <View style={[styles.profileCard, { backgroundColor: isDarkMode ? 'rgba(30,41,59,0.4)' : 'white', borderColor: isDarkMode ? '#374151' : '#e5e7eb' }]}>
-          <View style={[styles.avatarLarge, { backgroundColor: isDarkMode ? '#374151' : '#f3f4f6' }]}>
-            <User size={32} color={isDarkMode ? '#9ca3af' : '#6b7280'} />
-          </View>
-          <Text style={[styles.name, { color: isDarkMode ? 'white' : '#111827' }]}>{user?.name || 'User'}</Text>
-          <Text style={[styles.email, { color: isDarkMode ? '#9ca3af' : '#6b7280' }]}>{user?.email}</Text>
-          <View style={[styles.roleBadgeContainer, { backgroundColor: roleBadge.color + '20' }]}>
-            <RoleIcon size={14} color={roleBadge.color} />
-            <Text style={[styles.roleBadgeText, { color: roleBadge.color }]}>{roleBadge.label}</Text>
-          </View>
-          {user?.uid && <Text style={[styles.uid, { backgroundColor: isDarkMode ? '#1e293b' : '#f3f4f6', color: isDarkMode ? '#93c5fd' : '#2563eb' }]}>ID: {user.uid}</Text>}
-        </View>
-
-        <View style={styles.section}>
-          <Text style={[styles.sectionTitle, { color: isDarkMode ? '#e5e7eb' : '#374151' }]}>Security</Text>
-          <View style={[styles.settingCard, { backgroundColor: isDarkMode ? 'rgba(30,41,59,0.4)' : 'white', borderColor: isDarkMode ? '#374151' : '#e5e7eb' }]}>
-            <View style={styles.settingRow}>
-              <Fingerprint size={20} color={isDarkMode ? '#9ca3af' : '#6b7280'} />
-              <Text style={[styles.settingLabel, { color: isDarkMode ? 'white' : '#111827' }]}>Biometric Quick Unlock</Text>
-              <Switch value={biometricEnabled} onValueChange={async (v) => { if (v) { const ok = await authenticateWithBiometrics(); if (ok) setBiometricEnabled(true); } else setBiometricEnabled(false); }} trackColor={{ false: '#374151', true: '#7c3aed' }} thumbColor="white" />
+        <Gradient colors={theme.gradientHero} angle={135} radius={20} style={styles.cover}>
+          <View style={styles.coverDecor} />
+          <View style={styles.pfTop}>
+            <Gradient colors={['#818cf8', '#c084fc']} angle={135} radius={18} style={styles.pfAva}>
+              <Text style={styles.pfAvaText}>{name?.[0]?.toUpperCase() || 'A'}</Text>
+            </Gradient>
+            <View style={styles.pfInfo}>
+              <Text style={styles.pfName}>{name}</Text>
+              <Text style={styles.pfMeta}>3rd Year · CSE · UID {uid}</Text>
+              <Pill onDark>{roleLabel} · Active</Pill>
             </View>
           </View>
-        </View>
+          <View style={styles.pfStats}>
+            <View style={styles.st}><Text style={styles.stVal}>6</Text><Text style={styles.stLbl}>Courses</Text></View>
+            <View style={styles.st}><Text style={styles.stVal}>84%</Text><Text style={styles.stLbl}>Attendance</Text></View>
+            <View style={styles.st}><Text style={styles.stVal}>8.6</Text><Text style={styles.stLbl}>CGPA</Text></View>
+          </View>
+        </Gradient>
 
-        <View style={styles.section}>
-          <Text style={[styles.sectionTitle, { color: isDarkMode ? '#e5e7eb' : '#374151' }]}>Account</Text>
-          {[
-            { icon: Edit, label: 'Modify My Details', onPress: () => {} },
-            { icon: Key, label: 'Change Password', onPress: () => {} },
-            { icon: RotateCcw, label: 'Reset Password', onPress: () => {} },
-            { icon: Trash2, label: 'Delete Account', onPress: () => setShowDeleteConfirm(true), danger: true },
-          ].map((item, i) => (
-            <TouchableOpacity key={i} onPress={item.onPress} style={[styles.menuItem, { backgroundColor: isDarkMode ? 'rgba(30,41,59,0.4)' : 'white', borderColor: isDarkMode ? '#374151' : '#e5e7eb' }]}>
-              <item.icon size={18} color={item.danger ? '#ef4444' : isDarkMode ? '#9ca3af' : '#6b7280'} />
-              <Text style={[styles.menuItemLabel, { color: item.danger ? '#ef4444' : isDarkMode ? 'white' : '#111827' }]}>{item.label}</Text>
-            </TouchableOpacity>
-          ))}
-        </View>
-      </ScrollView>
+        <SectionHeader title="Account" />
+        <ListCard>
+          <LRow icon={<Bell size={17} color="#7c3aed" />} iconBg="rgba(124,58,237,0.12)" title="Notifications" subtitle="3 unread · exam alerts" />
+          <LRow icon={<Library size={17} color="#10b981" />} iconBg="rgba(16,185,129,0.12)" title="My Library" subtitle="Saved notes & PYQs" onPress={() => router.push('/(app)/library')} />
+          <LRow icon={<ShieldCheck size={17} color="#2563eb" />} iconBg="rgba(59,130,246,0.12)" title="Privacy & Security" subtitle="Manage sessions" />
+          <LRow
+            icon={isDarkMode ? <Moon size={17} color="#d97706" /> : <Sun size={17} color="#d97706" />}
+            iconBg="rgba(245,158,11,0.12)"
+            title="Dark Mode"
+            subtitle="Matches system"
+            trailing={<Switch value={isDarkMode} onValueChange={toggleTheme} trackColor={{ false: theme.border, true: theme.violet }} thumbColor="#fff" />}
+            last
+          />
+        </ListCard>
+
+        <SectionHeader title="Support" />
+        <ListCard>
+          <LRow icon={<MessageCircle size={17} color="#4f46e5" />} iconBg="rgba(99,102,241,0.12)" title="Help & Support" subtitle="FAQs and contact" />
+          <LRow
+            icon={<LogOut size={17} color="#ef4444" />}
+            iconBg="rgba(239,68,68,0.12)"
+            title="Sign Out"
+            subtitle="End this session"
+            onPress={handleSignOut}
+            last
+          />
+        </ListCard>
+        <Text style={[styles.version, { color: theme.faint }]}>NoteLoom App v1.0.1 · Beta</Text>
+      </Screen>
+      <BottomNav role="student" />
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1 },
-  header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 4, paddingBottom: 8 },
-  headerTitle: { fontSize: 20, fontWeight: '700' },
-  logoutBtn: { backgroundColor: '#7c3aed', padding: 10, borderRadius: 10 },
-  profileCard: { alignItems: 'center', padding: 24, borderRadius: 20, borderWidth: 1, marginBottom: 24 },
-  avatarLarge: { width: 80, height: 80, borderRadius: 40, alignItems: 'center', justifyContent: 'center', marginBottom: 12 },
-  name: { fontSize: 22, fontWeight: '700', marginBottom: 4 },
-  email: { fontSize: 14, marginBottom: 12 },
-  roleBadgeContainer: { flexDirection: 'row', alignItems: 'center', gap: 6, paddingHorizontal: 16, paddingVertical: 6, borderRadius: 20, marginBottom: 12 },
-  roleBadgeText: { fontSize: 13, fontWeight: '600' },
-  uid: { fontSize: 12, fontFamily: 'monospace', paddingHorizontal: 12, paddingVertical: 4, borderRadius: 6, overflow: 'hidden' },
-  section: { marginBottom: 24 },
-  sectionTitle: { fontSize: 14, fontWeight: '600', textTransform: 'uppercase', letterSpacing: 0.5, marginBottom: 12 },
-  settingCard: { padding: 16, borderRadius: 16, borderWidth: 1 },
-  settingRow: { flexDirection: 'row', alignItems: 'center', gap: 12 },
-  settingLabel: { flex: 1, fontSize: 15, fontWeight: '500' },
-  menuItem: { flexDirection: 'row', alignItems: 'center', gap: 12, padding: 16, borderRadius: 14, borderWidth: 1, marginBottom: 8 },
-  menuItemLabel: { fontSize: 15, fontWeight: '500' },
-  deleteContainer: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: 24 },
-  deleteCard: { width: '100%', maxWidth: 400, padding: 32, borderRadius: 20, borderWidth: 1, alignItems: 'center', gap: 16 },
-  deleteTitle: { fontSize: 24, fontWeight: '700' },
-  deleteWarning: { padding: 12, borderRadius: 10, fontSize: 13, lineHeight: 20, overflow: 'hidden' },
-  deleteLabel: { fontSize: 14, fontWeight: '500', alignSelf: 'flex-start' },
-  deleteInput: { width: '100%', borderRadius: 12, borderWidth: 1, padding: 14, fontSize: 15 },
-  deleteBtn: { backgroundColor: '#dc2626', width: '100%', paddingVertical: 14, borderRadius: 12, alignItems: 'center' },
-  deleteBtnText: { color: 'white', fontSize: 15, fontWeight: '600' },
-  cancelBtn: { width: '100%', paddingVertical: 14, borderRadius: 12, alignItems: 'center' },
+  cover: { padding: 20, marginTop: 8, shadowColor: 'rgba(124,58,237,0.35)', shadowOffset: { width: 0, height: 12 }, shadowOpacity: 0.6, shadowRadius: 24, elevation: 8 },
+  coverDecor: { position: 'absolute', right: -30, bottom: -50, width: 170, height: 170, borderRadius: 85, backgroundColor: 'rgba(168,85,247,0.4)' },
+  pfTop: { flexDirection: 'row', alignItems: 'center', gap: 14 },
+  pfAva: { width: 64, height: 64, borderRadius: 18, borderWidth: 3, borderColor: 'rgba(255,255,255,0.35)', alignItems: 'center', justifyContent: 'center' },
+  pfAvaText: { color: '#fff', fontSize: 24, fontWeight: '700' },
+  pfInfo: { flex: 1 },
+  pfName: { color: '#fff', fontSize: 19, fontWeight: '700', letterSpacing: -0.3 },
+  pfMeta: { color: 'rgba(255,255,255,0.85)', fontSize: 12, marginVertical: 4 },
+  pfStats: { flexDirection: 'row', gap: 8, marginTop: 18 },
+  st: { flex: 1, alignItems: 'center', backgroundColor: 'rgba(255,255,255,0.1)', borderWidth: 1, borderColor: 'rgba(255,255,255,0.16)', borderRadius: 12, paddingVertical: 10 },
+  stVal: { color: '#fff', fontSize: 16, fontWeight: '700' },
+  stLbl: { color: 'rgba(255,255,255,0.8)', fontSize: 9, fontWeight: '600', textTransform: 'uppercase', letterSpacing: 0.6, marginTop: 2 },
+  version: { textAlign: 'center', fontSize: 10, marginVertical: 6 },
 });

@@ -1,11 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, ScrollView, ActivityIndicator, StyleSheet } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { Award, CheckCircle, XCircle } from 'lucide-react-native';
+import { View, Text, ActivityIndicator, StyleSheet } from 'react-native';
 import { useTheme } from '../../contexts/ThemeContext';
 import { API_BASE } from '../../lib/constants';
+import { authHeaders } from '../../lib/api';
 import { getSessionToken } from '../../lib/storage';
-import GlassHeader from '../../components/ui/GlassHeader';
+import { Screen } from '../../components/ui/Screen';
+import { SubHeader } from '../../components/ui/SubHeader';
+import { StatGrid } from '../../components/ui/StatGrid';
+import { RecRow } from '../../components/ui/RecRow';
+import { Pill } from '../../components/ui/Pill';
+import { EmptyState } from '../../components/ui/EmptyState';
 
 interface ExamRecord {
   _id: string;
@@ -17,8 +21,7 @@ interface ExamRecord {
 }
 
 export default function Results() {
-  const { isDarkMode } = useTheme();
-  const insets = useSafeAreaInsets();
+  const { theme } = useTheme();
   const [results, setResults] = useState<ExamRecord[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -28,7 +31,7 @@ export default function Results() {
     try {
       const token = await getSessionToken();
       const response = await fetch(`${API_BASE}/api/student/marks`, {
-        headers: { Authorization: `Bearer ${token}` },
+        headers: authHeaders(token),
       });
       if (response.ok) {
         const data = await response.json();
@@ -40,53 +43,51 @@ export default function Results() {
 
   const getPercentage = (marks: number, total: number) => total > 0 ? Math.round((marks / total) * 100) : 0;
 
+  const totalExams = results.length;
+  const passedCount = results.filter(r => getPercentage(r.marks, r.totalMarks) >= 40).length;
+  const failedCount = totalExams - passedCount;
+  const avgPct = totalExams ? Math.round(results.reduce((sum, r) => sum + getPercentage(r.marks, r.totalMarks), 0) / totalExams) : 0;
+
   return (
-    <View style={[styles.container, { backgroundColor: isDarkMode ? '#0f172a' : '#f8fafc' }]}>
-      <GlassHeader variant="dashboard">
-        <View style={[styles.header, { paddingTop: insets.top + 8 }]}>
-          <Award size={22} color="#7c3aed" />
-          <Text style={[styles.headerTitle, { color: isDarkMode ? 'white' : '#111827' }]}>Results & Marks</Text>
-        </View>
-      </GlassHeader>
-      <ScrollView contentContainerStyle={{ paddingTop: 80, padding: 16 }}>
-        {loading ? <ActivityIndicator size="large" color="#7c3aed" style={{ marginTop: 60 }} /> :
-          results.map((r) => {
+    <View style={{ flex: 1, backgroundColor: theme.bg }}>
+      <Screen>
+        <SubHeader title="Results & Marks" subtitle="Semester examination performance" />
+        <StatGrid
+          items={[
+            { value: `${avgPct}%`, label: 'Average Score', color: theme.violet, main: true },
+            { value: `${totalExams}`, label: 'Exams', color: theme.fg },
+            { value: `${passedCount}`, label: 'Passed', color: theme.green },
+            { value: `${failedCount}`, label: 'Failed', color: theme.red },
+          ]}
+        />
+        {loading ? (
+          <ActivityIndicator color={theme.violet} style={{ paddingVertical: 60 }} />
+        ) : results.length === 0 ? (
+          <EmptyState message="No results available yet" />
+        ) : (
+          results.map(r => {
             const pct = getPercentage(r.marks, r.totalMarks);
             const passed = pct >= 40;
             return (
-              <View key={r._id} style={[styles.card, { backgroundColor: isDarkMode ? 'rgba(30,41,59,0.4)' : 'white', borderColor: isDarkMode ? '#374151' : '#e5e7eb' }]}>
-                <View style={styles.topRow}>
-                  <View style={{ flex: 1 }}>
-                    <Text style={[styles.subject, { color: isDarkMode ? 'white' : '#111827' }]}>{r.subject}</Text>
-                    <Text style={[styles.examType, { color: isDarkMode ? '#9ca3af' : '#6b7280' }]}>{r.examType} • Sem {r.semester}</Text>
+              <RecRow
+                key={r._id}
+                dateBox={
+                  <View style={[styles.scoreBox, { backgroundColor: passed ? 'rgba(16,185,129,0.12)' : 'rgba(239,68,68,0.12)' }]}>
+                    <Text style={{ fontSize: 14, fontWeight: '700', color: passed ? theme.green : theme.red }}>{pct}%</Text>
                   </View>
-                  {passed ? <CheckCircle size={20} color="#22c55e" /> : <XCircle size={20} color="#ef4444" />}
-                </View>
-                <View style={styles.scoreRow}>
-                  <Text style={[styles.marks, { color: isDarkMode ? 'white' : '#111827' }]}>{r.marks}<Text style={{ fontSize: 14, color: isDarkMode ? '#9ca3af' : '#6b7280' }}>/{r.totalMarks}</Text></Text>
-                  <View style={[styles.pctBadge, { backgroundColor: passed ? 'rgba(34,197,94,0.1)' : 'rgba(239,68,68,0.1)' }]}>
-                    <Text style={[styles.pctText, { color: passed ? '#22c55e' : '#ef4444' }]}>{pct}%</Text>
-                  </View>
-                </View>
-              </View>
+                }
+                title={r.subject}
+                subtitle={`${r.examType} · Sem ${r.semester} · ${r.marks}/${r.totalMarks}`}
+                trailing={<Pill color={passed ? 'green' : 'red'}>{passed ? 'Pass' : 'Fail'}</Pill>}
+              />
             );
           })
-        }
-      </ScrollView>
+        )}
+      </Screen>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1 },
-  header: { flexDirection: 'row', alignItems: 'center', gap: 8, paddingHorizontal: 4, paddingBottom: 8 },
-  headerTitle: { fontSize: 20, fontWeight: '700' },
-  card: { padding: 16, borderRadius: 16, borderWidth: 1, marginBottom: 12 },
-  topRow: { flexDirection: 'row', alignItems: 'flex-start', marginBottom: 12 },
-  subject: { fontSize: 16, fontWeight: '600', marginBottom: 2 },
-  examType: { fontSize: 13 },
-  scoreRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
-  marks: { fontSize: 24, fontWeight: '700' },
-  pctBadge: { paddingHorizontal: 12, paddingVertical: 4, borderRadius: 12 },
-  pctText: { fontSize: 14, fontWeight: '700' },
+  scoreBox: { width: 50, height: 52, borderRadius: 12, alignItems: 'center', justifyContent: 'center', flexShrink: 0 },
 });

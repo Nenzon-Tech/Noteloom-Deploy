@@ -5,6 +5,7 @@ import {
 import { Sparkles, X, Loader2 } from 'lucide-react-native';
 import { useTheme } from '../../contexts/ThemeContext';
 import { API_BASE } from '../../lib/constants';
+import { authHeaders } from '../../lib/api';
 import { getSessionToken } from '../../lib/storage';
 import { File } from 'expo-file-system';
 
@@ -42,10 +43,7 @@ export const PdfAiSummarizer = ({ pdfUrl }: PdfAiSummarizerProps) => {
 
       const response = await fetch(`${API_BASE}/api/ai/summarize-file`, {
         method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
+        headers: authHeaders(token),
         body: JSON.stringify({
           file: `data:application/pdf;base64,${blobBase64}`,
           taskType: 'summarize',

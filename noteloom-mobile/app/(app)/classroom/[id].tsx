@@ -1,18 +1,20 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import {
-  View, Text, ScrollView, TouchableOpacity, StyleSheet, Dimensions, RefreshControl, ActivityIndicator,
+  View, Text, Pressable, StyleSheet, ActivityIndicator, RefreshControl,
 } from 'react-native';
 import { useRouter, useLocalSearchParams } from 'expo-router';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import {
-  ArrowLeft, BookOpen, FileText, Video, Image, MoreVertical, Check, Circle, Download, Upload, X,
-} from 'lucide-react-native';
+import { BookOpen, FileText, Video, Image, Check, Circle, Download, FolderOpen } from 'lucide-react-native';
 import { useTheme } from '../../../contexts/ThemeContext';
 import { API_BASE } from '../../../lib/constants';
+import { authHeaders } from '../../../lib/api';
 import { getSessionToken } from '../../../lib/storage';
-import GlassHeader from '../../../components/ui/GlassHeader';
-
-const { width } = Dimensions.get('window');
+import { Screen } from '../../../components/ui/Screen';
+import { SubHeader } from '../../../components/ui/SubHeader';
+import { SectionHeader } from '../../../components/ui/SectionHeader';
+import { FilterChips } from '../../../components/ui/FilterChips';
+import { ListCard, LRow } from '../../../components/ui/ListCard';
+import { EmptyState } from '../../../components/ui/EmptyState';
+import { Gradient } from '../../../components/ui/Gradient';
 
 interface ModuleItem {
   _id: string;
@@ -35,8 +37,7 @@ interface ContentItem {
 
 export default function ClassroomView() {
   const { id } = useLocalSearchParams<{ id: string }>();
-  const { isDarkMode } = useTheme();
-  const insets = useSafeAreaInsets();
+  const { theme } = useTheme();
   const router = useRouter();
 
   const [classroom, setClassroom] = useState<any>(null);
@@ -56,8 +57,8 @@ export default function ClassroomView() {
     try {
       const token = await getSessionToken();
       const [classRes, infoRes] = await Promise.all([
-        fetch(`${API_BASE}/api/classrooms/${id}`, { headers: { Authorization: `Bearer ${token}` } }),
-        fetch(`${API_BASE}/session/info`, { headers: { Authorization: `Bearer ${token}` } }),
+        fetch(`${API_BASE}/api/classrooms/${id}`, { headers: authHeaders(token) }),
+        fetch(`${API_BASE}/session/info`, { headers: authHeaders(token) }),
       ]);
       if (classRes.ok) {
         const data = await classRes.json();
@@ -88,7 +89,7 @@ export default function ClassroomView() {
       const token = await getSessionToken();
       await fetch(`${API_BASE}/api/classrooms/${id}/content/${contentId}/complete`, {
         method: 'PUT',
-        headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+        headers: authHeaders(token),
         body: JSON.stringify({ isCompleted: !currentStatus }),
       });
       setContents((prev) => prev.map((c) => c._id === contentId ? { ...c, isCompleted: !currentStatus } : c));
@@ -108,180 +109,127 @@ export default function ClassroomView() {
   const isFaculty = profile?.role === 'faculty' || profile?.role === 'college_admin';
   const activeModuleData = modules.find((m) => m._id === activeModule);
 
+  const getIcon = (fileType: string) => {
+    if (fileType === 'video' || fileType === 'lecture') {
+      return { icon: <Video size={20} color={theme.blue} />, color: theme.blue, bg: 'rgba(59,130,246,0.12)' };
+    }
+    if (fileType === 'pdf' || fileType === 'note') {
+      return { icon: <FileText size={20} color={theme.amber} />, color: theme.amber, bg: 'rgba(245,158,11,0.12)' };
+    }
+    if (fileType === 'image') {
+      return { icon: <Image size={20} color={theme.green} />, color: theme.green, bg: 'rgba(16,185,129,0.12)' };
+    }
+    return { icon: <FileText size={20} color={theme.violet} />, color: theme.violet, bg: 'rgba(124,58,237,0.12)' };
+  };
+
   if (loading) {
     return (
-      <View style={[styles.loadingContainer, { backgroundColor: isDarkMode ? '#0f172a' : '#f8fafc' }]}>
-        <ActivityIndicator size="large" color="#7c3aed" />
+      <View style={[styles.loading, { backgroundColor: theme.bg }]}>
+        <ActivityIndicator size="large" color={theme.violet} />
       </View>
     );
   }
 
   return (
-    <View style={[styles.container, { backgroundColor: isDarkMode ? '#0f172a' : '#f8fafc' }]}>
-      <GlassHeader variant="dashboard">
-        <View style={[styles.headerInner, { paddingTop: insets.top + 8 }]}>
-          <TouchableOpacity onPress={() => router.back()} style={styles.backBtn}>
-            <ArrowLeft size={22} color={isDarkMode ? 'white' : '#111827'} />
-          </TouchableOpacity>
-          <View style={styles.headerText}>
-            <Text style={[styles.headerTitle, { color: isDarkMode ? 'white' : '#111827' }]} numberOfLines={1}>
-              {classroom?.name || 'Classroom'}
-            </Text>
+    <View style={{ flex: 1, backgroundColor: theme.bg }}>
+      <Screen refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={theme.violet} />}>
+        <SubHeader title={classroom?.name || 'Classroom'} subtitle={classroom?.subjectCode} />
+
+        <Gradient colors={theme.gradientBrand} angle={135} radius={20} style={styles.hero}>
+          <View style={styles.heroHead}>
+            <Text style={styles.heroTitle} numberOfLines={1}>{classroom?.name || 'Classroom'}</Text>
             {classroom?.subjectCode && (
-              <Text style={[styles.headerSub, { color: isDarkMode ? '#9ca3af' : '#6b7280' }]}>
-                {classroom.subjectCode}
-              </Text>
+              <View style={styles.pill}>
+                <Text style={styles.pillText}>{classroom.subjectCode}</Text>
+              </View>
             )}
           </View>
-        </View>
-      </GlassHeader>
-
-      <View style={{ flex: 1, paddingTop: 80 }}>
-        <View style={styles.body}>
-          <ScrollView style={styles.sidebar} showsVerticalScrollIndicator={false}>
-            <Text style={[styles.sidebarTitle, { color: isDarkMode ? '#d1d5db' : '#4b5563' }]}>Modules</Text>
-            {modules.map((mod) => (
-              <TouchableOpacity
-                key={mod._id}
-                onPress={() => setActiveModule(mod._id)}
-                style={[
-                  styles.moduleItem,
-                  activeModule === mod._id && { backgroundColor: '#7c3aed' },
-                ]}
-              >
-                <Text
-                  style={[
-                    styles.moduleText,
-                    { color: isDarkMode ? '#e5e7eb' : '#374151' },
-                    activeModule === mod._id && { color: 'white' },
-                  ]}
-                  numberOfLines={2}
-                >
-                  {mod.name}
-                </Text>
-              </TouchableOpacity>
-            ))}
-          </ScrollView>
-
-          <View style={styles.mainContent}>
-            <ScrollView
-              horizontal
-              showsHorizontalScrollIndicator={false}
-              style={styles.tabBar}
-              contentContainerStyle={{ gap: 8, paddingHorizontal: 12 }}
-            >
-              {tabs.map((tab) => (
-                <TouchableOpacity
-                  key={tab}
-                  onPress={() => setFilterTab(tab)}
-                  style={[styles.tab, filterTab === tab && { backgroundColor: '#7c3aed' }]}
-                >
-                  <Text style={[styles.tabText, filterTab === tab && { color: 'white' }]}>{tab}</Text>
-                </TouchableOpacity>
-              ))}
-            </ScrollView>
-
-            <ScrollView
-              style={styles.contentGrid}
-              contentContainerStyle={{ padding: 12, gap: 12 }}
-              refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#7c3aed" />}
-            >
-              {filteredContents.length === 0 ? (
-                <View style={styles.emptyState}>
-                  <BookOpen size={48} color={isDarkMode ? '#6b7280' : '#9ca3af'} opacity={0.4} />
-                  <Text style={[styles.emptyText, { color: isDarkMode ? '#9ca3af' : '#6b7280' }]}>No content yet</Text>
-                </View>
-              ) : (
-                filteredContents.map((item) => {
-                  const getIcon = () => {
-                    if (item.fileType === 'video' || item.fileType === 'lecture') return <Video size={20} color="#3b82f6" />;
-                    if (item.fileType === 'pdf' || item.fileType === 'note') return <FileText size={20} color="#f59e0b" />;
-                    if (item.fileType === 'image') return <Image size={20} color="#10b981" />;
-                    return <FileText size={20} color="#6b7280" />;
-                  };
-
-                  return (
-                    <TouchableOpacity
-                      key={item._id}
-                      style={[styles.contentCard, { backgroundColor: isDarkMode ? 'rgba(30,41,59,0.7)' : 'white', borderColor: isDarkMode ? 'rgba(55,65,81,0.5)' : 'rgba(229,231,235,0.5)' }]}
-                      onPress={() => router.push(`/(app)/content/${id}/${item._id}` as any)}
-                    >
-                      <View style={styles.cardHeader}>
-                        {getIcon()}
-                        <TouchableOpacity
-                          onPress={() => toggleComplete(item._id, item.isCompleted)}
-                          style={[styles.completeBtn, item.isCompleted && { backgroundColor: '#059669' }]}
-                        >
-                          {item.isCompleted ? <Check size={16} color="white" /> : <Circle size={16} color={isDarkMode ? '#6b7280' : '#9ca3af'} />}
-                        </TouchableOpacity>
-                      </View>
-                      <Text style={[styles.cardTitle, { color: isDarkMode ? 'white' : '#111827' }]} numberOfLines={2}>{item.title}</Text>
-                      {item.description && (
-                        <Text style={[styles.cardDesc, { color: isDarkMode ? '#9ca3af' : '#6b7280' }]} numberOfLines={2}>{item.description}</Text>
-                      )}
-                      <View style={styles.cardFooter}>
-                        <Text style={styles.cardDate}>{new Date(item.createdAt).toLocaleDateString()}</Text>
-                        {isFaculty && item.allowDownload && (
-                          <Download size={14} color="#3b82f6" />
-                        )}
-                      </View>
-                    </TouchableOpacity>
-                  );
-                })
-              )}
-            </ScrollView>
+          <View style={styles.heroStats}>
+            <View style={styles.heroStat}>
+              <FolderOpen size={16} color="rgba(255,255,255,0.9)" />
+              <Text style={styles.heroStatValue}>{modules.length}</Text>
+              <Text style={styles.heroStatLabel}>Modules</Text>
+            </View>
+            <View style={styles.heroDot} />
+            <View style={styles.heroStat}>
+              <FileText size={16} color="rgba(255,255,255,0.9)" />
+              <Text style={styles.heroStatValue}>{contents.length}</Text>
+              <Text style={styles.heroStatLabel}>Items</Text>
+            </View>
           </View>
-        </View>
-      </View>
+        </Gradient>
+
+        {modules.length > 0 && (
+          <>
+            <SectionHeader title="Modules" />
+            <FilterChips
+              options={modules.map((m) => ({ value: m._id, label: m.name }))}
+              value={activeModule || ''}
+              onChange={(v) => setActiveModule(v)}
+            />
+          </>
+        )}
+
+        <SectionHeader title={activeModuleData ? `${activeModuleData.name}` : 'Content'} />
+        <FilterChips options={tabs.map((t) => ({ value: t, label: t }))} value={filterTab} onChange={setFilterTab} />
+
+        {filteredContents.length === 0 ? (
+          <EmptyState icon={<BookOpen size={44} color={theme.faint} />} message="No content yet" />
+        ) : (
+          filteredContents.map((item) => {
+            const { icon, color, bg } = getIcon(item.fileType);
+            return (
+              <ListCard key={item._id}>
+                <LRow
+                  icon={icon}
+                  iconColor={color}
+                  iconBg={bg}
+                  title={item.title}
+                  subtitle={item.description}
+                  onPress={() => router.push(`/(app)/content/${id}/${item._id}` as any)}
+                  trailing={
+                    <View style={styles.trailing}>
+                      <Pressable
+                        onPress={() => toggleComplete(item._id, item.isCompleted)}
+                        style={[styles.completeBtn, item.isCompleted && { backgroundColor: theme.green }]}
+                      >
+                        {item.isCompleted ? <Check size={16} color="#fff" /> : <Circle size={16} color={theme.faint} />}
+                      </Pressable>
+                      <Text style={[styles.date, { color: theme.faint }]}>{new Date(item.createdAt).toLocaleDateString()}</Text>
+                      {isFaculty && item.allowDownload && <Download size={13} color={theme.blue} />}
+                    </View>
+                  }
+                  last
+                />
+              </ListCard>
+            );
+          })
+        )}
+      </Screen>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1 },
-  loadingContainer: { flex: 1, alignItems: 'center', justifyContent: 'center' },
-  headerInner: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingHorizontal: 4, paddingBottom: 8 },
-  backBtn: { padding: 8 },
-  headerText: { flex: 1 },
-  headerTitle: { fontSize: 17, fontWeight: '700' },
-  headerSub: { fontSize: 12 },
-  body: { flex: 1, flexDirection: 'row' },
-  sidebar: { width: 80, paddingHorizontal: 8, paddingTop: 12 },
-  sidebarTitle: { fontSize: 10, fontWeight: '700', textTransform: 'uppercase', letterSpacing: 1, marginBottom: 8, paddingHorizontal: 4 },
-  moduleItem: {
-    paddingVertical: 10,
-    paddingHorizontal: 8,
-    borderRadius: 10,
-    marginBottom: 4,
-  },
-  moduleText: { fontSize: 11, fontWeight: '600' },
-  mainContent: { flex: 1 },
-  tabBar: { maxHeight: 44, paddingVertical: 8 },
-  tab: {
-    paddingHorizontal: 14,
-    paddingVertical: 6,
-    borderRadius: 16,
-  },
-  tabText: { fontSize: 12, fontWeight: '600', color: '#6b7280' },
-  contentGrid: { flex: 1 },
-  contentCard: {
-    padding: 14,
-    borderRadius: 14,
-    borderWidth: 1,
-    gap: 6,
-  },
-  cardHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
+  loading: { flex: 1, alignItems: 'center', justifyContent: 'center' },
+  hero: { padding: 18, marginBottom: 4 },
+  heroHead: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 10 },
+  heroTitle: { color: '#fff', fontSize: 20, fontWeight: '800', letterSpacing: -0.4, flex: 1 },
+  pill: { borderWidth: 1, borderColor: 'rgba(255,255,255,0.28)', backgroundColor: 'rgba(255,255,255,0.12)', borderRadius: 999, paddingVertical: 4, paddingHorizontal: 10 },
+  pillText: { color: '#fff', fontSize: 10, fontWeight: '700', letterSpacing: 0.5 },
+  heroStats: { flexDirection: 'row', alignItems: 'center', gap: 14, marginTop: 14 },
+  heroStat: { flexDirection: 'row', alignItems: 'center', gap: 6 },
+  heroStatValue: { color: '#fff', fontSize: 16, fontWeight: '800' },
+  heroStatLabel: { color: 'rgba(255,255,255,0.85)', fontSize: 11, fontWeight: '600' },
+  heroDot: { width: 4, height: 4, borderRadius: 2, backgroundColor: 'rgba(255,255,255,0.4)' },
+  trailing: { alignItems: 'flex-end', gap: 6 },
   completeBtn: {
-    width: 28,
-    height: 28,
-    borderRadius: 14,
+    width: 30,
+    height: 30,
+    borderRadius: 15,
     alignItems: 'center',
     justifyContent: 'center',
+    backgroundColor: 'rgba(124,58,237,0.12)',
   },
-  cardTitle: { fontSize: 14, fontWeight: '700' },
-  cardDesc: { fontSize: 12, lineHeight: 17 },
-  cardFooter: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginTop: 4 },
-  cardDate: { fontSize: 10, color: '#6b7280' },
-  emptyState: { alignItems: 'center', paddingVertical: 60, gap: 12 },
-  emptyText: { fontSize: 14 },
+  date: { fontSize: 10, fontWeight: '600' },
 });

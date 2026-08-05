@@ -2,6 +2,8 @@ import { Platform } from 'react-native';
 
 export const API_BASE = process.env.EXPO_PUBLIC_API_BASE || 'http://10.84.220.137:4000';
 
+export const HF_TOKEN = process.env.EXPO_PUBLIC_HF_TOKEN || '';
+
 export const APP_THEME = {
   primary: '#9333ea',
   primaryHover: '#7e22ce',

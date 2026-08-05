@@ -1,98 +1,61 @@
 import React, { useState } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, ActivityIndicator, StyleSheet } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { FileText, Download, Share2, GraduationCap, User, Hash, Building, CalendarDays } from 'lucide-react-native';
+import { View, ActivityIndicator } from 'react-native';
+import Svg, { Rect } from 'react-native-svg';
 import { useTheme } from '../../../contexts/ThemeContext';
-import GlassHeader from '../../../components/ui/GlassHeader';
+import { useSession } from '../../../hooks/useSession';
+import { Screen } from '../../../components/ui/Screen';
+import { SubHeader } from '../../../components/ui/SubHeader';
+import { AdmitCard } from '../../../components/ui/AdmitCard';
+import { GradButton } from '../../../components/ui/GradButton';
+import { Download } from 'lucide-react-native';
 
-export default function AdmitCard() {
-  const { isDarkMode } = useTheme();
-  const insets = useSafeAreaInsets();
+const QRMock = () => {
+  const cells: [number, number][] = [
+    [0, 0], [1, 0], [2, 0], [3, 0], [0, 1], [3, 1], [0, 2], [3, 2], [0, 3], [1, 3], [2, 3], [3, 3],
+    [6, 0], [7, 0], [8, 0], [9, 0], [6, 1], [9, 1], [6, 2], [9, 2], [6, 3], [7, 3], [8, 3], [9, 3],
+    [0, 6], [0, 7], [0, 8], [0, 9], [1, 6], [2, 6], [3, 6], [3, 7], [3, 8], [3, 9],
+    [6, 6], [7, 6], [8, 6], [9, 6], [6, 7], [9, 7], [7, 8], [8, 8], [6, 9], [9, 9],
+    [1, 4], [4, 2], [4, 5], [5, 4], [5, 8], [2, 4], [4, 7], [7, 4], [8, 4], [4, 4],
+  ];
+  return (
+    <Svg viewBox="0 0 10 10" width={70} height={70}>
+      {cells.map(([x, y], i) => (
+        <Rect key={i} x={x} y={y} width={1.1} height={1.1} fill="#111" />
+      ))}
+    </Svg>
+  );
+};
+
+export default function AdmitCardScreen() {
+  const { theme } = useTheme();
+  const { user } = useSession();
   const [generating, setGenerating] = useState(false);
 
-  const handleGeneratePDF = async () => {
+  const handleDownload = async () => {
     setGenerating(true);
-    // PDF generation logic would go here via expo-print
     setTimeout(() => setGenerating(false), 1500);
   };
 
   return (
-    <View style={[styles.container, { backgroundColor: isDarkMode ? '#0f172a' : '#f8fafc' }]}>
-      <GlassHeader variant="dashboard">
-        <View style={[styles.header, { paddingTop: insets.top + 8 }]}>
-          <FileText size={22} color="#7c3aed" />
-          <Text style={[styles.headerTitle, { color: isDarkMode ? 'white' : '#111827' }]}>Admit Card</Text>
-        </View>
-      </GlassHeader>
-
-      <ScrollView contentContainerStyle={{ paddingTop: 80, padding: 16 }}>
-        <View style={[styles.card, { backgroundColor: isDarkMode ? 'rgba(30,41,59,0.4)' : 'white', borderColor: isDarkMode ? '#374151' : '#e5e7eb' }]}>
-          <View style={styles.cardHeader}>
-            <GraduationCap size={32} color="#7c3aed" />
-            <Text style={[styles.cardTitle, { color: isDarkMode ? 'white' : '#111827' }]}>Digital Admit Card</Text>
-          </View>
-
-          <View style={[styles.qrPlaceholder, { borderColor: isDarkMode ? '#374151' : '#e5e7eb' }]}>
-            <View style={[styles.qrBox, { backgroundColor: isDarkMode ? '#1e293b' : '#f3f4f6' }]}>
-              <Hash size={48} color={isDarkMode ? '#6b7280' : '#9ca3af'} />
-            </View>
-            <Text style={[styles.qrLabel, { color: isDarkMode ? '#9ca3af' : '#6b7280' }]}>QR Code</Text>
-          </View>
-
-          <View style={styles.infoSection}>
-            <InfoRow icon={Building} label="Institution" value="Institute of Engineering Management Kolkata" isDarkMode={isDarkMode} />
-            <InfoRow icon={GraduationCap} label="Program" value="B.Tech Computer Science" isDarkMode={isDarkMode} />
-            <InfoRow icon={CalendarDays} label="Exam Cycle" value="Even Semester 2026" isDarkMode={isDarkMode} />
-            <InfoRow icon={User} label="Student Name" value="John Doe" isDarkMode={isDarkMode} />
-          </View>
-
-          <View style={styles.actions}>
-            <TouchableOpacity onPress={handleGeneratePDF} disabled={generating} style={[styles.actionBtn, { opacity: generating ? 0.7 : 1 }]}>
-              {generating ? <ActivityIndicator color="white" /> : <Download size={18} color="white" />}
-              <Text style={styles.actionText}>{generating ? 'Generating...' : 'Download PDF'}</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={[styles.shareBtn, { backgroundColor: isDarkMode ? '#374151' : '#f3f4f6' }]}>
-              <Share2 size={18} color={isDarkMode ? '#9ca3af' : '#6b7280'} />
-              <Text style={[styles.shareText, { color: isDarkMode ? '#e5e7eb' : '#374151' }]}>Share</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-      </ScrollView>
+    <View style={{ flex: 1, backgroundColor: theme.bg }}>
+      <Screen>
+        <SubHeader title="Admit Card" />
+        <AdmitCard
+          title="Note Loom"
+          pill="Mid-Sem 2026"
+          qr={<QRMock />}
+          code={`IEM · ${user?.uid || '2023CS0765'} · SEM-06`}
+          cells={[
+            { label: 'Student', value: user?.name || 'Arpan Maity' },
+            { label: 'Course', value: 'CSE · Sem 6' },
+            { label: 'Exam Date', value: '12 Mar 2026' },
+            { label: 'Venue', value: 'Block B · Hall 2' },
+          ]}
+        />
+        <GradButton fullWidth size="md" onPress={handleDownload} icon={<Download size={18} color="#fff" />}>
+          {generating ? <ActivityIndicator color="#fff" /> : 'Download Admit Card'}
+        </GradButton>
+      </Screen>
     </View>
   );
 }
-
-const InfoRow = ({ icon: Icon, label, value, isDarkMode }: any) => (
-  <View style={infoStyles.row}>
-    <Icon size={16} color={isDarkMode ? '#9ca3af' : '#6b7280'} />
-    <View style={infoStyles.text}>
-      <Text style={[infoStyles.label, { color: isDarkMode ? '#9ca3af' : '#6b7280' }]}>{label}</Text>
-      <Text style={[infoStyles.value, { color: isDarkMode ? 'white' : '#111827' }]}>{value}</Text>
-    </View>
-  </View>
-);
-
-const infoStyles = StyleSheet.create({
-  row: { flexDirection: 'row', alignItems: 'flex-start', gap: 10, marginBottom: 16 },
-  text: { flex: 1 },
-  label: { fontSize: 12, marginBottom: 2 },
-  value: { fontSize: 15, fontWeight: '600' },
-});
-
-const styles = StyleSheet.create({
-  container: { flex: 1 },
-  header: { flexDirection: 'row', alignItems: 'center', gap: 8, paddingHorizontal: 4, paddingBottom: 8 },
-  headerTitle: { fontSize: 20, fontWeight: '700' },
-  card: { padding: 24, borderRadius: 20, borderWidth: 1 },
-  cardHeader: { flexDirection: 'row', alignItems: 'center', gap: 10, marginBottom: 24 },
-  cardTitle: { fontSize: 22, fontWeight: '700' },
-  qrPlaceholder: { alignItems: 'center', marginBottom: 24, borderWidth: 1, borderRadius: 16, padding: 16, borderStyle: 'dashed' },
-  qrBox: { width: 100, height: 100, borderRadius: 12, alignItems: 'center', justifyContent: 'center', marginBottom: 8 },
-  qrLabel: { fontSize: 12 },
-  infoSection: { marginBottom: 24 },
-  actions: { flexDirection: 'row', gap: 12 },
-  actionBtn: { flex: 1, backgroundColor: '#7c3aed', paddingVertical: 14, borderRadius: 12, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8 },
-  actionText: { color: 'white', fontSize: 15, fontWeight: '600' },
-  shareBtn: { paddingVertical: 14, paddingHorizontal: 20, borderRadius: 12, flexDirection: 'row', alignItems: 'center', gap: 8 },
-  shareText: { fontSize: 15, fontWeight: '600' },
-});

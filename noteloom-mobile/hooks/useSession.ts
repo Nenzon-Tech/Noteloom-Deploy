@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import * as LocalAuthentication from 'expo-local-authentication';
-import api from '../lib/api';
+import api, { authHeaders } from '../lib/api';
 import { saveSessionToken, getSessionToken, clearSessionToken } from '../lib/storage';
 import { API_BASE } from '../lib/constants';
 
@@ -47,7 +47,7 @@ export function useSession() {
       }
 
       const response = await fetch(`${API_BASE}/session/info`, {
-        headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+        headers: authHeaders(token),
       });
 
       if (response.ok) {
@@ -80,7 +80,7 @@ export function useSession() {
       const token = await getSessionToken();
       if (!token) return [];
       const response = await fetch(`${API_BASE}/session/menu`, {
-        headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+        headers: authHeaders(token),
       });
       if (response.ok) {
         const data = await response.json();
@@ -121,7 +121,7 @@ export function useSession() {
       if (token) {
         fetch(`${API_BASE}/api/auth/signout`, {
           method: 'POST',
-          headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+          headers: authHeaders(token),
         }).catch(() => {});
       }
     } catch {}

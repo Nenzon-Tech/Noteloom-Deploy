@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, StyleSheet, ActivityIndicator, TextInput } from 'react-native';
-import { useRouter } from 'expo-router';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { Building, Plus, ChevronRight, ArrowLeft } from 'lucide-react-native';
+import { View, StyleSheet, ActivityIndicator } from 'react-native';
+import { Building2 } from 'lucide-react-native';
 import { useTheme } from '../../../contexts/ThemeContext';
 import { API_BASE } from '../../../lib/constants';
+import { authHeaders } from '../../../lib/api';
 import { getSessionToken } from '../../../lib/storage';
-import GlassHeader from '../../../components/ui/GlassHeader';
+import { Screen } from '../../../components/ui/Screen';
+import { SubHeader } from '../../../components/ui/SubHeader';
+import { ListCard, LRow } from '../../../components/ui/ListCard';
+import { EmptyState } from '../../../components/ui/EmptyState';
 
 interface Department {
   _id: string;
@@ -18,9 +20,7 @@ interface Department {
 }
 
 export default function ManageDepartments() {
-  const { isDarkMode } = useTheme();
-  const insets = useSafeAreaInsets();
-  const router = useRouter();
+  const { theme } = useTheme();
   const [departments, setDepartments] = useState<Department[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -30,7 +30,7 @@ export default function ManageDepartments() {
     try {
       const token = await getSessionToken();
       const response = await fetch(`${API_BASE}/api/departments`, {
-        headers: { Authorization: `Bearer ${token}` },
+        headers: authHeaders(token),
       });
       if (response.ok) setDepartments(await response.json());
     } catch (err) { console.error(err); }
@@ -38,52 +38,31 @@ export default function ManageDepartments() {
   };
 
   return (
-    <View style={[styles.container, { backgroundColor: isDarkMode ? '#0f172a' : '#f8fafc' }]}>
-      <GlassHeader variant="dashboard">
-        <View style={[styles.headerInner, { paddingTop: insets.top + 8 }]}>
-          <TouchableOpacity onPress={() => router.back()} style={styles.backBtn}>
-            <ArrowLeft size={22} color={isDarkMode ? 'white' : '#111827'} />
-          </TouchableOpacity>
-          <Text style={[styles.headerTitle, { color: isDarkMode ? 'white' : '#111827' }]}>Departments</Text>
-        </View>
-      </GlassHeader>
+    <View style={{ flex: 1, backgroundColor: theme.bg }}>
+      <Screen>
+        <SubHeader title="Departments" subtitle={`${departments.length} departments`} />
 
-      <ScrollView contentContainerStyle={{ paddingTop: 80, padding: 16, gap: 12 }}>
         {loading ? (
-          <ActivityIndicator size="large" color="#7c3aed" style={{ marginTop: 60 }} />
+          <ActivityIndicator size="large" color={theme.violet} style={{ marginTop: 40 }} />
         ) : departments.length === 0 ? (
-          <View style={styles.empty}>
-            <Building size={48} color={isDarkMode ? '#6b7280' : '#9ca3af'} opacity={0.4} />
-            <Text style={[styles.emptyText, { color: isDarkMode ? '#9ca3af' : '#6b7280' }]}>No departments found</Text>
-          </View>
+          <EmptyState icon={<Building2 size={44} color={theme.faint} />} message="No departments found" />
         ) : (
-          departments.map((dept) => (
-            <View key={dept._id} style={[styles.card, { backgroundColor: isDarkMode ? 'rgba(30,41,59,0.6)' : 'white', borderColor: isDarkMode ? '#374151' : '#e5e7eb' }]}>
-              <View style={styles.cardLeft}>
-                <Building size={24} color="#7c3aed" />
-                <View style={{ flex: 1 }}>
-                  <Text style={[styles.deptName, { color: isDarkMode ? 'white' : '#111827' }]}>{dept.name}</Text>
-                  <Text style={[styles.deptCode, { color: isDarkMode ? '#9ca3af' : '#6b7280' }]}>{dept.code}</Text>
-                </View>
-              </View>
-              <ChevronRight size={18} color={isDarkMode ? '#6b7280' : '#9ca3af'} />
-            </View>
-          ))
+          <ListCard>
+            {departments.map((dept, i) => (
+              <LRow
+                key={dept._id}
+                icon={<Building2 size={18} color={theme.violet} />}
+                iconBg="rgba(124,58,237,0.12)"
+                title={dept.name}
+                subtitle={dept.code}
+                last={i === departments.length - 1}
+              />
+            ))}
+          </ListCard>
         )}
-      </ScrollView>
+      </Screen>
     </View>
   );
 }
 
-const styles = StyleSheet.create({
-  container: { flex: 1 },
-  headerInner: { flexDirection: 'row', alignItems: 'center', gap: 8, paddingHorizontal: 4, paddingBottom: 8 },
-  backBtn: { padding: 8 },
-  headerTitle: { fontSize: 18, fontWeight: '700' },
-  card: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', padding: 16, borderRadius: 14, borderWidth: 1 },
-  cardLeft: { flexDirection: 'row', alignItems: 'center', gap: 12, flex: 1 },
-  deptName: { fontSize: 15, fontWeight: '600' },
-  deptCode: { fontSize: 12, marginTop: 2 },
-  empty: { alignItems: 'center', paddingVertical: 60, gap: 12 },
-  emptyText: { fontSize: 14 },
-});
+const styles = StyleSheet.create({});

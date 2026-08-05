@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { API_BASE } from './constants';
+import { API_BASE, HF_TOKEN } from './constants';
 import { getSecure } from './storage';
 
 const api = axios.create({
@@ -8,10 +8,18 @@ const api = axios.create({
   headers: { 'Content-Type': 'application/json' },
 });
 
+export const authHeaders = (token?: string | null): Record<string, string> => {
+  const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+  if (HF_TOKEN) headers.Authorization = `Bearer ${HF_TOKEN}`;
+  if (token) headers['x-user-token'] = `Bearer ${token}`;
+  return headers;
+};
+
 api.interceptors.request.use(async (config) => {
   try {
     const token = await getSecure('sessionToken');
-    if (token) config.headers.Authorization = `Bearer ${token}`;
+    if (HF_TOKEN) config.headers.Authorization = `Bearer ${HF_TOKEN}`;
+    if (token) config.headers['x-user-token'] = `Bearer ${token}`;
   } catch {}
   return config;
 });

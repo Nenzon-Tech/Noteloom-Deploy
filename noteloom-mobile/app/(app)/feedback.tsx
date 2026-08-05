@@ -1,17 +1,17 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, StyleSheet, ActivityIndicator, TextInput } from 'react-native';
-import { useRouter } from 'expo-router';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { Star, Send, ArrowLeft, MessageSquare } from 'lucide-react-native';
+import { View, Text, Pressable, TextInput, StyleSheet, ActivityIndicator } from 'react-native';
+import { Star, Send } from 'lucide-react-native';
 import { useTheme } from '../../contexts/ThemeContext';
 import { API_BASE } from '../../lib/constants';
+import { authHeaders } from '../../lib/api';
 import { getSessionToken } from '../../lib/storage';
-import GlassHeader from '../../components/ui/GlassHeader';
+import { Screen } from '../../components/ui/Screen';
+import { SubHeader } from '../../components/ui/SubHeader';
+import { GradButton } from '../../components/ui/GradButton';
+import { Gradient } from '../../components/ui/Gradient';
 
 export default function SemesterFeedback() {
-  const { isDarkMode } = useTheme();
-  const insets = useSafeAreaInsets();
-  const router = useRouter();
+  const { theme } = useTheme();
 
   const [rating, setRating] = useState(0);
   const [feedback, setFeedback] = useState('');
@@ -26,7 +26,7 @@ export default function SemesterFeedback() {
     try {
       const token = await getSessionToken();
       const response = await fetch(`${API_BASE}/api/feedback/subjects`, {
-        headers: { Authorization: `Bearer ${token}` },
+        headers: authHeaders(token),
       });
       if (response.ok) setSubjects(await response.json());
     } catch {}
@@ -40,7 +40,7 @@ export default function SemesterFeedback() {
       const token = await getSessionToken();
       await fetch(`${API_BASE}/api/feedback/submit`, {
         method: 'POST',
-        headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+        headers: authHeaders(token),
         body: JSON.stringify({ rating, feedback, subjects: subjects.map((s) => s._id) }),
       });
       setSubmitted(true);
@@ -49,81 +49,75 @@ export default function SemesterFeedback() {
   };
 
   return (
-    <View style={[styles.container, { backgroundColor: isDarkMode ? '#0f172a' : '#f8fafc' }]}>
-      <GlassHeader variant="dashboard">
-        <View style={[styles.headerInner, { paddingTop: insets.top + 8 }]}>
-          <TouchableOpacity onPress={() => router.back()} style={styles.backBtn}>
-            <ArrowLeft size={22} color={isDarkMode ? 'white' : '#111827'} />
-          </TouchableOpacity>
-          <Text style={[styles.headerTitle, { color: isDarkMode ? 'white' : '#111827' }]}>Semester Feedback</Text>
-        </View>
-      </GlassHeader>
+    <View style={{ flex: 1, backgroundColor: theme.bg }}>
+      <Screen>
+        <SubHeader title="Semester Feedback" subtitle="Share your experience" />
 
-      <ScrollView contentContainerStyle={{ paddingTop: 80, padding: 16, gap: 20 }}>
         {submitted ? (
           <View style={styles.successCard}>
-            <Star size={48} color="#f59e0b" fill="#f59e0b" />
-            <Text style={[styles.successTitle, { color: isDarkMode ? 'white' : '#111827' }]}>Thank You!</Text>
-            <Text style={[styles.successSub, { color: isDarkMode ? '#9ca3af' : '#6b7280' }]}>Your feedback has been recorded.</Text>
+            <Gradient colors={theme.gradientBrand} angle={135} radius={28} style={styles.successIcon}>
+              <Star size={34} color="#fff" fill="#fff" />
+            </Gradient>
+            <Text style={[styles.successTitle, { color: theme.fg }]}>Thank You!</Text>
+            <Text style={[styles.successSub, { color: theme.faint }]}>Your feedback has been recorded.</Text>
           </View>
+        ) : loading ? (
+          <ActivityIndicator color={theme.violet} style={{ paddingVertical: 60 }} />
         ) : (
           <>
-            <Text style={[styles.sectionTitle, { color: isDarkMode ? '#d1d5db' : '#4b5563' }]}>Rate your experience this semester</Text>
+            <Text style={[styles.sectionTitle, { color: theme.fg }]}>Rate your experience this semester</Text>
 
             <View style={styles.stars}>
               {[1, 2, 3, 4, 5].map((n) => (
-                <TouchableOpacity key={n} onPress={() => setRating(n)}>
+                <Pressable
+                  key={n}
+                  onPress={() => setRating(n)}
+                  style={({ pressed }) => pressed && { transform: [{ scale: 0.85 }] }}
+                >
                   <Star
                     size={36}
-                    color={n <= rating ? '#f59e0b' : (isDarkMode ? '#6b7280' : '#d1d5db')}
-                    fill={n <= rating ? '#f59e0b' : 'transparent'}
+                    color={n <= rating ? theme.amber : theme.faint}
+                    fill={n <= rating ? theme.amber : 'transparent'}
                   />
-                </TouchableOpacity>
+                </Pressable>
               ))}
             </View>
 
-            <Text style={[styles.label, { color: isDarkMode ? '#d1d5db' : '#4b5563' }]}>Your Feedback</Text>
+            <Text style={[styles.label, { color: theme.fg }]}>Your Feedback</Text>
             <TextInput
-              style={[styles.textArea, { backgroundColor: isDarkMode ? 'rgba(55,65,81,0.3)' : 'rgba(243,244,246,0.8)', color: isDarkMode ? 'white' : '#111827', borderColor: isDarkMode ? 'rgba(75,85,99,0.5)' : 'rgba(209,213,219,0.5)' }]}
+              style={[styles.textArea, { backgroundColor: theme.surface, color: theme.fg, borderColor: theme.border, ...theme.elev1 }]}
               placeholder="Share your thoughts about this semester..."
-              placeholderTextColor={isDarkMode ? '#6b7280' : '#9ca3af'}
+              placeholderTextColor={theme.faint}
               multiline
               numberOfLines={6}
               value={feedback}
               onChangeText={setFeedback}
             />
 
-            <TouchableOpacity onPress={handleSubmit} disabled={submitting || rating === 0} style={[styles.submitBtn, (submitting || rating === 0) && { opacity: 0.5 }]}>
-              <Send size={18} color="white" />
-              <Text style={styles.submitText}>{submitting ? 'Submitting...' : 'Submit Feedback'}</Text>
-            </TouchableOpacity>
+            <GradButton
+              fullWidth
+              size="lg"
+              loading={submitting}
+              onPress={handleSubmit}
+              icon={<Send size={18} color="#fff" />}
+              style={rating === 0 ? { opacity: 0.5 } : undefined}
+            >
+              {submitting ? 'Submitting...' : 'Submit Feedback'}
+            </GradButton>
           </>
         )}
-      </ScrollView>
+      </Screen>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1 },
-  headerInner: { flexDirection: 'row', alignItems: 'center', gap: 8, paddingHorizontal: 4, paddingBottom: 8 },
-  backBtn: { padding: 8 },
-  headerTitle: { fontSize: 18, fontWeight: '700' },
-  sectionTitle: { fontSize: 14, fontWeight: '600', textAlign: 'center' },
-  stars: { flexDirection: 'row', justifyContent: 'center', gap: 8 },
-  label: { fontSize: 14, fontWeight: '600' },
-  textArea: { padding: 16, borderRadius: 12, borderWidth: 1, fontSize: 14, minHeight: 140, textAlignVertical: 'top' },
-  submitBtn: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 8,
-    backgroundColor: '#7c3aed',
-    paddingVertical: 14,
-    borderRadius: 12,
-  },
-  submitText: { color: 'white', fontSize: 15, fontWeight: '700' },
+  sectionTitle: { fontSize: 15, fontWeight: '600', textAlign: 'center', marginTop: 8 },
+  stars: { flexDirection: 'row', justifyContent: 'center', gap: 8, marginVertical: 16 },
+  label: { fontSize: 14, fontWeight: '600', marginBottom: 10 },
+  textArea: { padding: 16, borderRadius: 14, borderWidth: 1, fontSize: 14, minHeight: 140, textAlignVertical: 'top', marginBottom: 18 },
   successCard: { alignItems: 'center', paddingVertical: 60, gap: 12 },
-  successTitle: { fontSize: 22, fontWeight: '800' },
+  successIcon: { width: 56, height: 56, alignItems: 'center', justifyContent: 'center', marginBottom: 6 },
+  successTitle: { fontSize: 22, fontWeight: '800', letterSpacing: -0.4 },
   successSub: { fontSize: 14 },
 });

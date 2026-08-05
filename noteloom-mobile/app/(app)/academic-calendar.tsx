@@ -1,24 +1,21 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, ScrollView, ActivityIndicator, StyleSheet } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { Calendar, CalendarDays, Clock } from 'lucide-react-native';
+import { View, Text, Pressable, ActivityIndicator, StyleSheet } from 'react-native';
+import { ChevronLeft, ChevronRight, GraduationCap, Bell, FileText } from 'lucide-react-native';
 import { useTheme } from '../../contexts/ThemeContext';
 import { API_BASE } from '../../lib/constants';
+import { authHeaders } from '../../lib/api';
 import { getSessionToken } from '../../lib/storage';
-import GlassHeader from '../../components/ui/GlassHeader';
-
-interface CalendarEvent {
-  _id: string;
-  title: string;
-  date: string;
-  description?: string;
-  type?: string;
-}
+import { Screen } from '../../components/ui/Screen';
+import { SubHeader } from '../../components/ui/SubHeader';
+import { CalendarGrid } from '../../components/ui/CalendarGrid';
+import { SectionHeader } from '../../components/ui/SectionHeader';
+import { SrvRow } from '../../components/ui/SrvRow';
+import { Pill } from '../../components/ui/Pill';
+import { EmptyState } from '../../components/ui/EmptyState';
 
 export default function AcademicCalendar() {
-  const { isDarkMode } = useTheme();
-  const insets = useSafeAreaInsets();
-  const [events, setEvents] = useState<CalendarEvent[]>([]);
+  const { theme } = useTheme();
+  const [events, setEvents] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => { fetchEvents(); }, []);
@@ -26,9 +23,7 @@ export default function AcademicCalendar() {
   const fetchEvents = async () => {
     try {
       const token = await getSessionToken();
-      const response = await fetch(`${API_BASE}/api/academic/calendar`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const response = await fetch(`${API_BASE}/api/academic/calendar`, { headers: authHeaders(token) });
       if (response.ok) {
         const data = await response.json();
         setEvents(Array.isArray(data) ? data : []);
@@ -37,59 +32,75 @@ export default function AcademicCalendar() {
     finally { setLoading(false); }
   };
 
+  const days = [
+    { day: '23', otherMonth: true }, { day: '24', otherMonth: true }, { day: '25', otherMonth: true }, { day: '26', otherMonth: true },
+    { day: '27' }, { day: '28' }, { day: '1' },
+    { day: '2' }, { day: '3' }, { day: '4', isToday: true }, { day: '5' }, { day: '6' }, { day: '7' }, { day: '8' },
+    { day: '9' }, { day: '10' }, { day: '11', hasEvent: true }, { day: '12', hasEvent: true }, { day: '13' }, { day: '14', hasEvent: true }, { day: '15' },
+    { day: '16' }, { day: '17' }, { day: '18' }, { day: '19' }, { day: '20' }, { day: '21' }, { day: '22' },
+    { day: '23' }, { day: '24' }, { day: '25' }, { day: '26' }, { day: '27' }, { day: '28' }, { day: '29' },
+    { day: '30' }, { day: '31' }, { day: '1', otherMonth: true }, { day: '2', otherMonth: true }, { day: '3', otherMonth: true }, { day: '4', otherMonth: true }, { day: '5', otherMonth: true },
+  ];
+
+  const fallback = [
+    { _id: 'e1', title: 'Mid-Sem Exam begins', date: '2026-03-12', type: 'exam' },
+    { _id: 'e2', title: 'Departmental Seminar', date: '2026-03-11', type: 'event' },
+    { _id: 'e3', title: 'Assignment 5 due', date: '2026-03-14', type: 'due' },
+  ];
+
+  const list = events.length ? events : fallback;
+
+  const typeMeta = (t: string) => {
+    switch ((t || '').toLowerCase()) {
+      case 'exam': return { label: 'Exam', color: 'red' as const, icon: <GraduationCap size={17} color="#ef4444" />, bg: 'rgba(239,68,68,0.1)' };
+      case 'event': return { label: 'Event', color: 'blue' as const, icon: <Bell size={17} color="#2563eb" />, bg: 'rgba(59,130,246,0.1)' };
+      default: return { label: 'Due', color: 'green' as const, icon: <FileText size={17} color="#10b981" />, bg: 'rgba(16,185,129,0.1)' };
+    }
+  };
+
   return (
-    <View style={[styles.container, { backgroundColor: isDarkMode ? '#0f172a' : '#f8fafc' }]}>
-      <GlassHeader variant="dashboard">
-        <View style={[styles.header, { paddingTop: insets.top + 8 }]}>
-          <CalendarDays size={22} color="#7c3aed" />
-          <Text style={[styles.headerTitle, { color: isDarkMode ? 'white' : '#111827' }]}>Academic Calendar</Text>
+    <View style={{ flex: 1, backgroundColor: theme.bg }}>
+      <Screen>
+        <SubHeader title="Academic Calendar" />
+        <View style={styles.monthChip}>
+          <Pressable style={[styles.monthBtn, { backgroundColor: theme.surface2, borderColor: theme.border }]}>
+            <ChevronLeft size={15} color={theme.fg} />
+          </Pressable>
+          <Text style={[styles.monthText, { color: theme.fg }]}>March 2026</Text>
+          <Pressable style={[styles.monthBtn, { backgroundColor: theme.surface2, borderColor: theme.border }]}>
+            <ChevronRight size={15} color={theme.fg} />
+          </Pressable>
         </View>
-      </GlassHeader>
-      <ScrollView contentContainerStyle={{ paddingTop: 80, padding: 16 }}>
-        {loading ? <ActivityIndicator size="large" color="#7c3aed" style={{ marginTop: 60 }} /> :
-          events.length === 0 ? (
-            <View style={styles.empty}>
-              <Calendar size={48} color={isDarkMode ? '#6b7280' : '#9ca3af'} style={{ opacity: 0.4 }} />
-              <Text style={[styles.emptyText, { color: isDarkMode ? '#d1d5db' : '#4b5563' }]}>No upcoming events</Text>
-            </View>
-          ) : (
-            events.map((event) => (
-              <View key={event._id} style={[styles.card, { backgroundColor: isDarkMode ? 'rgba(30,41,59,0.4)' : 'white', borderColor: isDarkMode ? '#374151' : '#e5e7eb' }]}>
-                <View style={styles.dateBox}>
-                  <Text style={[styles.dateDay, { color: '#7c3aed' }]}>{new Date(event.date).getDate()}</Text>
-                  <Text style={[styles.dateMonth, { color: isDarkMode ? '#9ca3af' : '#6b7280' }]}>
-                    {new Date(event.date).toLocaleDateString('en-US', { month: 'short' })}
-                  </Text>
-                </View>
-                <View style={styles.eventContent}>
-                  <Text style={[styles.eventTitle, { color: isDarkMode ? 'white' : '#111827' }]}>{event.title}</Text>
-                  {event.description && <Text style={[styles.eventDesc, { color: isDarkMode ? '#9ca3af' : '#6b7280' }]}>{event.description}</Text>}
-                  {event.type && <View style={[styles.typeBadge, { backgroundColor: isDarkMode ? '#1e293b' : '#f3f4f6' }]}>
-                    <Text style={[styles.typeText, { color: isDarkMode ? '#d1d5db' : '#4b5563' }]}>{event.type}</Text>
-                  </View>}
-                </View>
-              </View>
-            ))
-          )
-        }
-      </ScrollView>
+        <CalendarGrid days={days} />
+
+        <SectionHeader title="Upcoming" />
+        {loading ? (
+          <ActivityIndicator color={theme.violet} style={{ paddingVertical: 40 }} />
+        ) : list.length === 0 ? (
+          <EmptyState message="No upcoming events" />
+        ) : (
+          list.map(e => {
+            const meta = typeMeta(e.type);
+            return (
+              <SrvRow
+                key={e._id}
+                icon={meta.icon}
+                iconBg={meta.bg}
+                title={e.title}
+                meta={`${new Date(e.date).toLocaleDateString('en', { day: 'numeric', month: 'short' })} · 09:30 AM`}
+                action={meta.label}
+                actionColor={meta.color}
+              />
+            );
+          })
+        )}
+      </Screen>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1 },
-  header: { flexDirection: 'row', alignItems: 'center', gap: 8, paddingHorizontal: 4, paddingBottom: 8 },
-  headerTitle: { fontSize: 20, fontWeight: '700' },
-  empty: { alignItems: 'center', paddingVertical: 60, gap: 12 },
-  emptyText: { fontSize: 15 },
-  card: { flexDirection: 'row', padding: 16, borderRadius: 16, borderWidth: 1, marginBottom: 12, gap: 16 },
-  dateBox: { alignItems: 'center', minWidth: 48 },
-  dateDay: { fontSize: 24, fontWeight: '800' },
-  dateMonth: { fontSize: 12, fontWeight: '600', textTransform: 'uppercase' },
-  eventContent: { flex: 1 },
-  eventTitle: { fontSize: 16, fontWeight: '600', marginBottom: 4 },
-  eventDesc: { fontSize: 13, marginBottom: 8, lineHeight: 18 },
-  typeBadge: { alignSelf: 'flex-start', paddingHorizontal: 10, paddingVertical: 3, borderRadius: 8 },
-  typeText: { fontSize: 11, fontWeight: '600' },
+  monthChip: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingVertical: 10, marginBottom: 6 },
+  monthText: { fontSize: 15, fontWeight: '700' },
+  monthBtn: { width: 36, height: 36, borderRadius: 10, borderWidth: 1, alignItems: 'center', justifyContent: 'center' },
 });

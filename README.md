@@ -40,6 +40,14 @@ NoteLoom is a state-of-the-art, secure, multi-tenant Software-as-a-Service (SaaS
 *   **Multimodal File Summary**: Text extraction from PDF, Word, Excel, PowerPoint, and images (OCR).
 *   **Speech-to-Text Video Transcription**: Transcribes lecture videos using Whisper model fallbacks if direct video parsing limits are reached.
 
+### 8. 📱 React Native Mobile App (Android)
+*   **Expo Router + NativeWind**: The `noteloom-mobile` folder is a cross-platform React Native app built on Expo SDK 57, React Native 0.86, and Tailwind via NativeWind v4.
+*   **Role-Based Portals**: Dedicated Student, Faculty, College Admin, and IT Admin experiences with protected routes, bottom tab navigation, and biometric (face-ID / fingerprint) unlock via SecureStore.
+*   **Full Academic Suite**: Dashboard, attendance, timetable, academic calendar, leave requests, results, fees & payment history, exam (COE) portal with QR admit cards, library, notice board, feedback, AI study assistant chat, and AI PDF summarizer.
+*   **Video-First LMS**: Lecture modules with `expo-video` streaming, content progress tracking, and downloadable course material.
+*   **Theming**: Central `ThemeContext` with a global gradient design system and reusable UI components under `components/ui`.
+*   **Latest Build (v1.0.1)**: Rebuilt video player on the native `expo-video` engine, smoother lecture streaming, upgraded Expo SDK dependencies, version bumped to 1.0.1 (versionCode 2) — see `RELEASE_NOTES_v1.0.1.md`.
+
 ---
 
 ## 👥 Platform User Roles & Permissions
@@ -251,3 +259,29 @@ VITE_API_BASE=http://localhost:4000
 4.  **Verification**:
     *   Open `http://localhost:5173` in your browser.
     *   SaaS system management dashboard can be accessed using configured IT credentials.
+
+### Running the Mobile App (Android / Expo)
+
+The mobile app lives in the **`noteloom-mobile`** folder. It talks to the same NoteLoom backend API.
+
+```bash
+cd noteloom-mobile
+npm install --legacy-peer-deps
+
+# Start the Expo dev server
+npm start          # or: npx expo start
+
+# Run on a connected device / emulator
+npm run android    # or: npx expo run:android
+
+# Build a release APK via EAS
+npx eas build --platform android
+```
+
+Create a `.env` in `noteloom-mobile` pointing at your backend:
+
+```env
+EXPO_PUBLIC_API_BASE=http://localhost:4000
+```
+
+> Full release notes for the latest build are in `RELEASE_NOTES_v1.0.1.md`.

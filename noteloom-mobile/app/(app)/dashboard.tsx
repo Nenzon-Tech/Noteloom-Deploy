@@ -1,237 +1,149 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, RefreshControl, StyleSheet, Dimensions, Animated } from 'react-native';
+import React, { useState, useEffect, useCallback } from 'react';
+import { View, Text, Pressable, RefreshControl, StyleSheet, ActivityIndicator } from 'react-native';
 import { useRouter } from 'expo-router';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { Wifi, Sparkles, Database, Layout, GraduationCap, Users, Shield, LogOut, ArrowRight } from 'lucide-react-native';
+import { Sun, Moon, Bell, LogOut, BookOpen, Library, CheckSquare, Megaphone, Calendar, Clock, QrCode, GraduationCap, BookMarked, Heart, MessageCircle, TrendingUp } from 'lucide-react-native';
 import { useTheme } from '../../contexts/ThemeContext';
 import { useSession } from '../../hooks/useSession';
-import { API_BASE, ROLE_LABELS } from '../../lib/constants';
+import { API_BASE } from '../../lib/constants';
+import { authHeaders } from '../../lib/api';
 import { getSessionToken } from '../../lib/storage';
-import GlassHeader from '../../components/ui/GlassHeader';
-import ThemeToggle from '../../components/ui/ThemeToggle';
-import UserProfileDropdown from '../../components/ui/UserProfileDropdown';
-import DashboardCard from '../../components/ui/DashboardCard';
-import LoadingSpinner from '../../components/ui/LoadingSpinner';
-import SessionExpired from '../../components/ui/SessionExpired';
+import { Screen } from '../../components/ui/Screen';
+import { GHeader } from '../../components/ui/GHeader';
+import { Avatar } from '../../components/ui/Avatar';
+import { HeroCard } from '../../components/ui/HeroCard';
+import { QuickGrid } from '../../components/ui/QuickGrid';
+import { LearnCard } from '../../components/ui/LearnCard';
+import { NoticeMini } from '../../components/ui/NoticeMini';
+import { SectionHeader } from '../../components/ui/SectionHeader';
+import { BottomNav } from '../../components/ui/BottomNav';
 
-interface MenuItem {
-  key: string;
-  title: string;
-  description: string;
-  icon: string;
-  category: 'LMS' | 'ERP';
-}
-
-const { width } = Dimensions.get('window');
-
-const routeMap: Record<string, string> = {
-  attendance: '/(app)/attendance',
-  my_classes: '/(app)/my-classes',
-  notice_board: '/(app)/notice-board',
-  timetable: '/(app)/timetable',
-  library: '/(app)/library',
-  leave: '/(app)/leave',
-  coe: '/(app)/coe',
-  ai_chat: '/(app)/ai-chat',
-  profile: '/(app)/profile',
-  mark_attendance: '/(app)/mark-attendance',
-  manage_users: '/(app)/manage-users',
-  manage_departments: '/(app)/manage-departments',
-  exam_form: '/(app)/exam-form',
-  fees: '/(app)/fees',
-  results: '/(app)/results',
-  academic_calendar: '/(app)/academic-calendar',
-  courses: '/(app)/my-classes',
-  feedback: '/(app)/feedback',
-  chat: '/(app)/ai-chat',
-  library_books: '/(app)/library',
-  admit_card: '/(app)/coe/admit-card',
-  exam_portal: '/(app)/coe',
-  question_bank: '/(app)/coe',
-  leave_apply: '/(app)/leave',
-  leave_manager: '/(app)/leave',
-  fees_exam_records: '/(app)/fees',
-  exam_management: '/(app)/exam-management',
-  university_marks: '/(app)/results',
-  staff_notices: '/(app)/notice-board',
-  dept_notices: '/(app)/notice-board',
-  account_creation: '/(app)/manage-users',
-};
-
-const AnimatedScrollView = Animated.createAnimatedComponent(ScrollView);
-
-export default function Dashboard() {
-  const { isDarkMode } = useTheme();
-  const insets = useSafeAreaInsets();
-  const { user, profile, loading, isSessionValid, logout, fetchMenu } = useSession();
+export default function StudentHome() {
+  const { theme, isDarkMode, toggleTheme } = useTheme();
+  const { user, profile, logout } = useSession();
   const router = useRouter();
-  const [lmsItems, setLmsItems] = useState<MenuItem[]>([]);
-  const [erpItems, setErpItems] = useState<MenuItem[]>([]);
-  const [menuLoading, setMenuLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
+  const [notices, setNotices] = useState<any[]>([]);
+  const [classes, setClasses] = useState<any[]>([]);
+  const [loaded, setLoaded] = useState(false);
 
-  const loadMenu = useCallback(async () => {
-    setMenuLoading(true);
+  const loadData = useCallback(async () => {
     try {
       const token = await getSessionToken();
-      if (!token) { setMenuLoading(false); return; }
-      const response = await fetch(`${API_BASE}/session/menu`, {
-        headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
-      });
-      if (response.ok) {
-        const data = await response.json();
-        const lms: MenuItem[] = [];
-        const erp: MenuItem[] = [];
-        const lmsKeywords = ['notes', 'assignments', 'exams', 'classroom', 'library', 'quiz', 'course', 'faculty', 'attendance', 'notice', 'project', 'class', 'routine', 'timetable'];
-        data.forEach((item: MenuItem) => {
-          const key = item.key?.toLowerCase() || '';
-          const title = item.title?.toLowerCase() || '';
-          const matchesKeyword = lmsKeywords.some(kw => key.includes(kw) || title.includes(kw));
-          if (item.category === 'LMS' || matchesKeyword) lms.push(item);
-          else erp.push(item);
-        });
-        setLmsItems(lms);
-        setErpItems(erp);
-      }
-    } catch (error) { console.error('Error fetching menu:', error); }
-    finally { setMenuLoading(false); }
+      const [nRes, cRes] = await Promise.all([
+        fetch(`${API_BASE}/api/notices`, { headers: authHeaders(token) }),
+        fetch(`${API_BASE}/api/classrooms`, { headers: authHeaders(token) }),
+      ]);
+      if (nRes.ok) { const d = await nRes.json(); if (Array.isArray(d)) setNotices(d); }
+      if (cRes.ok) { const d = await cRes.json(); if (Array.isArray(d)) setClasses(d); }
+    } catch {} finally { setLoaded(true); }
   }, []);
 
-  useEffect(() => { if (isSessionValid) loadMenu(); }, [isSessionValid]);
+  useEffect(() => { loadData(); }, [loadData]);
 
-  const onRefresh = useCallback(async () => {
-    setRefreshing(true);
-    await loadMenu();
-    setRefreshing(false);
-  }, [loadMenu]);
+  const onRefresh = useCallback(async () => { setRefreshing(true); await loadData(); setRefreshing(false); }, [loadData]);
 
-  const handleCardPress = (item: MenuItem) => {
-    const route = routeMap[item.key] || `/(app)/${item.key.replace(/_/g, '-')}`;
-    router.push(route as any);
-  };
+  const handleSignOut = async () => { await logout(); router.replace('/college-selection'); };
 
-  const handleSignOut = async () => {
-    await logout();
-    router.replace('/college-selection');
-  };
+  const quickModules = [
+    { key: 'courses', label: 'My Courses', gradient: ['#10b981', '#0d9488'] as [string, string], icon: <BookOpen size={18} color="#fff" />, onPress: () => router.push('/(app)/my-classes') },
+    { key: 'library', label: 'Library', gradient: ['#6366f1', '#a855f7'] as [string, string], icon: <Library size={18} color="#fff" />, onPress: () => router.push('/(app)/library') },
+    { key: 'attendance', label: 'Attendance', gradient: ['#3b82f6', '#6366f1'] as [string, string], icon: <CheckSquare size={18} color="#fff" />, onPress: () => router.push('/(app)/attendance') },
+    { key: 'notice', label: 'Notices', gradient: ['#f59e0b', '#ea580c'] as [string, string], icon: <Megaphone size={18} color="#fff" />, onPress: () => router.push('/(app)/notice-board') },
+    { key: 'calendar', label: 'Calendar', gradient: ['#475569', '#334155'] as [string, string], icon: <Calendar size={18} color="#fff" />, onPress: () => router.push('/(app)/academic-calendar') },
+    { key: 'timetable', label: 'Timetable', gradient: ['#3b82f6', '#2563eb'] as [string, string], icon: <Clock size={18} color="#fff" />, onPress: () => router.push('/(app)/timetable') },
+    { key: 'admit', label: 'Admit Card', gradient: ['#ef4444', '#db2777'] as [string, string], icon: <QrCode size={18} color="#fff" />, onPress: () => router.push('/(app)/coe/admit-card') },
+    { key: 'univ', label: 'University', gradient: ['#6366f1', '#a855f7'] as [string, string], icon: <GraduationCap size={18} color="#fff" />, onPress: () => router.push('/(app)/results') },
+  ];
 
-  const getRoleInfo = () => {
-    const map: Record<string, { label: string; icon: any }> = {
-      student: { label: 'Student Dashboard', icon: GraduationCap },
-      faculty: { label: 'Faculty Dashboard', icon: Users },
-      college_admin: { label: 'Admin Dashboard', icon: Shield },
-    };
-    return map[profile?.role || 'student'] || map.student;
-  };
-
-  if (loading || menuLoading) {
-    return <LoadingSpinner message="Hang On, Loading..." />;
-  }
-
-  if (!isSessionValid) {
-    return <SessionExpired onLoginRedirect={() => router.push('/college-selection')} />;
-  }
-
-  const roleInfo = getRoleInfo();
-  const RoleIcon = roleInfo.icon;
+  const learnItem = classes[0]
+    ? { title: classes[0].name || 'Course', subtitle: 'Module · Continue where you left', code: classes[0].subjectCode, progress: 72, timeLeft: '24 min left' }
+    : { title: 'Database Management Systems', subtitle: 'Module 4 · Normalization', code: 'CS-502', progress: 72, timeLeft: '24 min left' };
 
   return (
-    <View style={[styles.container, { backgroundColor: isDarkMode ? '#0f172a' : '#f3f4f6' }]}>
-      <GlassHeader variant="dashboard">
-        <View style={[styles.headerInner, { paddingTop: insets.top + 8 }]}>
-          <View style={styles.headerLeft}>
-            <UserProfileDropdown
-              userName={user?.name}
-              userEmail={user?.email}
-              userUid={user?.uid}
-              onOptionClick={(id) => console.log(id)}
+    <View style={{ flex: 1, backgroundColor: theme.bg }}>
+      <Screen refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={theme.violet} />}>
+        <GHeader
+          avatar={<Avatar label={user?.name?.[0] || 'A'} />}
+          title={`Hi, ${user?.name?.split(' ')[0] || 'Arpan'} 👋`}
+          subtitle={`${profile?.college || 'IEM'} · Active`}
+          actions={
+            <>
+              <Pressable onPress={toggleTheme} style={[styles.iconBtn, { backgroundColor: theme.surface2, borderColor: theme.border }]}>
+                {isDarkMode ? <Sun size={19} color={theme.fg} /> : <Moon size={19} color={theme.fg} />}
+              </Pressable>
+              <Pressable onPress={() => router.push('/(app)/notice-board')} style={[styles.iconBtn, { backgroundColor: theme.surface2, borderColor: theme.border }]}>
+                <Bell size={19} color={theme.fg} />
+              </Pressable>
+              <Pressable onPress={handleSignOut} style={[styles.iconBtn, { backgroundColor: theme.surface2, borderColor: theme.border }]}>
+                <LogOut size={19} color={theme.red} />
+              </Pressable>
+            </>
+          }
+        />
+
+        <HeroCard
+          title="Attendance Overview"
+          pillLabel="Sem 6 · 2026"
+          ringPercent={84}
+          big="74"
+          small="/88"
+          label="lectures covered"
+          trend="+6% vs last month"
+          chips={[{ value: '62', label: 'Present' }, { value: '08', label: 'Absent' }, { value: '04', label: 'Excused' }]}
+        />
+
+        <SectionHeader title="Quick Modules" action="All" onAction={() => router.push('/(app)/my-classes')} />
+        {!loaded ? (
+          <ActivityIndicator color={theme.violet} style={{ paddingVertical: 30 }} />
+        ) : (
+          <QuickGrid items={quickModules} />
+        )}
+
+        <SectionHeader title="Continue Learning" action="See all" onAction={() => router.push('/(app)/my-classes')} />
+        <LearnCard {...learnItem} onPress={() => router.push(`/(app)/classroom/${classes[0]?._id || ''}` as any)} />
+
+        <SectionHeader title="Latest Notices" action="See all" onAction={() => router.push('/(app)/notice-board')} />
+        {notices.length === 0 ? (
+          <>
+            <NoticeMini
+              avatar={<Avatar label="S" gradient={['#3b82f6', '#6366f1']} />}
+              title="Mid-Sem Exam Schedule Released"
+              meta="Prof. S. Banerjee · CSE Dept · 2h ago"
+              body="Mid-semester examinations for all branches will begin from 12 March. Admit cards are now available in the exam portal."
+              likes={48}
+              comments={12}
+              onPress={() => router.push('/(app)/notice-board')}
             />
-            <View>
-              <View style={styles.roleRow}>
-                <View style={styles.roleBadge}>
-                  <RoleIcon size={14} color="white" />
-                  <Text style={styles.roleBadgeText}>{roleInfo.label}</Text>
-                </View>
-                <View style={styles.activeBadge}>
-                  <Wifi size={10} color="#22c55e" />
-                  <Text style={styles.activeText}>Active</Text>
-                </View>
-              </View>
-              <Text style={[styles.collegeName, { color: isDarkMode ? '#d1d5db' : '#4b5563' }]}>
-                {profile?.college || 'Note Loom'}
-              </Text>
-            </View>
-          </View>
-          <View style={styles.headerRight}>
-            <ThemeToggle />
-            <TouchableOpacity onPress={handleSignOut} style={[styles.signOutBtn, { backgroundColor: isDarkMode ? 'rgba(55,65,81,0.7)' : '#7c3aed' }]}>
-              <LogOut size={16} color="white" />
-            </TouchableOpacity>
-          </View>
-        </View>
-      </GlassHeader>
-
-      <ScrollView
-        style={styles.scroll}
-        contentContainerStyle={{ paddingTop: 100, paddingBottom: 100, paddingHorizontal: 16 }}
-        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#7c3aed" />}
-      >
-        {lmsItems.length > 0 && (
-          <View style={styles.section}>
-            <View style={styles.sectionHeader}>
-              <Sparkles size={20} color="#7c3aed" />
-              <Text style={[styles.sectionTitle, { color: isDarkMode ? '#f3f4f6' : '#111827' }]}>Learning & Academics</Text>
-            </View>
-            <View style={styles.grid}>
-              {lmsItems.map((item, index) => (
-                <DashboardCard key={item.key} item={item} index={index} onPress={() => handleCardPress(item)} />
-              ))}
-            </View>
-          </View>
+            <NoticeMini
+              avatar={<Avatar label="H" gradient={['#f59e0b', '#ea580c']} />}
+              title="Library: New PYQ Uploads"
+              meta="Central Library · 5h ago"
+              body="Previous year question papers (2020–2025) for core engineering subjects are now available in the Digital Library."
+              likes={23}
+              comments={5}
+              onPress={() => router.push('/(app)/notice-board')}
+            />
+          </>
+        ) : (
+          notices.slice(0, 3).map(n => (
+            <NoticeMini
+              key={n._id}
+              avatar={<Avatar label={n.category?.[0] || 'N'} />}
+              title={n.title}
+              meta={n.category || 'Campus'}
+              body={n.content || ''}
+              likes={0}
+              comments={0}
+              onPress={() => router.push('/(app)/notice-board')}
+            />
+          ))
         )}
-
-        {erpItems.length > 0 && (
-          <View style={styles.section}>
-            <View style={styles.sectionHeader}>
-              <Database size={20} color="#2563eb" />
-              <Text style={[styles.sectionTitle, { color: isDarkMode ? '#f3f4f6' : '#111827' }]}>Resource Planning & Management</Text>
-            </View>
-            <View style={styles.grid}>
-              {erpItems.map((item, index) => (
-                <DashboardCard key={item.key} item={item} index={index} onPress={() => handleCardPress(item)} />
-              ))}
-            </View>
-          </View>
-        )}
-
-        {lmsItems.length === 0 && erpItems.length === 0 && (
-          <View style={styles.empty}>
-            <Layout size={64} color={isDarkMode ? '#6b7280' : '#9ca3af'} style={{ opacity: 0.4 }} />
-            <Text style={[styles.emptyText, { color: isDarkMode ? '#d1d5db' : '#4b5563' }]}>No active modules assigned to your profile.</Text>
-          </View>
-        )}
-      </ScrollView>
+      </Screen>
+      <BottomNav role="student" />
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1 },
-  headerInner: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 4, paddingBottom: 8 },
-  headerLeft: { flexDirection: 'row', alignItems: 'center', gap: 12 },
-  headerRight: { flexDirection: 'row', alignItems: 'center', gap: 8 },
-  roleRow: { flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 4 },
-  roleBadge: { flexDirection: 'row', alignItems: 'center', gap: 6, backgroundColor: '#7c3aed', paddingHorizontal: 12, paddingVertical: 4, borderRadius: 20 },
-  roleBadgeText: { color: 'white', fontSize: 12, fontWeight: '600' },
-  activeBadge: { flexDirection: 'row', alignItems: 'center', gap: 4 },
-  activeText: { color: '#22c55e', fontSize: 11 },
-  collegeName: { fontSize: 13, fontWeight: '500' },
-  signOutBtn: { padding: 10, borderRadius: 10 },
-  scroll: { flex: 1 },
-  section: { marginBottom: 32 },
-  sectionHeader: { flexDirection: 'row', alignItems: 'center', gap: 10, marginBottom: 16, paddingBottom: 8, borderBottomWidth: 1, borderBottomColor: 'rgba(55,65,81,0.3)' },
-  sectionTitle: { fontSize: 18, fontWeight: '700' },
-  grid: { flexDirection: 'row', flexWrap: 'wrap', gap: 16 },
-  empty: { alignItems: 'center', paddingVertical: 80, gap: 16 },
-  emptyText: { fontSize: 15, textAlign: 'center', opacity: 0.6 },
+  iconBtn: { width: 40, height: 40, borderRadius: 12, borderWidth: 1, alignItems: 'center', justifyContent: 'center' },
 });

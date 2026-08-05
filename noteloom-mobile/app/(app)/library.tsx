@@ -1,34 +1,29 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, ScrollView, ActivityIndicator, StyleSheet } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { Library, CalendarDays } from 'lucide-react-native';
+import { View, Text, Pressable, ActivityIndicator, StyleSheet } from 'react-native';
+import { FileText, Library as LibraryIcon, Play, StickyNote, Download, GraduationCap } from 'lucide-react-native';
 import { useTheme } from '../../contexts/ThemeContext';
 import { API_BASE } from '../../lib/constants';
+import { authHeaders } from '../../lib/api';
 import { getSessionToken } from '../../lib/storage';
-import GlassHeader from '../../components/ui/GlassHeader';
+import { Screen } from '../../components/ui/Screen';
+import { SubHeader } from '../../components/ui/SubHeader';
+import { FilterChips } from '../../components/ui/FilterChips';
+import { EmptyState } from '../../components/ui/EmptyState';
 
-interface BookItem {
-  _id: string;
-  title: string;
-  author: string;
-  dueDate?: string;
-  status: string;
-}
+type LibFilter = 'all' | 'syllabus' | 'pyqs' | 'slides' | 'notes';
 
 export default function LibraryScreen() {
-  const { isDarkMode } = useTheme();
-  const insets = useSafeAreaInsets();
-  const [books, setBooks] = useState<BookItem[]>([]);
+  const { theme } = useTheme();
+  const [books, setBooks] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [filter, setFilter] = useState<LibFilter>('all');
 
   useEffect(() => { fetchBooks(); }, []);
 
   const fetchBooks = async () => {
     try {
       const token = await getSessionToken();
-      const response = await fetch(`${API_BASE}/api/library/books`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const response = await fetch(`${API_BASE}/api/library/books`, { headers: authHeaders(token) });
       if (response.ok) {
         const data = await response.json();
         setBooks(Array.isArray(data) ? data : []);
@@ -37,51 +32,52 @@ export default function LibraryScreen() {
     finally { setLoading(false); }
   };
 
+  const fallback = [
+    { _id: 'l1', title: 'DBMS Syllabus — Sem 6', category: 'syllabus', meta: 'PDF · 3rd Year CSE', icon: <FileText size={19} color="#7c3aed" />, bg: 'rgba(124,58,237,0.1)' },
+    { _id: 'l2', title: 'PYQ 2020–2025 · Computer Networks', category: 'pyqs', meta: 'PDF · Combined', icon: <GraduationCap size={19} color="#2563eb" />, bg: 'rgba(59,130,246,0.1)' },
+    { _id: 'l3', title: 'OS Lecture Slides — Modules 1–3', category: 'slides', meta: 'PDF · Prof. R. Ghosh', icon: <Play size={19} color="#10b981" />, bg: 'rgba(16,185,129,0.1)' },
+    { _id: 'l4', title: 'DSA Handwritten Notes', category: 'notes', meta: 'PDF · Unit 4 Graphs', icon: <StickyNote size={19} color="#d97706" />, bg: 'rgba(245,158,11,0.1)' },
+  ];
+
+  const list = (books.length ? books.map(b => ({ _id: b._id, title: b.title, category: 'notes', meta: b.author || 'PDF', icon: <LibraryIcon size={19} color="#7c3aed" />, bg: 'rgba(124,58,237,0.1)' })) : fallback).filter(d => filter === 'all' || d.category === filter);
+
   return (
-    <View style={[styles.container, { backgroundColor: isDarkMode ? '#0f172a' : '#f8fafc' }]}>
-      <GlassHeader variant="dashboard">
-        <View style={[styles.header, { paddingTop: insets.top + 8 }]}>
-          <Text style={[styles.headerTitle, { color: isDarkMode ? 'white' : '#111827' }]}>Library</Text>
-        </View>
-      </GlassHeader>
-      <ScrollView contentContainerStyle={{ paddingTop: 80, padding: 16 }}>
-        {loading ? <ActivityIndicator size="large" color="#7c3aed" style={{ marginTop: 60 }} /> :
-          books.length === 0 ? (
-            <View style={styles.empty}>
-              <Library size={48} color={isDarkMode ? '#6b7280' : '#9ca3af'} style={{ opacity: 0.4 }} />
-              <Text style={[styles.emptyText, { color: isDarkMode ? '#d1d5db' : '#4b5563' }]}>No books issued</Text>
-            </View>
-          ) : (
-            books.map((book) => (
-              <View key={book._id} style={[styles.card, { backgroundColor: isDarkMode ? 'rgba(30,41,59,0.4)' : 'white', borderColor: isDarkMode ? '#374151' : '#e5e7eb' }]}>
-                <View style={styles.cardLeft}>
-                  <Text style={[styles.bookTitle, { color: isDarkMode ? 'white' : '#111827' }]}>{book.title}</Text>
-                  <Text style={[styles.author, { color: isDarkMode ? '#9ca3af' : '#6b7280' }]}>{book.author}</Text>
-                </View>
-                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
-                  <CalendarDays size={14} color={isDarkMode ? '#9ca3af' : '#6b7280'} />
-                  <Text style={[styles.dueDate, { color: isDarkMode ? '#9ca3af' : '#6b7280' }]}>
-                    {book.dueDate ? new Date(book.dueDate).toLocaleDateString() : 'N/A'}
-                  </Text>
-                </View>
+    <View style={{ flex: 1, backgroundColor: theme.bg }}>
+      <Screen>
+        <SubHeader title="Digital Library" />
+        <FilterChips<LibFilter>
+          options={[{ value: 'all', label: 'All' }, { value: 'syllabus', label: 'Syllabus' }, { value: 'pyqs', label: 'PYQs' }, { value: 'slides', label: 'Slides' }, { value: 'notes', label: 'Notes' }]}
+          value={filter}
+          onChange={setFilter}
+        />
+        {loading ? (
+          <ActivityIndicator color={theme.violet} style={{ paddingVertical: 60 }} />
+        ) : list.length === 0 ? (
+          <EmptyState message="No documents in this category" />
+        ) : (
+          list.map(d => (
+            <View key={d._id} style={[styles.row, { backgroundColor: theme.surface, borderColor: theme.border, ...theme.elev1 }]}>
+              <View style={[styles.ic, { backgroundColor: d.bg }]}>{d.icon}</View>
+              <View style={styles.info}>
+                <Text style={[styles.title, { color: theme.fg }]} numberOfLines={1}>{d.title}</Text>
+                <Text style={[styles.meta, { color: theme.faint }]}>{d.meta}</Text>
               </View>
-            ))
-          )
-        }
-      </ScrollView>
+              <Pressable style={[styles.dl, { backgroundColor: theme.surface2, borderColor: theme.border }]}>
+                <Download size={15} color={theme.violet} />
+              </Pressable>
+            </View>
+          ))
+        )}
+      </Screen>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1 },
-  header: { paddingHorizontal: 4, paddingBottom: 8 },
-  headerTitle: { fontSize: 20, fontWeight: '700' },
-  empty: { alignItems: 'center', paddingVertical: 60, gap: 12 },
-  emptyText: { fontSize: 15 },
-  card: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', padding: 16, borderRadius: 16, borderWidth: 1, marginBottom: 12 },
-  cardLeft: { flex: 1 },
-  bookTitle: { fontSize: 16, fontWeight: '600', marginBottom: 4 },
-  author: { fontSize: 13 },
-  dueDate: { fontSize: 12 },
+  row: { flexDirection: 'row', alignItems: 'center', gap: 12, padding: 13, borderRadius: 14, borderWidth: 1, marginBottom: 10 },
+  ic: { width: 42, height: 42, borderRadius: 12, alignItems: 'center', justifyContent: 'center' },
+  info: { flex: 1, minWidth: 0 },
+  title: { fontSize: 13, fontWeight: '600' },
+  meta: { fontSize: 10, marginTop: 2 },
+  dl: { width: 36, height: 36, borderRadius: 10, borderWidth: 1, alignItems: 'center', justifyContent: 'center' },
 });

@@ -1,17 +1,20 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, StyleSheet, ActivityIndicator } from 'react-native';
-import { useRouter, useLocalSearchParams } from 'expo-router';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { ArrowLeft, Receipt, IndianRupee, Calendar, FileText, Download } from 'lucide-react-native';
+import { View, Text, StyleSheet, ActivityIndicator } from 'react-native';
+import { useLocalSearchParams } from 'expo-router';
+import { IndianRupee, Receipt, Calendar, FileText, Download } from 'lucide-react-native';
 import { useTheme } from '../../contexts/ThemeContext';
 import { API_BASE } from '../../lib/constants';
+import { authHeaders } from '../../lib/api';
 import { getSessionToken } from '../../lib/storage';
-import GlassHeader from '../../components/ui/GlassHeader';
+import { Screen } from '../../components/ui/Screen';
+import { SubHeader } from '../../components/ui/SubHeader';
+import { ListCard, LRow } from '../../components/ui/ListCard';
+import { GradButton } from '../../components/ui/GradButton';
+import { Gradient } from '../../components/ui/Gradient';
+import { EmptyState } from '../../components/ui/EmptyState';
 
 export default function PaymentDetails() {
-  const { isDarkMode } = useTheme();
-  const insets = useSafeAreaInsets();
-  const router = useRouter();
+  const { theme } = useTheme();
   const { id } = useLocalSearchParams<{ id: string }>();
 
   const [payment, setPayment] = useState<any>(null);
@@ -23,7 +26,7 @@ export default function PaymentDetails() {
     try {
       const token = await getSessionToken();
       const response = await fetch(`${API_BASE}/api/payments/${id}`, {
-        headers: { Authorization: `Bearer ${token}` },
+        headers: authHeaders(token),
       });
       if (response.ok) setPayment(await response.json());
     } catch {}
@@ -32,81 +35,83 @@ export default function PaymentDetails() {
 
   if (loading) {
     return (
-      <View style={[styles.loading, { backgroundColor: isDarkMode ? '#0f172a' : '#f8fafc' }]}>
-        <ActivityIndicator size="large" color="#7c3aed" />
+      <View style={[styles.loading, { backgroundColor: theme.bg }]}>
+        <ActivityIndicator size="large" color={theme.violet} />
       </View>
     );
   }
 
   return (
-    <View style={[styles.container, { backgroundColor: isDarkMode ? '#0f172a' : '#f8fafc' }]}>
-      <GlassHeader variant="dashboard">
-        <View style={[styles.headerInner, { paddingTop: insets.top + 8 }]}>
-          <TouchableOpacity onPress={() => router.back()} style={styles.backBtn}>
-            <ArrowLeft size={22} color={isDarkMode ? 'white' : '#111827'} />
-          </TouchableOpacity>
-          <Text style={[styles.headerTitle, { color: isDarkMode ? 'white' : '#111827' }]}>Payment Details</Text>
-        </View>
-      </GlassHeader>
+    <View style={{ flex: 1, backgroundColor: theme.bg }}>
+      <Screen>
+        <SubHeader title="Payment Details" subtitle={payment ? `TXN ${payment.transactionId || ''}` : undefined} />
 
-      <ScrollView contentContainerStyle={{ paddingTop: 80, padding: 16, gap: 16 }}>
         {payment ? (
           <>
-            <View style={[styles.amountCard, { backgroundColor: isDarkMode ? 'rgba(30,41,59,0.6)' : 'white', borderColor: isDarkMode ? '#374151' : '#e5e7eb' }]}>
-              <IndianRupee size={32} color="#059669" />
-              <Text style={[styles.amount, { color: isDarkMode ? 'white' : '#111827' }]}>₹{payment.amount?.toLocaleString()}</Text>
-              <Text style={[styles.status, { color: payment.status === 'paid' ? '#059669' : '#f59e0b' }]}>{payment.status?.toUpperCase()}</Text>
-            </View>
+            <Gradient
+              colors={(payment.status === 'paid' ? ['#10b981', '#059669'] : theme.gradientCta) as any}
+              angle={135}
+              radius={20}
+              style={styles.amountCard}
+            >
+              <View style={styles.amountHead}>
+                <View style={styles.amountIcon}>
+                  <IndianRupee size={24} color="#fff" />
+                </View>
+                <View style={styles.pill}>
+                  <Text style={styles.pillText}>{payment.status?.toUpperCase() || 'PENDING'}</Text>
+                </View>
+              </View>
+              <Text style={styles.amount}>₹{payment.amount?.toLocaleString()}</Text>
+              <Text style={styles.amountSub}>{payment.description || 'Payment'}</Text>
+            </Gradient>
 
-            <View style={styles.detailRow}>
-              <Receipt size={16} color={isDarkMode ? '#9ca3af' : '#6b7280'} />
-              <Text style={[styles.detailLabel, { color: isDarkMode ? '#9ca3af' : '#6b7280' }]}>Transaction ID</Text>
-              <Text style={[styles.detailValue, { color: isDarkMode ? 'white' : '#111827' }]}>{payment.transactionId}</Text>
-            </View>
-
-            <View style={styles.detailRow}>
-              <Calendar size={16} color={isDarkMode ? '#9ca3af' : '#6b7280'} />
-              <Text style={[styles.detailLabel, { color: isDarkMode ? '#9ca3af' : '#6b7280' }]}>Date</Text>
-              <Text style={[styles.detailValue, { color: isDarkMode ? 'white' : '#111827' }]}>{new Date(payment.createdAt).toLocaleDateString()}</Text>
-            </View>
-
-            <View style={styles.detailRow}>
-              <FileText size={16} color={isDarkMode ? '#9ca3af' : '#6b7280'} />
-              <Text style={[styles.detailLabel, { color: isDarkMode ? '#9ca3af' : '#6b7280' }]}>Description</Text>
-              <Text style={[styles.detailValue, { color: isDarkMode ? 'white' : '#111827' }]}>{payment.description || 'Payment'}</Text>
-            </View>
+            <ListCard>
+              <LRow
+                icon={<Receipt size={18} color={theme.violet} />}
+                iconBg="rgba(124,58,237,0.12)"
+                title={payment.transactionId || '—'}
+                subtitle="Transaction ID"
+                trailing={<View />}
+              />
+              <LRow
+                icon={<Calendar size={18} color={theme.blue} />}
+                iconBg="rgba(59,130,246,0.12)"
+                title={new Date(payment.createdAt).toLocaleDateString()}
+                subtitle="Date"
+                trailing={<View />}
+              />
+              <LRow
+                icon={<FileText size={18} color={theme.amber} />}
+                iconBg="rgba(245,158,11,0.12)"
+                title={payment.description || 'Payment'}
+                subtitle="Description"
+                trailing={<View />}
+                last
+              />
+            </ListCard>
 
             {payment.receiptUrl && (
-              <TouchableOpacity style={styles.receiptBtn}>
-                <Download size={18} color="white" />
-                <Text style={styles.receiptText}>Download Receipt</Text>
-              </TouchableOpacity>
+              <GradButton fullWidth size="lg" icon={<Download size={18} color="#fff" />}>
+                Download Receipt
+              </GradButton>
             )}
           </>
         ) : (
-          <View style={styles.empty}>
-            <Text style={[styles.emptyText, { color: isDarkMode ? '#9ca3af' : '#6b7280' }]}>Payment not found</Text>
-          </View>
+          <EmptyState message="Payment not found" />
         )}
-      </ScrollView>
+      </Screen>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1 },
   loading: { flex: 1, alignItems: 'center', justifyContent: 'center' },
-  headerInner: { flexDirection: 'row', alignItems: 'center', gap: 8, paddingHorizontal: 4, paddingBottom: 8 },
-  backBtn: { padding: 8 },
-  headerTitle: { fontSize: 18, fontWeight: '700' },
-  amountCard: { alignItems: 'center', padding: 24, borderRadius: 16, borderWidth: 1, gap: 8 },
-  amount: { fontSize: 32, fontWeight: '800' },
-  status: { fontSize: 13, fontWeight: '700' },
-  detailRow: { flexDirection: 'row', alignItems: 'center', gap: 8, paddingVertical: 12, borderBottomWidth: 1, borderBottomColor: 'rgba(55,65,81,0.2)' },
-  detailLabel: { fontSize: 13, width: 100 },
-  detailValue: { fontSize: 14, fontWeight: '600', flex: 1 },
-  receiptBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, backgroundColor: '#7c3aed', paddingVertical: 14, borderRadius: 12, marginTop: 8 },
-  receiptText: { color: 'white', fontSize: 15, fontWeight: '700' },
-  empty: { alignItems: 'center', paddingVertical: 60 },
-  emptyText: { fontSize: 14 },
+  amountCard: { padding: 22, marginBottom: 16 },
+  amountHead: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 },
+  amountIcon: { width: 44, height: 44, borderRadius: 14, backgroundColor: 'rgba(255,255,255,0.14)', alignItems: 'center', justifyContent: 'center' },
+  pill: { borderWidth: 1, borderColor: 'rgba(255,255,255,0.28)', backgroundColor: 'rgba(255,255,255,0.12)', borderRadius: 999, paddingVertical: 4, paddingHorizontal: 10 },
+  pillText: { color: '#fff', fontSize: 10, fontWeight: '700', letterSpacing: 0.5 },
+  amount: { color: '#fff', fontSize: 34, fontWeight: '800', letterSpacing: -0.6 },
+  amountSub: { color: 'rgba(255,255,255,0.85)', fontSize: 12, fontWeight: '600', marginTop: 4 },
 });
