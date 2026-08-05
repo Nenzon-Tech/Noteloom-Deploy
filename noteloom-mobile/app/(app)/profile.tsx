@@ -1,9 +1,11 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Text, Pressable, Switch, StyleSheet } from 'react-native';
 import { useRouter } from 'expo-router';
-import { Bell, Library, ShieldCheck, Moon, Sun, MessageCircle, LogOut, ChevronRight } from 'lucide-react-native';
+import * as LocalAuthentication from 'expo-local-authentication';
+import { Bell, Library, ShieldCheck, Moon, Sun, MessageCircle, LogOut, ChevronRight, Fingerprint } from 'lucide-react-native';
 import { useTheme } from '../../contexts/ThemeContext';
 import { useSession } from '../../hooks/useSession';
+import { isBiometricEnabled, setBiometricEnabled } from '../../lib/storage';
 import { Screen } from '../../components/ui/Screen';
 import { GHeader, Wordmark } from '../../components/ui/GHeader';
 import { Gradient } from '../../components/ui/Gradient';
@@ -14,9 +16,33 @@ import { BottomNav } from '../../components/ui/BottomNav';
 
 export default function Profile() {
   const { theme, isDarkMode, toggleTheme } = useTheme();
-  const { user, profile, logout } = useSession();
+  const { user, profile, logout, authenticateWithBiometrics } = useSession();
   const router = useRouter();
-  const [biometricEnabled, setBiometricEnabled] = useState(false);
+  const [biometricEnabled, setBiometricEnabledState] = useState(false);
+
+  useEffect(() => {
+    let mounted = true;
+    (async () => {
+      const enabled = await isBiometricEnabled();
+      if (mounted) setBiometricEnabledState(enabled);
+    })();
+    return () => { mounted = false; };
+  }, []);
+
+  const handleToggleBiometric = async (value: boolean) => {
+    setBiometricEnabledState(value);
+    if (value) {
+      const ok = await authenticateWithBiometrics();
+      if (ok) {
+        await setBiometricEnabled(true);
+      } else {
+        setBiometricEnabledState(false);
+        await setBiometricEnabled(false);
+      }
+    } else {
+      await setBiometricEnabled(false);
+    }
+  };
 
   const handleSignOut = async () => { await logout(); router.replace('/college-selection'); };
 
@@ -53,7 +79,13 @@ export default function Profile() {
         <ListCard>
           <LRow icon={<Bell size={17} color="#7c3aed" />} iconBg="rgba(124,58,237,0.12)" title="Notifications" subtitle="3 unread · exam alerts" />
           <LRow icon={<Library size={17} color="#10b981" />} iconBg="rgba(16,185,129,0.12)" title="My Library" subtitle="Saved notes & PYQs" onPress={() => router.push('/(app)/library')} />
-          <LRow icon={<ShieldCheck size={17} color="#2563eb" />} iconBg="rgba(59,130,246,0.12)" title="Privacy & Security" subtitle="Manage sessions" />
+          <LRow
+            icon={<Fingerprint size={17} color="#2563eb" />}
+            iconBg="rgba(59,130,246,0.12)"
+            title="Biometric Login"
+            subtitle="Unlock NoteLoom with fingerprint at launch"
+            trailing={<Switch value={biometricEnabled} onValueChange={handleToggleBiometric} trackColor={{ false: theme.border, true: theme.violet }} thumbColor="#fff" />}
+          />
           <LRow
             icon={isDarkMode ? <Moon size={17} color="#d97706" /> : <Sun size={17} color="#d97706" />}
             iconBg="rgba(245,158,11,0.12)"
@@ -64,9 +96,9 @@ export default function Profile() {
           />
         </ListCard>
 
-        <SectionHeader title="Support" />
+        <SectionHeader title="Security" />
         <ListCard>
-          <LRow icon={<MessageCircle size={17} color="#4f46e5" />} iconBg="rgba(99,102,241,0.12)" title="Help & Support" subtitle="FAQs and contact" />
+          <LRow icon={<ShieldCheck size={17} color="#4f46e5" />} iconBg="rgba(99,102,241,0.12)" title="Privacy & Security" subtitle="Manage sessions" />
           <LRow
             icon={<LogOut size={17} color="#ef4444" />}
             iconBg="rgba(239,68,68,0.12)"
