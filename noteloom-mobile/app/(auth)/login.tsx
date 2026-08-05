@@ -7,7 +7,7 @@ import { useErrorPopup } from '../../contexts/ErrorPopupContext';
 import { useSession } from '../../hooks/useSession';
 import { API_BASE } from '../../lib/constants';
 import { authHeaders, publicHeaders } from '../../lib/api';
-import { isBiometricEnabled, removeSecure } from '../../lib/storage';
+import { isBiometricEnabled, setBiometricEnabled, removeSecure } from '../../lib/storage';
 import { Gradient } from '../../components/ui/Gradient';
 import { GradButton, GhostButton } from '../../components/ui/GradButton';
 import { RoleCard } from '../../components/ui/RoleCard';
@@ -542,11 +542,13 @@ export default function LoginPage() {
       <BiometricSetupModal
         visible={showBiometricSetup}
         onAccept={async () => {
+          await setBiometricEnabled(true);
           setBiometricEnabledState(true);
           setShowBiometricSetup(false);
           router.replace('/(app)/dashboard');
         }}
-        onDecline={() => {
+        onDecline={async () => {
+          await setBiometricEnabled(false);
           setShowBiometricSetup(false);
           router.replace('/(app)/dashboard');
         }}

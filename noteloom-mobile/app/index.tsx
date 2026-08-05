@@ -1,9 +1,10 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { View, Text, Animated, Easing, StyleSheet, StatusBar, Pressable } from 'react-native';
+import { View, Text, Animated, Easing, StyleSheet, StatusBar, Pressable, ActivityIndicator } from 'react-native';
 import { useRouter } from 'expo-router';
-import { GraduationCap, Bell, Bot, Building2 } from 'lucide-react-native';
+import * as LocalAuthentication from 'expo-local-authentication';
+import { Fingerprint, Lock, GraduationCap, Bell, Bot, Building2 } from 'lucide-react-native';
 import { useTheme } from '../contexts/ThemeContext';
-import { getSessionToken, getSecure } from '../lib/storage';
+import { getSessionToken, getSecure, isBiometricEnabled } from '../lib/storage';
 import { Gradient } from '../components/ui/Gradient';
 import { GradButton } from '../components/ui/GradButton';
 import { Screen } from '../components/ui/Screen';
@@ -12,6 +13,9 @@ export default function Index() {
   const { theme, isDarkMode } = useTheme();
   const router = useRouter();
   const [checking, setChecking] = useState(true);
+  const [biometricGate, setBiometricGate] = useState(false);
+  const [biometricUnlocking, setBiometricUnlocking] = useState(false);
+  const [biometricUnavailable, setBiometricUnavailable] = useState(false);
 
   const INITIAL_SPLASH_MS = 1600;
 
@@ -79,13 +83,16 @@ export default function Index() {
   useEffect(() => {
     const init = async () => {
       const minSplash = new Promise(resolve => setTimeout(resolve, INITIAL_SPLASH_MS));
-      const [token, collegeCode] = await Promise.all([
+      const [token, collegeCode, biometrics] = await Promise.all([
         getSessionToken(),
         getSecure('selectedCollegeCode'),
+        isBiometricEnabled(),
       ]);
       await minSplash;
 
-      if (token) {
+      if (token && biometrics) {
+        setBiometricGate(true);
+      } else if (token) {
         router.replace('/(app)/dashboard');
       } else if (collegeCode) {
         router.replace(`/(auth)/login?code=${encodeURIComponent(collegeCode)}`);
@@ -95,6 +102,68 @@ export default function Index() {
     };
     init();
   }, []);
+
+  const handleBiometricUnlock = async () => {
+    if (biometricUnlocking) return;
+    setBiometricUnlocking(true);
+    try {
+      const hasHardware = await LocalAuthentication.hasHardwareAsync();
+      const isEnrolled = await LocalAuthentication.isEnrolledAsync();
+      if (!hasHardware || !isEnrolled) {
+        setBiometricUnavailable(true);
+        return;
+      }
+      const result = await LocalAuthentication.authenticateAsync({
+        promptMessage: 'Unlock NoteLoom with Biometrics',
+        fallbackLabel: 'Use Passcode',
+        cancelLabel: 'Cancel',
+      });
+      if (result.success) {
+        router.replace('/(app)/dashboard');
+      }
+    } catch {
+      setBiometricUnavailable(true);
+    } finally {
+      setBiometricUnlocking(false);
+    }
+  };
+
+  if (biometricGate) {
+    return (
+      <View style={[styles.container, { backgroundColor: theme.bg }]}>
+        <StatusBar barStyle={isDarkMode ? 'light-content' : 'dark-content'} />
+        <Screen hasHeader={false} contentContainerStyle={styles.gateContainer}>
+          <Gradient colors={theme.gradientBrand} angle={140} radius={26} style={styles.gateLogo}>
+            <Fingerprint size={40} color="#fff" />
+          </Gradient>
+          <Text style={[styles.gateTitle, { color: theme.fg }]}>Welcome back</Text>
+          <Text style={[styles.gateSubtitle, { color: theme.muted }]}>
+            Unlock NoteLoom to continue to your dashboard.
+          </Text>
+
+          {biometricUnavailable ? (
+            <GradButton fullWidth size="lg" icon={<Lock size={17} color="#fff" />} onPress={() => router.replace('/(auth)/login')}>
+              Sign In with Password
+            </GradButton>
+          ) : (
+            <GradButton
+              fullWidth
+              size="lg"
+              icon={<Fingerprint size={17} color="#fff" />}
+              onPress={handleBiometricUnlock}
+              loading={biometricUnlocking}
+            >
+              {biometricUnlocking ? 'Verifying…' : 'Unlock with Biometrics'}
+            </GradButton>
+          )}
+
+          <Pressable onPress={() => router.replace('/college-selection')}>
+            <Text style={[styles.gateChange, { color: theme.faint }]}>Not you? Choose a different college</Text>
+          </Pressable>
+        </Screen>
+      </View>
+    );
+  }
 
   if (checking) {
     return (
@@ -225,4 +294,21 @@ const styles = StyleSheet.create({
   featDesc: { fontSize: 11, lineHeight: 16, marginTop: 2 },
   foot: { gap: 14 },
   note: { fontSize: 11, textAlign: 'center', lineHeight: 16 },
+  gateContainer: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: 14, paddingBottom: 40 },
+  gateLogo: {
+    width: 86,
+    height: 86,
+    borderRadius: 26,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 10,
+    shadowColor: 'rgba(124,58,237,0.5)',
+    shadowOffset: { width: 0, height: 12 },
+    shadowOpacity: 0.7,
+    shadowRadius: 24,
+    elevation: 10,
+  },
+  gateTitle: { fontSize: 26, fontWeight: '800', letterSpacing: -0.6 },
+  gateSubtitle: { fontSize: 13, lineHeight: 20, textAlign: 'center', paddingHorizontal: 24, marginBottom: 10 },
+  gateChange: { fontSize: 12, textAlign: 'center', marginTop: 8, textDecorationLine: 'underline' },
 });
