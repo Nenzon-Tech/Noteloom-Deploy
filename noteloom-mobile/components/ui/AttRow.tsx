@@ -21,6 +21,10 @@ export const AttRow = ({ initial, name, id, status = 'unmarked', onChange }: Att
     onChange?.(next);
   };
 
+  const bg = status === 'present' ? theme.green : status === 'absent' ? theme.red : theme.surface;
+  const bc = status === 'present' ? theme.green : status === 'absent' ? theme.red : theme.border;
+  const txt = status === 'unmarked' ? theme.muted : '#fff';
+
   return (
     <View style={[styles.row, { backgroundColor: theme.surface, borderColor: theme.border, ...theme.elev1 }]}>
       <Gradient colors={theme.gradientBrand} angle={135} radius={11} style={styles.ava}>
@@ -30,32 +34,22 @@ export const AttRow = ({ initial, name, id, status = 'unmarked', onChange }: Att
         <Text style={[styles.nameText, { color: theme.fg }]} numberOfLines={1}>{name}</Text>
         <Text style={[styles.idText, { color: theme.faint }]}>{id}</Text>
       </View>
-      <Pressable
-        onPress={cycle}
-        style={[
-          styles.btn,
-          status === 'present' && { backgroundColor: theme.green, borderColor: theme.green },
-          status === 'absent' && { backgroundColor: theme.red, borderColor: theme.red },
-          status === 'unmarked' && { backgroundColor: theme.surface, borderColor: theme.border },
-        ]}
-      >
-        <Text style={[styles.btnText, { color: status === 'unmarked' ? theme.muted : '#fff' }]}>
-          {status === 'unmarked' ? '?' : status === 'present' ? 'P' : 'A'}
-        </Text>
+      <Pressable onPress={cycle} style={[styles.btn, { backgroundColor: bg, borderColor: bc }]}>
+        <Text style={[styles.btnText, { color: txt }]}>{status === 'unmarked' ? '?' : status === 'present' ? 'P' : 'A'}</Text>
       </Pressable>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  row: { flexDirection: 'row', alignItems: 'center', gap: 10, paddingHorizontal: 12, paddingVertical: 10, borderRadius: 14, borderWidth: 1, marginBottom: 8 },
-  ava: { width: 36, height: 36, borderRadius: 11, alignItems: 'center', justifyContent: 'center' },
+  row: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingHorizontal: 14, paddingVertical: 12, borderRadius: 14, borderWidth: 1, marginBottom: 10 },
+  ava: { width: 36, height: 36, borderRadius: 11, alignItems: 'center', justifyContent: 'center', flexShrink: 0 },
   avaText: { color: '#fff', fontSize: 12, fontWeight: '700' },
   name: { flex: 1, minWidth: 0 },
   nameText: { fontSize: 12, fontWeight: '600' },
   idText: { fontSize: 10, marginTop: 1 },
-  btn: { width: 40, height: 40, borderRadius: 11, borderWidth: 1, alignItems: 'center', justifyContent: 'center' },
-  btnText: { fontSize: 12, fontWeight: '700' },
+  btn: { width: 44, height: 44, borderRadius: 12, borderWidth: 1, alignItems: 'center', justifyContent: 'center', flexShrink: 0 },
+  btnText: { fontSize: 13, fontWeight: '700' },
 });
 
 export default AttRow;

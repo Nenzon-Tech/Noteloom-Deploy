@@ -77,7 +77,6 @@ export const Wordmark = ({ dark }: { dark?: boolean }) => {
 const styles = StyleSheet.create({
   container: {
     borderBottomWidth: 1,
-    paddingHorizontal: 16,
     paddingBottom: 10,
     marginHorizontal: -16,
   },
@@ -85,6 +84,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
+    paddingHorizontal: 16,
   },
   left: { flexDirection: 'row', alignItems: 'center', gap: 10, flex: 1, minWidth: 0 },
   titleWrap: { flex: 1, minWidth: 0 },

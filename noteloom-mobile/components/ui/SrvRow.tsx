@@ -30,8 +30,7 @@ export const SrvRow = ({ icon, iconBg, iconColor, title, meta, action, actionCol
 
   const body = (
     <>
-      {avatar}
-      {icon && <View style={[styles.icon, { backgroundColor: iconBg }]}>{icon}</View>}
+      {avatar ?? (icon ? <View style={[styles.icon, { backgroundColor: iconBg }]}>{icon}</View> : null)}
       <View style={styles.info}>
         <Text style={[styles.title, { color: theme.fg }]} numberOfLines={1}>{title}</Text>
         <Text style={[styles.meta, { color: theme.faint }]} numberOfLines={1}>{meta}</Text>

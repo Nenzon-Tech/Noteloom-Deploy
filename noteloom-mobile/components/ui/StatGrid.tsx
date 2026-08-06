@@ -37,7 +37,7 @@ export const StatGrid = ({ items }: StatGridProps) => {
 
 const styles = StyleSheet.create({
   grid: { flexDirection: 'row', flexWrap: 'wrap', gap: 10, marginBottom: 18 },
-  box: { flex: 1, flexBasis: 0, borderRadius: 16, padding: 14, borderWidth: 1 },
+  box: { flex: 1, flexBasis: 0, minWidth: 0, borderRadius: 16, padding: 14, borderWidth: 1 },
   main: { flexBasis: '100%' },
   val: { fontSize: 22, fontWeight: '700', letterSpacing: -0.4 },
   lbl: { fontSize: 10, fontWeight: '600', textTransform: 'uppercase', letterSpacing: 0.6, marginTop: 2 },

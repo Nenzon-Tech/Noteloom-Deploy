@@ -19,9 +19,9 @@ export const QuickGrid = ({ items, columns = 4 }: { items: QuickItem[]; columns?
   const [containerWidth, setContainerWidth] = useState(0);
 
   const gap = 10;
-  const itemWidth = containerWidth
-    ? Math.floor((containerWidth - gap * (columns - 1)) / columns)
-    : Math.floor((screenWidth - 32 - gap * (columns - 1)) / columns);
+  const paddingHorizontal = 32;
+  const calculatedWidth = containerWidth || (screenWidth - paddingHorizontal);
+  const itemWidth = Math.floor((calculatedWidth - gap * (columns - 1)) / columns);
 
   return (
     <View style={[styles.grid, { gap }]} onLayout={e => setContainerWidth(e.nativeEvent.layout.width)}>

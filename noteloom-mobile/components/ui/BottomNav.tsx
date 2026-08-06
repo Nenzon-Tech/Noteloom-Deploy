@@ -117,7 +117,7 @@ const styles = StyleSheet.create({
     elevation: 10,
   },
   item: { flex: 1, alignItems: 'center', gap: 3, paddingVertical: 4, minHeight: 52, justifyContent: 'center' },
-  label: { fontSize: 10, fontWeight: '600', maxWidth: 68, textAlign: 'center' },
+  label: { fontSize: 10, fontWeight: '600', maxWidth: 80, textAlign: 'center', lineHeight: 13 },
   ind: { width: 26, height: 3, borderRadius: 2 },
 });
 

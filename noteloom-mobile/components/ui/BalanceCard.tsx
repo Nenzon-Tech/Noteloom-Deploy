@@ -33,7 +33,7 @@ export const BalanceCard = ({ colors, label, pill, value, valueSuffix, subLabel,
       </Text>
       <View style={[styles.row, styles.subRow]}>
         {subLabel ? (
-          <Text style={[styles.subLabel, { color: 'rgba(255,255,255,0.8)' }]}>{subLabel}</Text>
+          <Text style={[styles.subLabel, { color: 'rgba(255,255,255,0.8)' }]} numberOfLines={1}>{subLabel}</Text>
         ) : (
           <View style={{ flex: 1 }} />
         )}
@@ -60,21 +60,21 @@ const styles = StyleSheet.create({
   },
   decor: {
     position: 'absolute',
-    right: -30,
-    top: -40,
-    width: 150,
-    height: 150,
-    borderRadius: 75,
+    right: -20,
+    top: -30,
+    width: 140,
+    height: 140,
+    borderRadius: 70,
     backgroundColor: 'rgba(255,255,255,0.12)',
   },
   row: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 10 },
   label: { fontSize: 11, fontWeight: '600' },
-  pill: { borderWidth: 1, borderColor: 'rgba(255,255,255,0.22)', backgroundColor: 'rgba(255,255,255,0.18)', borderRadius: 999, paddingVertical: 4, paddingHorizontal: 10 },
+  pill: { borderWidth: 1, borderColor: 'rgba(255,255,255,0.22)', backgroundColor: 'rgba(255,255,255,0.18)', borderRadius: 999, paddingVertical: 4, paddingHorizontal: 10, flexShrink: 0 },
   pillText: { color: '#fff', fontSize: 10, fontWeight: '700' },
   value: { color: '#fff', fontSize: 34, fontWeight: '700', letterSpacing: -0.7, marginVertical: 10 },
   valueSuffix: { fontSize: 15, fontWeight: '700', opacity: 0.75 },
   subRow: { alignItems: 'center' },
-  subLabel: { flex: 1, fontSize: 12, fontWeight: '600' },
+  subLabel: { flex: 1, flexShrink: 1, fontSize: 12, fontWeight: '600' },
 });
 
 export default BalanceCard;

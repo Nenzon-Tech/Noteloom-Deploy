@@ -120,7 +120,7 @@ const styles = StyleSheet.create({
   who: { flex: 1, minWidth: 0 },
   author: { fontSize: 14, fontWeight: '700' },
   authorMeta: { fontSize: 9, fontWeight: '600', textTransform: 'uppercase', letterSpacing: 0.8, marginTop: 2 },
-  body: { marginBottom: 4 },
+  body: { marginTop: 4, marginBottom: 4 },
   title: { fontSize: 16, fontWeight: '700', letterSpacing: -0.2, lineHeight: 21, marginBottom: 6 },
   para: { fontSize: 13, lineHeight: 20 },
   attach: {

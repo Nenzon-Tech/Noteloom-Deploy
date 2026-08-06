@@ -38,7 +38,7 @@ export const Gradient = ({ colors, style, angle = 135, children, radius = 0 }: G
 };
 
 const styles = StyleSheet.create({
-  content: { flex: 1 },
+  content: { flex: 1, alignItems: 'center', justifyContent: 'center' },
 });
 
 export default Gradient;

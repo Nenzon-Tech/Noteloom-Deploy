@@ -50,9 +50,8 @@ export default function FacultyClasses() {
         <SubHeader title="My Classes" subtitle={`${classes.length} created · Faculty`} />
         <SearchBar value={q} onChangeText={setQ} placeholder="Search classes…" />
 
-        <GradButton style={styles.createBtn} onPress={() => router.push('/(app)/faculty/create-class')}>
-          <Plus size={16} color="#fff" />
-          <Text style={{ color: '#fff', fontSize: 12, fontWeight: '600' }}>Create Class</Text>
+        <GradButton icon={<Plus size={16} color="#fff" />} style={styles.createBtn} onPress={() => router.push('/(app)/faculty/create-class')}>
+          Create Class
         </GradButton>
 
         {loading ? (

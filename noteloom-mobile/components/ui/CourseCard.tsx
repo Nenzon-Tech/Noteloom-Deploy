@@ -39,10 +39,12 @@ export const CourseCard = ({ title, code, meta, gradient, rows, footerLeft, foot
           </View>
         ))}
       </View>
-      <View style={[styles.foot, { borderTopColor: theme.border, backgroundColor: theme.surface2 }]}>
-        {footerLeft}
-        {footerRight}
-      </View>
+      {(footerLeft || footerRight) && (
+        <View style={styles.foot}>
+          {footerLeft && <View style={styles.footItem}>{footerLeft}</View>}
+          {footerRight && <View style={styles.footItem}>{footerRight}</View>}
+        </View>
+      )}
     </Pressable>
   );
 };
@@ -57,25 +59,26 @@ const styles = StyleSheet.create({
   banner: { height: 92, padding: 16, justifyContent: 'center' },
   bannerDecor: { position: 'absolute', right: -40, top: -30, width: 150, height: 150, borderRadius: 75, backgroundColor: 'rgba(255,255,255,0.08)' },
   bannerTitle: { color: '#fff', fontSize: 17, fontWeight: '700', letterSpacing: -0.2, lineHeight: 22, paddingRight: 20 },
-  tags: { flexDirection: 'row', alignItems: 'center', gap: 7, marginTop: 8 },
+  tags: { flexDirection: 'row', alignItems: 'center', gap: 7, marginTop: 8, flexWrap: 'wrap' },
   mono: { fontSize: 10, fontWeight: '700', backgroundColor: 'rgba(255,255,255,0.22)', paddingVertical: 3, paddingHorizontal: 7, borderRadius: 7, color: '#fff', fontVariant: ['tabular-nums'] },
   meta: { fontSize: 11, fontWeight: '500', color: 'rgba(255,255,255,0.9)' },
   body: { paddingHorizontal: 16, paddingTop: 14 },
   row: { flexDirection: 'row', alignItems: 'center', gap: 10, paddingVertical: 6 },
-  rb: { width: 32, height: 32, borderRadius: 10, alignItems: 'center', justifyContent: 'center' },
-  rt: { flex: 1 },
+  rb: { width: 32, height: 32, borderRadius: 10, alignItems: 'center', justifyContent: 'center', flexShrink: 0 },
+  rt: { flex: 1, minWidth: 0 },
   rtLabel: { fontSize: 9, fontWeight: '700', textTransform: 'uppercase', letterSpacing: 0.7 },
   rtValue: { fontSize: 12, fontWeight: '600' },
   foot: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
     gap: 10,
+    flexWrap: 'wrap',
     paddingHorizontal: 16,
     paddingVertical: 12,
     borderTopWidth: 1,
     marginTop: 8,
   },
+  footItem: { flexShrink: 1 },
 });
 
 export default CourseCard;

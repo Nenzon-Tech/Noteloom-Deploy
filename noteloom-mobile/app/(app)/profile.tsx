@@ -131,7 +131,7 @@ export default function Profile() {
 
 const styles = StyleSheet.create({
   cover: { padding: 20, marginTop: 8, shadowColor: 'rgba(124,58,237,0.35)', shadowOffset: { width: 0, height: 12 }, shadowOpacity: 0.6, shadowRadius: 24, elevation: 8 },
-  coverDecor: { position: 'absolute', right: -30, bottom: -50, width: 170, height: 170, borderRadius: 85, backgroundColor: 'rgba(168,85,247,0.4)' },
+  coverDecor: { position: 'absolute', right: -20, bottom: -30, width: 140, height: 140, borderRadius: 70, backgroundColor: 'rgba(168,85,247,0.35)' },
   pfTop: { flexDirection: 'row', alignItems: 'center', gap: 14 },
   pfAva: { width: 64, height: 64, borderRadius: 18, borderWidth: 3, borderColor: 'rgba(255,255,255,0.35)', alignItems: 'center', justifyContent: 'center' },
   pfAvaText: { color: '#fff', fontSize: 24, fontWeight: '700' },

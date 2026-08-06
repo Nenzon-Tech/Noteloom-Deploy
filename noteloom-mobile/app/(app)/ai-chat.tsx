@@ -65,9 +65,10 @@ export default function AIChat() {
             </View>
             <View style={styles.headText}>
               <Text style={styles.headTitle}>Noteloom Ai</Text>
-              <Text style={styles.headSub}>
-                <Sparkles size={10} color="#fff" /> Your personalised assistant
-              </Text>
+              <View style={styles.headSub}>
+                <Sparkles size={10} color="#fff" />
+                <Text style={styles.headSubText}>Your personalised assistant</Text>
+              </View>
             </View>
             <Pressable onPress={() => router.push('/(app)/dashboard')} style={styles.closeBtn}>
               <X size={17} color="#fff" />
@@ -153,8 +154,9 @@ const styles = StyleSheet.create({
   headBot: { width: 40, height: 40, borderRadius: 12, alignItems: 'center', justifyContent: 'center' },
   headText: { flex: 1 },
   headTitle: { color: '#fff', fontSize: 15, fontWeight: '700' },
-  headSub: { color: 'rgba(255,255,255,0.85)', fontSize: 10, flexDirection: 'row', alignItems: 'center', gap: 4 },
-  closeBtn: { width: 36, height: 36, borderRadius: 10, backgroundColor: 'rgba(255,255,255,0.15)', alignItems: 'center', justifyContent: 'center' },
+  headSub: { flexDirection: 'row', alignItems: 'center', gap: 4, marginTop: 2 },
+  headSubText: { color: 'rgba(255,255,255,0.85)', fontSize: 10 },
+  closeBtn: { width: 36, height: 36, borderRadius: 10, backgroundColor: 'rgba(255,255,255,0.15)', alignItems: 'center', justifyContent: 'center', marginLeft: 'auto' },
   seg: { flexDirection: 'row', gap: 4, padding: 4, borderRadius: 14, borderWidth: 1, marginBottom: 10 },
   segBtn: { flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 5, paddingVertical: 9, borderRadius: 11, borderWidth: 1, borderColor: 'transparent' },
   segText: { fontSize: 11, fontWeight: '600' },
@@ -165,14 +167,14 @@ const styles = StyleSheet.create({
   bubbleWrap: { flexDirection: 'row', marginBottom: 12 },
   userWrap: { justifyContent: 'flex-end' },
   botWrap: { justifyContent: 'flex-start' },
-  bubble: { maxWidth: '86%', paddingVertical: 11, paddingHorizontal: 13, borderRadius: 16, fontSize: 13, lineHeight: 20 },
+  bubble: { maxWidth: '86%', paddingVertical: 11, paddingHorizontal: 13, borderRadius: 16 },
   userBubble: { borderBottomRightRadius: 4 },
   botBubble: { borderBottomLeftRadius: 4, borderWidth: 1 },
   bubbleText: { fontSize: 13, lineHeight: 20 },
   typingWrap: { alignItems: 'flex-start', marginBottom: 12 },
   typing: { flexDirection: 'row', gap: 5, paddingVertical: 13, paddingHorizontal: 15, borderRadius: 16, borderBottomLeftRadius: 4, borderWidth: 1 },
   typingDot: { width: 6, height: 6, borderRadius: 3, opacity: 0.4 },
-  inputBar: { flexDirection: 'row', alignItems: 'center', gap: 8, padding: 8, borderRadius: 16, borderWidth: 1, marginTop: 'auto', ...{ shadowColor: 'rgba(17,24,39,0.08)', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.5, shadowRadius: 6, elevation: 2 } },
+  inputBar: { flexDirection: 'row', alignItems: 'center', gap: 8, padding: 8, borderRadius: 16, borderWidth: 1, marginBottom: 8, shadowColor: 'rgba(17,24,39,0.08)', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.5, shadowRadius: 6, elevation: 2 },
   input: { flex: 1, fontSize: 13, paddingVertical: 6, paddingHorizontal: 4 },
   sendBtn: { width: 42, height: 42, borderRadius: 12, alignItems: 'center', justifyContent: 'center', shadowColor: 'rgba(147,51,234,0.4)', shadowOffset: { width: 0, height: 6 }, shadowOpacity: 0.8, shadowRadius: 14, elevation: 3 },
 });

@@ -22,7 +22,7 @@ export const Screen = ({ children, refreshControl, contentContainerStyle, hasHea
         showsVerticalScrollIndicator={false}
         contentContainerStyle={[
           styles.content,
-          { paddingTop: topPadding, paddingBottom: insets.bottom + 80 },
+          { paddingTop: topPadding, paddingBottom: insets.bottom + 100 },
           contentContainerStyle,
         ]}
         refreshControl={refreshControl}

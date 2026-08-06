@@ -36,9 +36,10 @@ export const FilterChips = <T extends string>({ options, value, onChange, style 
             ]}
           >
             {active ? (
-              <Gradient colors={theme.gradientBrand} angle={135} style={styles.chipGrad}>
+              <View style={styles.chipActive}>
+                <Gradient colors={theme.gradientBrand} angle={135} style={StyleSheet.absoluteFill} radius={999} />
                 <Text style={[styles.text, { color: '#fff' }]}>{opt.label}</Text>
-              </Gradient>
+              </View>
             ) : (
               <Text style={[styles.text, { color: theme.muted }]}>{opt.label}</Text>
             )}
@@ -60,6 +61,7 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
   },
   chipGrad: { position: 'absolute', left: 0, right: 0, top: 0, bottom: 0, justifyContent: 'center', alignItems: 'center' },
+  chipActive: { position: 'absolute', left: 0, right: 0, top: 0, bottom: 0, justifyContent: 'center', alignItems: 'center' },
   text: { fontSize: 11, fontWeight: '600' },
 });
 

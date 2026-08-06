@@ -3,7 +3,7 @@
     "name": "NoteLoom",
     "slug": "noteloom",
     "owner": "nenzon-technology",
-    "version": "2.0.0",
+    "version": "2.2.5",
     "scheme": "noteloom",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -14,7 +14,7 @@
     },
     "android": {
       "package": "com.nenzontech.noteloom",
-      "versionCode": 4,
+      "versionCode": 5,
       "adaptiveIcon": {
         "backgroundColor": "#1f2937",
         "foregroundImage": "./assets/android-icon-foreground.png"

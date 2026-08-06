@@ -21,13 +21,13 @@ export const AprRow = ({ initial, name, meta, gradient, onApprove, onReject }: A
       </Gradient>
       <View style={styles.info}>
         <Text style={[styles.name, { color: theme.fg }]} numberOfLines={1}>{name}</Text>
-        <Text style={[styles.meta, { color: theme.faint }]}>{meta}</Text>
+        <Text style={[styles.meta, { color: theme.faint }]} numberOfLines={1}>{meta}</Text>
       </View>
       <View style={styles.acts}>
-        <Pressable onPress={onApprove} style={[styles.btn, { backgroundColor: theme.green }]}>
+        <Pressable onPress={onApprove} style={[styles.btn, styles.btnPrimary, { backgroundColor: theme.green }]}>
           <Text style={styles.btnText}>Verify</Text>
         </Pressable>
-        <Pressable onPress={onReject} style={[styles.btn, { backgroundColor: theme.surface2, borderColor: theme.border, borderWidth: 1 }]}>
+        <Pressable onPress={onReject} style={[styles.btn, styles.btnSecondary, { backgroundColor: theme.surface2, borderColor: theme.border, borderWidth: 1 }]}>
           <Text style={[styles.btnText, { color: theme.muted }]}>Reject</Text>
         </Pressable>
       </View>
@@ -37,13 +37,15 @@ export const AprRow = ({ initial, name, meta, gradient, onApprove, onReject }: A
 
 const styles = StyleSheet.create({
   row: { flexDirection: 'row', alignItems: 'center', gap: 12, padding: 13, borderRadius: 16, borderWidth: 1, marginBottom: 10 },
-  ava: { width: 36, height: 36, borderRadius: 11, alignItems: 'center', justifyContent: 'center' },
+  ava: { width: 36, height: 36, borderRadius: 11, alignItems: 'center', justifyContent: 'center', flexShrink: 0 },
   avaText: { color: '#fff', fontSize: 12, fontWeight: '700' },
   info: { flex: 1, minWidth: 0 },
   name: { fontSize: 13, fontWeight: '700' },
   meta: { fontSize: 10, marginTop: 1 },
-  acts: { flexDirection: 'row', gap: 6 },
-  btn: { paddingVertical: 9, paddingHorizontal: 12, borderRadius: 9 },
+  acts: { flexDirection: 'row', gap: 6, flexShrink: 0 },
+  btn: { paddingVertical: 8, paddingHorizontal: 12, borderRadius: 10, minWidth: 60, alignItems: 'center' },
+  btnPrimary: { shadowColor: 'rgba(16,185,129,0.4)', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.5, shadowRadius: 8, elevation: 3 },
+  btnSecondary: {},
   btnText: { color: '#fff', fontSize: 11, fontWeight: '600' },
 });
 

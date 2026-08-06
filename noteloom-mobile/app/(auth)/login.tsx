@@ -588,7 +588,7 @@ const InputField = ({ label, value, onChange, error, placeholder, isPassword, ke
 
 const styles = StyleSheet.create({
   container: { flex: 1 },
-  scrollContent: { padding: 16, paddingBottom: 40 },
+  scrollContent: { padding: 16, paddingBottom: 80 },
   backRow: { marginBottom: 8 },
   backBtn: { width: 40, height: 40, borderRadius: 12, borderWidth: 1, alignItems: 'center', justifyContent: 'center' },
   guardContainer: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: 24 },
@@ -605,7 +605,7 @@ const styles = StyleSheet.create({
   passWrap: { position: 'relative' },
   eye: { position: 'absolute', right: 12, top: 15, zIndex: 2 },
   roleGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginVertical: 16 },
-  roleCell: { flexBasis: '47%' },
+  roleCell: { flexBasis: '48%', maxWidth: '48%' },
   authSec: { fontSize: 10, textAlign: 'center', marginTop: 18 },
   bioArea: { marginTop: 14 },
   bioDivider: { flexDirection: 'row', alignItems: 'center', gap: 10, marginBottom: 14 },

@@ -35,7 +35,7 @@ export const RecRow = ({ dateTop, dateMain, dateStyle, dateBox, title, subtitle,
           </View>
         )}
       </View>
-      {trailing}
+      {trailing && <View style={styles.trailingWrap}>{trailing}</View>}
     </>
   );
 
@@ -60,12 +60,13 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     flexShrink: 0,
   },
-  dateTop: { fontSize: 9, fontWeight: '700', color: '#ef4444', textTransform: 'uppercase' },
+  dateTop: { fontSize: 9, fontWeight: '700', color: '#ef4444', textTransform: 'uppercase', letterSpacing: 0.5 },
   dateMain: { fontSize: 16, fontWeight: '700' },
   info: { flex: 1, minWidth: 0 },
   title: { fontSize: 13, fontWeight: '600' },
   subWrap: { flexDirection: 'row', alignItems: 'center', gap: 6, marginTop: 2 },
-  sub: { fontSize: 10 },
+  sub: { fontSize: 10, flexShrink: 1 },
+  trailingWrap: { flexShrink: 0, marginLeft: 8 },
 });
 
 export default RecRow;

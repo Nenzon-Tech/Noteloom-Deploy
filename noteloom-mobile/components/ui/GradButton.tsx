@@ -104,7 +104,7 @@ const styles = StyleSheet.create({
     shadowRadius: 18,
     elevation: 4,
   },
-  full: { width: '100%' },
+  full: { alignSelf: 'stretch' },
   content: {
     flexDirection: 'row',
     alignItems: 'center',
