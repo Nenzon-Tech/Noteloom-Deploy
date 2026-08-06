@@ -50,8 +50,25 @@ const lessonLogSchema = new mongoose.Schema({
   createdAt: { type: Date, default: Date.now }
 });
 
+// --- 4. Faculty Class Schedule Schema ---
+// Optional per-faculty schedule used by /api/faculty/schedule (GET/POST).
+// strict:false so the POST route's {...req.body} is persisted as-is.
+const classScheduleSchema = new mongoose.Schema({
+  tenantId: { type: mongoose.Schema.Types.ObjectId, ref: 'Tenant' },
+  facultyId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+  batchId: { type: mongoose.Schema.Types.ObjectId, ref: 'Batch' },
+  subject: String,
+  subjectCode: String,
+  dayOfWeek: String,
+  startTime: String,
+  endTime: String,
+  roomNo: String,
+  createdAt: { type: Date, default: Date.now }
+}, { strict: false });
+
 const CalendarEvent = mongoose.model('CalendarEvent', calendarEventSchema);
 const ClassRoutine = mongoose.model('ClassRoutine', classRoutineSchema);
 const LessonLog = mongoose.model('LessonLog', lessonLogSchema);
+const ClassSchedule = mongoose.model('ClassSchedule', classScheduleSchema);
 
-module.exports = { CalendarEvent, ClassRoutine, LessonLog };
+module.exports = { CalendarEvent, ClassRoutine, LessonLog, ClassSchedule };
