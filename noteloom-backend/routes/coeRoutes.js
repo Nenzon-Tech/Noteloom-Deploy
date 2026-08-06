@@ -41,6 +41,8 @@ router.post('/upload-marks', coeController.uploadMarks);
 router.post('/publish-results', coeController.publishResults);
 router.get('/results/:rollNo', coeController.getResults);
 router.get('/my-results', coeController.getMyResults);
+router.get('/student/results/:userId', coeController.getStudentResults);
+
 
 // --- H. ADMIN REPORTS ---
 router.get('/admin/exam-forms', coeController.getExamForms);
@@ -54,7 +56,9 @@ router.delete('/admin/reset-form/:formId', coeController.resetExamForm);
 router.get('/student/feedback-data/:userId', coeController.getFeedbackData);
 router.post('/student/submit-feedback', coeController.submitFeedback);
 
-// --- K. ADMIT CARD ---
+// --- K. ADMIT CARD & PAYMENTS ---
 router.get('/admit-card/:studentUserId', admitCardController.getAdmitCardDashboard);
+router.put('/student/update-form-payment/:id', coeController.updateFormPayment);
+router.get('/student/payment-history/:userId', coeController.getStudentPaymentHistory);
 
 module.exports = router;

@@ -197,16 +197,14 @@ app.use('/api', lmsRoutes); // Handles /modules and /content
 app.use('/api/library', libraryRoutes);
 app.use('/api/attendance', attendanceRoutes); // Handles attendance-related routes
 
-// --- FALLBACK MOCK ROUTING (Payment & Individual Student Safety) ---
+// --- FALLBACK ROUTING ---
 app.get('/api/individual/content', (req, res) => {
   res.json({ success: true, courses: [], progress: {} });
 });
 app.post('/api/individual/progress', (req, res) => {
   res.json({ success: true, message: "Progress updated successfully" });
 });
-app.put('/api/coe/student/update-form-payment/:id', (req, res) => {
-  res.json({ success: true, message: "Mock payment marked successfully" });
-});
+
 
 // --- HEALTH CHECK ---
 app.get('/health', (req, res) => {

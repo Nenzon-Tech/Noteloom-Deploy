@@ -97,8 +97,8 @@ exports.getAdmitCardDashboard = async (req, res) => {
         stream: dept?.name || profile.stream || 'N/A',
         registrationNo: profile.uid || 'N/A',
         examRollNo: profile.rollNo || 'N/A',
-        examCenter: 'Main Block', // Can be made configurable via SystemConfig
-        centerCode: 'N/A',
+        examCenter: profile.college || 'Main Campus',
+        centerCode: 'CTR-01',
         applicationNo: profile.rollNo ? `APP${profile.rollNo}` : 'N/A',
         photoUrl: profile.profilePicture || ''
       },

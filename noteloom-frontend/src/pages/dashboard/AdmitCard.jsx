@@ -237,35 +237,57 @@ const AdmitCard = () => {
         const token = localStorage.getItem('sessionToken');
         const headers = { Authorization: `Bearer ${token}` };
 
-        // 1. Fetch Candidate Forms (History)
-        const formsRes = await axios.get(`${API_BASE}/api/coe/my-forms/${user.id}`, { headers });
-        const formsData = formsRes.data || [];
+        // 1. Fetch Admit Card Dashboard Data & Candidate Forms
+        const [admitRes, formsRes] = await Promise.all([
+          axios.get(`${API_BASE}/api/coe/admit-card/${user.id}`, { headers }).catch(() => null),
+          axios.get(`${API_BASE}/api/coe/my-forms/${user.id}`, { headers }).catch(() => null)
+        ]);
 
-        // 2. Map Backend Forms to UI History Array
-        const mappedHistory = formsData.map((form, index) => ({
-            id: form._id,
-            label: form.sessionId?.sessionName || `Exam Form ${index + 1}`,
-            session: form.sessionId?.cycle ? `${form.sessionId.cycle} Cycle` : 'Examination',
-            status: form.admitCardGenerated ? "GENERATED" : "PENDING",
-            payment: form.paymentStatus === 'Paid' ? 'PAID' : 'UNPAID',
-            isCurrent: index === formsData.length - 1, // Assume last fetched is current
-            subjects: form.verifiedSubjects || []
-        }));
+        const admitData = admitRes?.data;
+        const formsData = formsRes?.data || [];
 
-        setHistory(mappedHistory);
-
-        // 3. Set Candidate Profile Details
-        setCandidate({
-            name: profile?.name || user?.name || "Unknown Candidate",
-            program: profile?.course || "UG/PG",
-            stream: profile?.stream || "General",
-            registrationNo: profile?.uid || "N/A",
-            examRollNo: profile?.rollNo || "N/A",
-            examCenter: profile?.college || "Institute Name Missing",
-            centerCode: "IEM-C-01",
-            photoUrl: "" // Add a logic to fetch user profile pic if available
+        // Build forms map by semester or session
+        const formSubjectsMap = {};
+        formsData.forEach(form => {
+            if (form.verifiedSubjects) {
+                formSubjectsMap[form._id] = form.verifiedSubjects;
+            }
         });
-        
+
+        if (admitData) {
+            setCandidate(admitData.candidate);
+            // Enrich history with verified subjects from forms if present
+            const enrichedHistory = (admitData.history || []).map(item => {
+                const matchingForm = formsData.find(f => f.paymentStatus === 'Paid');
+                return {
+                    ...item,
+                    subjects: item.status === 'GENERATED' ? (matchingForm?.verifiedSubjects || admitData.schedule || []) : []
+                };
+            });
+            setHistory(enrichedHistory);
+        } else {
+            // Fallback to empty history array based on user forms
+            const mappedHistory = formsData.map((form, index) => ({
+                id: form._id,
+                label: form.sessionId?.sessionName || `Exam Form ${index + 1}`,
+                session: form.sessionId?.cycle ? `${form.sessionId.cycle} Cycle` : 'Examination',
+                status: form.paymentStatus === 'Paid' ? "GENERATED" : "PENDING",
+                payment: form.paymentStatus === 'Paid' ? 'PAID' : 'UNPAID',
+                isCurrent: index === formsData.length - 1,
+                subjects: form.verifiedSubjects || []
+            }));
+            setHistory(mappedHistory);
+            setCandidate({
+                name: profile?.name || user?.name || "Candidate",
+                program: profile?.course || "B.Tech",
+                stream: profile?.stream || "General",
+                registrationNo: profile?.uid || "N/A",
+                examRollNo: profile?.rollNo || "N/A",
+                examCenter: profile?.college || "Main Campus",
+                centerCode: "CTR-01",
+                photoUrl: profile?.profilePicture || ""
+            });
+        }
       } catch (error) {
         console.error("Failed to fetch admit card data", error);
       } finally {

@@ -28,48 +28,18 @@ import LoadingSpinner from '@/components/common/LoadingSpinner';
    1. FALLBACK MOCK DATA (Used if Backend API is pending)
    ========================================================================= */
 
-const MOCK_SEMESTER_RESULTS = [
-  {
-    id: 'sem1', sem: 1, label: 'Semester 1', status: 'PUBLISHED',
-    sgpa: 9.14, totalCredits: 22, earnedCredits: 22,
-    publishDate: '2024-02-15',
-    subjects: [
-      { code: 'BS-M101', name: 'Mathematics - IA', credit: 4, letterGrade: 'O', points: 10, type: 'Theory' },
-      { code: 'BS-PH101', name: 'Physics - I', credit: 4, letterGrade: 'E', points: 9, type: 'Theory' },
-      { code: 'ES-EE101', name: 'Basic Electrical Engg.', credit: 4, letterGrade: 'O', points: 10, type: 'Theory' },
-      { code: 'BS-PH191', name: 'Physics - I Lab', credit: 1.5, letterGrade: 'O', points: 10, type: 'Practical' },
-      { code: 'ES-EE191', name: 'Basic Electrical Engg. Lab', credit: 1.5, letterGrade: 'E', points: 9, type: 'Practical' },
-      { code: 'ES-ME192', name: 'Workshop/Manufacturing Practices', credit: 3, letterGrade: 'O', points: 10, type: 'Sessional' }
-    ]
-  },
-  {
-    id: 'sem2', sem: 2, label: 'Semester 2', status: 'PUBLISHED',
-    sgpa: 8.92, totalCredits: 20.5, earnedCredits: 20.5,
-    publishDate: '2024-08-20',
-    subjects: [
-      { code: 'BS-M201', name: 'Mathematics - IIA', credit: 4, letterGrade: 'E', points: 9, type: 'Theory' },
-      { code: 'BS-CH201', name: 'Chemistry - I', credit: 4, letterGrade: 'O', points: 10, type: 'Theory' },
-      { code: 'ES-CS201', name: 'Programming for Problem Solving', credit: 3, letterGrade: 'E', points: 9, type: 'Theory' },
-      { code: 'HM-HU201', name: 'English', credit: 2, letterGrade: 'A', points: 8, type: 'Theory' },
-      { code: 'ES-CS291', name: 'Programming Lab', credit: 1.5, letterGrade: 'O', points: 10, type: 'Practical' }
-    ]
-  },
-  {
-    id: 'sem3', sem: 3, label: 'Semester 3', status: 'PUBLISHED',
-    sgpa: 9.30, totalCredits: 23, earnedCredits: 23,
-    publishDate: '2025-02-10',
-    subjects: [
-      { code: 'PCC-CS301', name: 'Data Structure & Algorithms', credit: 3, letterGrade: 'O', points: 10, type: 'Theory' },
-      { code: 'PCC-CS302', name: 'IT Workshop (Sci Lab/MATLAB)', credit: 3, letterGrade: 'E', points: 9, type: 'Theory' },
-      { code: 'PCC-CS391', name: 'Data Structure Lab', credit: 1.5, letterGrade: 'O', points: 10, type: 'Practical' },
-    ]
-  },
-  { id: 'sem4', sem: 4, label: 'Semester 4', status: 'PROCESSING', sgpa: null, subjects: [] },
-  { id: 'sem5', sem: 5, label: 'Semester 5', status: 'LOCKED', sgpa: null, subjects: [] },
-  { id: 'sem6', sem: 6, label: 'Semester 6', status: 'LOCKED', sgpa: null, subjects: [] },
-  { id: 'sem7', sem: 7, label: 'Semester 7', status: 'LOCKED', sgpa: null, subjects: [] },
-  { id: 'sem8', sem: 8, label: 'Semester 8', status: 'LOCKED', sgpa: null, subjects: [] },
-];
+const DEFAULT_EMPTY_SEMESTERS = Array.from({ length: 8 }, (_, i) => ({
+  id: `sem${i + 1}`,
+  sem: i + 1,
+  label: `Semester ${i + 1}`,
+  status: i === 0 ? 'PROCESSING' : 'LOCKED',
+  sgpa: null,
+  totalCredits: 0,
+  earnedCredits: 0,
+  publishDate: null,
+  subjects: []
+}));
+
 
 /* =========================================================================
    2. SUB-COMPONENTS
@@ -248,11 +218,10 @@ const UniversityMarks = () => {
             const res = await axios.get(`${API_BASE}/api/coe/student/results/${user.id}`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
-            setResults(res.data.length ? res.data : MOCK_SEMESTER_RESULTS);
+            setResults(res.data && res.data.length ? res.data : DEFAULT_EMPTY_SEMESTERS);
         } catch (e) {
-            console.warn("Failed to fetch real results, using fallback mock data.");
-            // Fallback to MOCK data if API fails to ensure UI works
-            setResults(MOCK_SEMESTER_RESULTS);
+            console.warn("Failed to fetch real results from backend.");
+            setResults(DEFAULT_EMPTY_SEMESTERS);
         } finally {
             setLoading(false);
         }

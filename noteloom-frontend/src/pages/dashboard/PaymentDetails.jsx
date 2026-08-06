@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
+import { API_BASE } from '@/utils/config';
 import { motion, AnimatePresence } from "framer-motion";
 import { 
   ArrowLeft, Search, Filter, Download, 
@@ -18,41 +20,23 @@ import CollegeBannerLogo from '@/components/common/CollegeBannerLogo.jsx';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
 
 /* =========================================================================
-   1. MOCK DATA (Only PAID records template)
+   1. PAID RECEIPTS (Fetched from Backend API)
    ========================================================================= */
 
-const PAID_RECEIPTS = [
-  {
-    id: "RCPT_1001", semester: "1st Semester", tuitionFee: "85,000", busFee: "0", hostelFee: "0", fine: "0",
-    paidOn: "08-Jul-2023", transactionId: "TXN_8821901", method: "UPI", status: "SUCCESS"
-  },
-  {
-    id: "RCPT_1002", semester: "2nd Semester", tuitionFee: "85,000", busFee: "0", hostelFee: "0", fine: "0",
-    paidOn: "05-Jan-2024", transactionId: "TXN_8821902", method: "Credit Card", status: "SUCCESS"
-  },
-  {
-    id: "RCPT_1003", semester: "3rd Semester", tuitionFee: "85,000", busFee: "5,000", hostelFee: "0", fine: "0",
-    paidOn: "12-Jul-2024", transactionId: "TXN_8821903", method: "Net Banking", status: "SUCCESS"
-  },
-  {
-    id: "RCPT_1004", semester: "4th Semester", tuitionFee: "85,000", busFee: "0", hostelFee: "0", fine: "150",
-    paidOn: "15-Jan-2025", transactionId: "TXN_8821904", method: "UPI", status: "SUCCESS"
-  },
-  {
-    id: "RCPT_1005", semester: "5th Semester", tuitionFee: "85,000", busFee: "5,000", hostelFee: "0", fine: "0",
-    paidOn: "05-Jul-2025", transactionId: "TXN_8821905", method: "Debit Card", status: "SUCCESS"
-  }
-].reverse(); // Show latest first
+
 
 /* =========================================================================
    2. SUB-COMPONENTS
    ========================================================================= */
 
 const ReceiptCard = ({ receipt, onView, isDarkMode, theme }) => {
-  const totalPaid = parseInt(receipt.tuitionFee.replace(/,/g, '')) + 
-                    parseInt(receipt.hostelFee.replace(/,/g, '')) + 
-                    parseInt(receipt.busFee.replace(/,/g, '')) + 
-                    parseInt(receipt.fine.replace(/,/g, ''));
+  const parseFee = (val) => {
+    if (typeof val === 'number') return val;
+    if (!val) return 0;
+    return parseInt(String(val).replace(/,/g, ''), 10) || 0;
+  };
+  const totalPaid = receipt.totalAmount || (parseFee(receipt.tuitionFee) + parseFee(receipt.hostelFee) + parseFee(receipt.busFee) + parseFee(receipt.fine));
+
 
   return (
     <motion.div 
@@ -110,7 +94,13 @@ const ReceiptCard = ({ receipt, onView, isDarkMode, theme }) => {
 
 const PrintableReceiptModal = ({ receipt, studentInfo, onClose, autoPrint }) => {
   if (!receipt) return null;
-  const totalPaid = parseInt(receipt.tuitionFee.replace(/,/g, '')) + parseInt(receipt.hostelFee.replace(/,/g, '')) + parseInt(receipt.busFee.replace(/,/g, '')) + parseInt(receipt.fine.replace(/,/g, ''));
+  const parseFee = (val) => {
+    if (typeof val === 'number') return val;
+    if (!val) return 0;
+    return parseInt(String(val).replace(/,/g, ''), 10) || 0;
+  };
+  const totalPaid = receipt.totalAmount || (parseFee(receipt.tuitionFee) + parseFee(receipt.hostelFee) + parseFee(receipt.busFee) + parseFee(receipt.fine));
+
 
   useEffect(() => {
     if (autoPrint) setTimeout(() => window.print(), 300);
@@ -195,13 +185,32 @@ const PaymentDetails = () => {
   const { isDarkMode } = useTheme();
   const { user, profile, loading } = useSessionManager();
   
+  const [paidReceipts, setPaidReceipts] = useState([]);
+  const [dataLoading, setDataLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedReceipt, setSelectedReceipt] = useState(null);
   const [autoPrint, setAutoPrint] = useState(false);
 
-  useEffect(() => { window.scrollTo(0, 0); }, []);
+  useEffect(() => {
+    const fetchPaymentHistory = async () => {
+      if (!user) return;
+      try {
+        const token = localStorage.getItem('sessionToken');
+        const res = await axios.get(`${API_BASE}/api/coe/student/payment-history/${user.id}`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        setPaidReceipts(res.data || []);
+      } catch (err) {
+        console.error("Failed to fetch payment history:", err);
+      } finally {
+        setDataLoading(false);
+      }
+    };
+    fetchPaymentHistory();
+    window.scrollTo(0, 0);
+  }, [user]);
 
-  if (loading) {
+  if (loading || dataLoading) {
     return (
       <div className={`min-h-screen ${isDarkMode ? 'bg-gray-900' : 'bg-gray-50'} flex items-center justify-center`}>
         <LoadingSpinner message="Loading Receipt Vault..." />
@@ -212,11 +221,11 @@ const PaymentDetails = () => {
   // Dynamic Student Info
   const studentInfo = {
     fullName: user?.name || "Student",
-    enrollmentNo: profile?.uid || user?.uid || "12024001001",
-    course: profile?.stream || "B.Tech - Computer Science & Engineering",
+    enrollmentNo: profile?.uid || user?.uid || "N/A",
+    course: profile?.stream || "B.Tech",
   };
 
-  const filteredReceipts = PAID_RECEIPTS.filter(receipt => 
+  const filteredReceipts = paidReceipts.filter(receipt => 
     receipt.semester.toLowerCase().includes(searchTerm.toLowerCase()) ||
     receipt.id.toLowerCase().includes(searchTerm.toLowerCase())
   );

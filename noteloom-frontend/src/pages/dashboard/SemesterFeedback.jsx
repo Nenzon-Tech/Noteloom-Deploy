@@ -359,14 +359,14 @@ const SemesterFeedback = () => {
   // Prepare Subjects for the currently selected semester Tab
   const rawSemSubjects = allSubjects.filter(s => s.semester === activeSem);
   
-  // Map Raw API Subject data to include local feedback state
+  // Map Raw API Subject data to include backend feedback state
   const mappedSubjects = rawSemSubjects.map(sub => ({
       id: sub.id,
       code: sub.code,
       name: sub.name,
       type: sub.type?.toUpperCase() || 'THEORY',
-      status: feedbackStatuses[sub.id]?.status || 'PENDING',
-      rating: feedbackStatuses[sub.id]?.rating || 0
+      status: sub.feedbackSubmitted || feedbackStatuses[sub.id]?.status === 'SUBMITTED' ? 'SUBMITTED' : 'PENDING',
+      rating: sub.feedback?.rating || feedbackStatuses[sub.id]?.rating || 5
   }));
 
   // Apply UI Filters (Pending/Submitted Tab -> Search Bar -> Theory/Lab Type)
@@ -387,19 +387,40 @@ const SemesterFeedback = () => {
   const completedInSem = mappedSubjects.filter(s => s.status === 'SUBMITTED').length;
 
   const handleFeedbackSubmit = async (subjectId) => {
+    if (!selectedSubject) return;
     setIsSubmitting(true);
-    // Simulate API Call Delay (Replace with real POST request later)
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    
-    // Update local state to mark this specific subject ID as submitted
-    setFeedbackStatuses(prev => ({
-        ...prev,
-        [subjectId]: { status: 'SUBMITTED', rating: 5 } // Hardcoding 5 stars for the UI demo effect
-    }));
-    
-    setIsSubmitting(false);
-    setSelectedSubject(null);
-    triggerPopup("Feedback submitted successfully. Thank you!", "success");
+    try {
+        const token = localStorage.getItem('sessionToken');
+        await axios.post(`${API_BASE}/api/coe/student/submit-feedback`, {
+            subjectId: selectedSubject.id,
+            subjectCode: selectedSubject.code,
+            semester: activeSem,
+            rating: 5,
+            comments: "Feedback submitted via Student Portal"
+        }, {
+            headers: { Authorization: `Bearer ${token}` }
+        });
+
+        setFeedbackStatuses(prev => ({
+            ...prev,
+            [subjectId]: { status: 'SUBMITTED', rating: 5 }
+        }));
+
+        triggerPopup("Feedback submitted successfully. Thank you!", "success");
+        setSelectedSubject(null);
+        
+        // Refetch to align with backend
+        const res = await axios.get(`${API_BASE}/api/coe/student/feedback-data/${user.id}`, {
+            headers: { Authorization: `Bearer ${token}` }
+        });
+        if (res.data?.subjects) setAllSubjects(res.data.subjects);
+
+    } catch (err) {
+        console.error("Feedback submit error:", err);
+        triggerPopup(err.response?.data?.error || "Failed to submit feedback", "error");
+    } finally {
+        setIsSubmitting(false);
+    }
   };
 
   if (loading) {
