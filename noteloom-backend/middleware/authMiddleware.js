@@ -1,5 +1,6 @@
 const Session = require('../models/Session'); 
 const Membership = require('../models/Membership'); 
+const AdminProfile = require('../models/AdminProfile');
 
 // 1. Middleware for Tenant Context (Students, Faculty, College Admin)
 const setTenantContext = async (req, res, next) => {
@@ -47,6 +48,21 @@ const setTenantContext = async (req, res, next) => {
     
     req.role = membership.role;
     req.sessionId = session._id;
+
+    if (membership.role === 'college_admin') {
+      const adminProfile = await AdminProfile.findOne({
+        userId: session.userId._id,
+        tenantId: session.tenantId._id
+      }).select('adminRoles');
+
+      req.adminRoles = adminProfile && adminProfile.adminRoles && adminProfile.adminRoles.length > 0 
+        ? adminProfile.adminRoles 
+        : ['super_admin'];
+      req.isSuperAdmin = req.adminRoles.includes('super_admin');
+    } else {
+      req.adminRoles = [];
+      req.isSuperAdmin = false;
+    }
 
     // Update last activity — only if stale by more than 5 minutes to avoid
     // a DB write on every single authenticated request.

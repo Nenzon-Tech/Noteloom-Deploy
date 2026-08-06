@@ -8,6 +8,24 @@ const FacultyProfile = require('../models/FacultyProfile');
 const StudentProfile = require('../models/StudentProfile');
 const AdminProfile = require('../models/AdminProfile'); // 🟢 ADDED THIS IMPORT
 const Membership = require('../models/Membership'); 
+const roleController = require('../controllers/collegeAdminRoleController');
+const { requireSuperAdmin, checkConfigLock } = require('../middleware/requireAdminRole');
+
+// -----------------------------------------------------------
+// 0. College Admin Role & Tab Config Routes
+// -----------------------------------------------------------
+router.get('/my-roles', roleController.getMyRoles);
+router.get('/available-roles', roleController.getAvailableRoles);
+
+router.get('/admin-roles', requireSuperAdmin, roleController.getAdminRolesList);
+router.post('/admin-roles', requireSuperAdmin, checkConfigLock, roleController.createOrAssignAdmin);
+router.patch('/admin-roles/:userId', requireSuperAdmin, checkConfigLock, roleController.updateAdminRoles);
+router.delete('/admin-roles/:userId', requireSuperAdmin, checkConfigLock, roleController.removeAdmin);
+
+router.get('/role-tab-config', requireSuperAdmin, roleController.getRoleTabConfig);
+router.put('/role-tab-config', requireSuperAdmin, checkConfigLock, roleController.saveRoleTabConfig);
+router.post('/role-tab-config/lock', requireSuperAdmin, roleController.lockConfig);
+router.post('/role-tab-config/unlock', requireSuperAdmin, roleController.unlockConfig);
 
 // -----------------------------------------------------------
 // 1. Get All Requests (Existing)

@@ -108,6 +108,7 @@ const ITLoginPage = lazy(() => import('@/pages/auth/ITLoginPage.jsx'));
 const ITAdminDashboard = lazy(() => import('@/pages/admin/ITAdminDashboard.jsx'));
 const FeatureManager = lazy(() => import('@/pages/admin/FeatureManager.jsx'));
 const AddEditContentPage = lazy(() => import('@/pages/admin/AddEditContentPage.jsx'));
+const AdminRoleManager = lazy(() => import('@/pages/dashboard/AdminRoleManager.jsx'));
 
 // Dashboard & Portals
 const CollegeDashboard = lazy(() => import('@/pages/dashboard/CollegeDashboard.jsx'));
@@ -1860,6 +1861,14 @@ const App = () => {
           </div>
         }>
           <Routes>
+            <Route 
+              path="/dashboard/admin-roles" 
+              element={
+                <ProtectedRoute allowedRoles={["college_admin"]}>
+                  <AdminRoleManager />
+                </ProtectedRoute>
+              } 
+            />
             <Route 
               path="/dashboard/manage-departments" 
               element={

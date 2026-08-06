@@ -6,7 +6,13 @@ const adminProfileSchema = new mongoose.Schema({
   tenantId: { type: mongoose.Schema.Types.ObjectId, ref: 'Tenant', required: true },
   adminLevel: String,
   employeeId: String,
-  responsibilities: String
+  responsibilities: String,
+  adminRoles: {
+    type: [String],
+    default: ['super_admin']
+  },
+  assignedBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+  assignedAt: { type: Date, default: Date.now }
 });
 
 adminProfileSchema.index({ userId: 1, tenantId: 1 }, { unique: true });
