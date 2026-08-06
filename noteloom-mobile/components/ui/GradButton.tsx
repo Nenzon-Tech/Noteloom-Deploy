@@ -109,9 +109,10 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
+    flexShrink: 1,
   },
   icon: { marginRight: 6 },
-  text: { color: '#fff', fontWeight: '600' },
+  text: { color: '#fff', fontWeight: '600', textAlign: 'center', flexShrink: 1 },
   ghost: {
     alignItems: 'center',
     justifyContent: 'center',

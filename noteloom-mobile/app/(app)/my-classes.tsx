@@ -47,29 +47,21 @@ export default function MyClasses() {
     return (c.name || '').toLowerCase().includes(q) || (c.subjectCode || '').toLowerCase().includes(q);
   });
 
-  const fallback = [
-    { _id: 'dbms', name: 'Database Management Systems', subjectCode: 'CS-502', studentCount: 54 },
-    { _id: 'dsa', name: 'Data Structures & Algorithms', subjectCode: 'CS-501', studentCount: 54 },
-    { _id: 'os', name: 'Operating Systems', subjectCode: 'CS-503', studentCount: 54 },
-    { _id: 'cn', name: 'Computer Networks', subjectCode: 'CS-504', studentCount: 54 },
-  ];
-
-  const list = classes.length ? filtered : fallback.filter(c => (c.name || '').toLowerCase().includes(query.toLowerCase()));
-  const showingDemo = classes.length === 0;
+  const list = filtered;
 
   return (
     <View style={{ flex: 1, backgroundColor: theme.bg }}>
       <Screen>
         <GHeader
           title="My Courses"
-          subtitle={showingDemo ? '6 subjects · Sem 6' : `${classes.length} subjects · Sem 6`}
+          subtitle={`${classes.length} courses`}
         />
         <SearchBar value={query} onChangeText={setQuery} placeholder="Search courses..." />
 
         {loading ? (
           <ActivityIndicator color={theme.violet} style={{ paddingVertical: 60 }} />
-        ) : filtered.length === 0 && classes.length > 0 ? (
-          <EmptyState message="No courses found" />
+        ) : list.length === 0 ? (
+          <EmptyState message={classes.length === 0 ? 'No courses yet' : 'No courses found'} />
         ) : (
           list.map((cls, i) => (
             <CourseCard

@@ -32,8 +32,8 @@ export default function ContentDetailScreen() {
     try {
       const token = await getSessionToken();
       const [contentRes, classRes, infoRes] = await Promise.all([
-        fetch(`${API_BASE}/api/classrooms/${classId}/content/${contentId}`, { headers: authHeaders(token) }),
-        fetch(`${API_BASE}/api/classrooms/${classId}`, { headers: authHeaders(token) }),
+        fetch(`${API_BASE}/api/content/${contentId}`, { headers: authHeaders(token) }),
+        fetch(`${API_BASE}/api/classrooms`, { headers: authHeaders(token) }),
         fetch(`${API_BASE}/session/info`, { headers: authHeaders(token) }),
       ]);
       if (contentRes.ok) {
@@ -42,7 +42,11 @@ export default function ContentDetailScreen() {
         setIsCompleted(data.isCompleted || false);
         setAllowDownload(data.allowDownload !== false);
       }
-      if (classRes.ok) setClassroom(await classRes.json());
+      if (classRes.ok) {
+        const all = await classRes.json();
+        const found = Array.isArray(all) ? all.find((c: any) => c._id === classId) : null;
+        setClassroom(found || null);
+      }
       if (infoRes.ok) setProfile(await infoRes.json());
     } catch (err) {
       console.error(err);
@@ -54,8 +58,8 @@ export default function ContentDetailScreen() {
   const toggleComplete = async () => {
     try {
       const token = await getSessionToken();
-      await fetch(`${API_BASE}/api/classrooms/${classId}/content/${contentId}/complete`, {
-        method: 'PUT',
+      await fetch(`${API_BASE}/api/content/${contentId}/complete`, {
+        method: 'POST',
         headers: authHeaders(token),
         body: JSON.stringify({ isCompleted: !isCompleted }),
       });
@@ -66,7 +70,7 @@ export default function ContentDetailScreen() {
   const toggleDownloadPermission = async () => {
     try {
       const token = await getSessionToken();
-      await fetch(`${API_BASE}/api/classrooms/${classId}/content/${contentId}/download`, {
+      await fetch(`${API_BASE}/api/content/${contentId}/toggle-download`, {
         method: 'PUT',
         headers: authHeaders(token),
         body: JSON.stringify({ allowDownload: !allowDownload }),
@@ -159,7 +163,7 @@ export default function ContentDetailScreen() {
                     key={idx}
                     icon={<FileText size={18} color={theme.blue} />}
                     iconBg="rgba(59,130,246,0.12)"
-                    title={att.name || `Attachment ${idx + 1}`}
+                    title={att.name || att.originalName || `Attachment ${idx + 1}`}
                     subtitle="Attachment"
                     trailing={<Download size={16} color={theme.faint} />}
                     last={idx === content.attachments.length - 1}

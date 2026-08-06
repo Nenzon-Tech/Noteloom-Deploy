@@ -24,7 +24,7 @@ export default function AcademicCalendar() {
   const fetchEvents = async () => {
     try {
       const token = await getSessionToken();
-      const response = await fetch(`${API_BASE}/api/academic/calendar`, { headers: authHeaders(token) });
+      const response = await fetch(`${API_BASE}/api/calendar/events`, { headers: authHeaders(token) });
       if (response.ok) {
         const data = await response.json();
         setEvents(Array.isArray(data) ? data : []);
@@ -33,29 +33,30 @@ export default function AcademicCalendar() {
     finally { setLoading(false); }
   };
 
+  const eventDays = new Set(
+    events
+      .filter(e => e.date && new Date(e.date).getMonth() === 2 && new Date(e.date).getFullYear() === 2026)
+      .map(e => String(new Date(e.date).getDate()))
+  );
+
   const days = [
     { day: '23', otherMonth: true }, { day: '24', otherMonth: true }, { day: '25', otherMonth: true }, { day: '26', otherMonth: true },
     { day: '27' }, { day: '28' }, { day: '1' },
     { day: '2' }, { day: '3' }, { day: '4', isToday: true }, { day: '5' }, { day: '6' }, { day: '7' }, { day: '8' },
-    { day: '9' }, { day: '10' }, { day: '11', hasEvent: true }, { day: '12', hasEvent: true }, { day: '13' }, { day: '14', hasEvent: true }, { day: '15' },
+    { day: '9' }, { day: '10' }, { day: '11', hasEvent: eventDays.has('11') }, { day: '12', hasEvent: eventDays.has('12') }, { day: '13' }, { day: '14', hasEvent: eventDays.has('14') }, { day: '15' },
     { day: '16' }, { day: '17' }, { day: '18' }, { day: '19' }, { day: '20' }, { day: '21' }, { day: '22' },
     { day: '23' }, { day: '24' }, { day: '25' }, { day: '26' }, { day: '27' }, { day: '28' }, { day: '29' },
     { day: '30' }, { day: '31' }, { day: '1', otherMonth: true }, { day: '2', otherMonth: true }, { day: '3', otherMonth: true }, { day: '4', otherMonth: true }, { day: '5', otherMonth: true },
   ];
 
-  const fallback = [
-    { _id: 'e1', title: 'Mid-Sem Exam begins', date: '2026-03-12', type: 'exam' },
-    { _id: 'e2', title: 'Departmental Seminar', date: '2026-03-11', type: 'event' },
-    { _id: 'e3', title: 'Assignment 5 due', date: '2026-03-14', type: 'due' },
-  ];
-
-  const list = events.length ? events : fallback;
+  const list = [...events].sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
 
   const typeMeta = (t: string) => {
     switch ((t || '').toLowerCase()) {
       case 'exam': return { label: 'Exam', color: 'red' as const, icon: <GraduationCap size={17} color="#ef4444" />, bg: 'rgba(239,68,68,0.1)' };
       case 'event': return { label: 'Event', color: 'blue' as const, icon: <Bell size={17} color="#2563eb" />, bg: 'rgba(59,130,246,0.1)' };
-      default: return { label: 'Due', color: 'green' as const, icon: <FileText size={17} color="#10b981" />, bg: 'rgba(16,185,129,0.1)' };
+      case 'task': return { label: 'Task', color: 'green' as const, icon: <FileText size={17} color="#10b981" />, bg: 'rgba(16,185,129,0.1)' };
+      default: return { label: 'Note', color: 'green' as const, icon: <FileText size={17} color="#10b981" />, bg: 'rgba(16,185,129,0.1)' };
     }
   };
 

@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, Pressable, StyleSheet } from 'react-native';
+import { View, Text, Pressable, StyleSheet, StyleProp, ViewStyle } from 'react-native';
 import { useTheme } from '../../contexts/ThemeContext';
 
 interface RoleCardProps {
@@ -8,9 +8,10 @@ interface RoleCardProps {
   description: string;
   selected?: boolean;
   onPress?: () => void;
+  style?: StyleProp<ViewStyle>;
 }
 
-export const RoleCard = ({ icon, title, description, selected, onPress }: RoleCardProps) => {
+export const RoleCard = ({ icon, title, description, selected, onPress, style }: RoleCardProps) => {
   const { theme } = useTheme();
 
   return (
@@ -18,6 +19,7 @@ export const RoleCard = ({ icon, title, description, selected, onPress }: RoleCa
       onPress={onPress}
       style={({ pressed }) => [
         styles.card,
+        style,
         {
           backgroundColor: selected ? 'rgba(124,58,237,0.08)' : theme.surface,
           borderColor: selected ? theme.violet : theme.border,
@@ -39,7 +41,7 @@ const styles = StyleSheet.create({
   card: { flexDirection: 'column', gap: 6, alignItems: 'flex-start', padding: 13, borderRadius: 14, borderWidth: 1, minHeight: 106 },
   icon: { width: 34, height: 34, borderRadius: 10, alignItems: 'center', justifyContent: 'center' },
   title: { fontSize: 12, fontWeight: '700' },
-  desc: { fontSize: 9.5, lineHeight: 13 },
+  desc: { fontSize: 10, lineHeight: 14 },
 });
 
 export default RoleCard;

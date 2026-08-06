@@ -19,6 +19,7 @@ type Month = 'all' | 'jan' | 'feb' | 'mar';
 export default function Attendance() {
   const { theme } = useTheme();
   const [records, setRecords] = useState<any[]>([]);
+  const [summary, setSummary] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [month, setMonth] = useState<Month>('all');
 
@@ -27,23 +28,26 @@ export default function Attendance() {
   const fetchAttendance = async () => {
     try {
       const token = await getSessionToken();
-      const response = await fetch(`${API_BASE}/api/attendance/my-attendance`, { headers: authHeaders(token) });
+      const response = await fetch(`${API_BASE}/api/attendance/my-records`, { headers: authHeaders(token) });
       if (response.ok) {
         const data = await response.json();
-        setRecords(Array.isArray(data) ? data : []);
+        setRecords(Array.isArray(data.records) ? data.records : []);
+        if (data.summary) setSummary(data.summary);
       }
     } catch {}
     finally { setLoading(false); }
   };
 
-  const fallback = [
-    { _id: 'a1', subject: 'Database Management Systems', date: '2026-03-04', status: 'present' },
-    { _id: 'a2', subject: 'Data Structures & Algorithms', date: '2026-03-03', status: 'absent' },
-    { _id: 'a3', subject: 'Operating Systems', date: '2026-02-27', status: 'present' },
-    { _id: 'a4', subject: 'Computer Networks', date: '2026-02-25', status: 'late' },
+  const pad = (n: string | number) => String(n).padStart(2, '0');
+  const overall = summary?.overall ?? 0;
+  const statItems = [
+    { value: `${overall}%`, label: 'Overall attendance', color: theme.blue, main: true },
+    { value: pad(summary?.present ?? 0), label: 'Present', color: theme.emerald },
+    { value: pad(summary?.absent ?? 0), label: 'Absent', color: theme.red },
+    { value: pad((summary?.late ?? 0) + (summary?.excused ?? 0)), label: 'Late / Excused', color: theme.amberText },
   ];
 
-  const list = (records.length ? records : fallback).filter(r => {
+  const list = records.filter(r => {
     if (month === 'all') return true;
     return new Date(r.date).getMonth() + 1 === (month === 'jan' ? 1 : month === 'feb' ? 2 : 3);
   });
@@ -52,6 +56,7 @@ export default function Attendance() {
     switch (status) {
       case 'present': return { label: 'Present', color: 'green' as const };
       case 'absent': return { label: 'Absent', color: 'red' as const };
+      case 'late': return { label: 'Late', color: 'amber' as const };
       default: return { label: 'Excused', color: 'amber' as const };
     }
   };
@@ -62,14 +67,7 @@ export default function Attendance() {
     <View style={{ flex: 1, backgroundColor: theme.bg }}>
       <Screen hasHeader={false}>
         <SubHeader title="My Attendance" />
-        <StatGrid
-          items={[
-            { value: '84%', label: 'Overall · Sem 6', color: theme.blue, main: true },
-            { value: '62', label: 'Present', color: theme.emerald },
-            { value: '08', label: 'Absent', color: theme.red },
-            { value: '04', label: 'Excused', color: theme.amberText },
-          ]}
-        />
+        <StatGrid items={statItems} />
         <FilterChips<Month>
           options={[{ value: 'all', label: 'All' }, { value: 'jan', label: 'Jan' }, { value: 'feb', label: 'Feb' }, { value: 'mar', label: 'Mar' }]}
           value={month}

@@ -34,7 +34,7 @@ export default function StudentHome() {
     try {
       const token = await getSessionToken();
       const [nRes, cRes] = await Promise.all([
-        fetch(`${API_BASE}/api/notices`, { headers: authHeaders(token) }),
+        fetch(`${API_BASE}/api/notices/staff`, { headers: authHeaders(token) }),
         fetch(`${API_BASE}/api/classrooms`, { headers: authHeaders(token) }),
       ]);
       if (nRes.ok) { const d = await nRes.json(); if (Array.isArray(d)) setNotices(d); }

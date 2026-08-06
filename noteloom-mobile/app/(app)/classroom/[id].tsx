@@ -18,7 +18,8 @@ import { Gradient } from '../../../components/ui/Gradient';
 
 interface ModuleItem {
   _id: string;
-  name: string;
+  title: string;
+  name?: string;
   description?: string;
 }
 
@@ -26,7 +27,8 @@ interface ContentItem {
   _id: string;
   title: string;
   description?: string;
-  fileType: string;
+  type?: string;
+  fileType?: string;
   fileUrl?: string;
   thumbnailUrl?: string;
   isCompleted: boolean;
@@ -56,16 +58,30 @@ export default function ClassroomView() {
   const fetchData = async () => {
     try {
       const token = await getSessionToken();
-      const [classRes, infoRes] = await Promise.all([
-        fetch(`${API_BASE}/api/classrooms/${id}`, { headers: authHeaders(token) }),
+      const [classRoomsRes, modulesRes, infoRes] = await Promise.all([
+        fetch(`${API_BASE}/api/classrooms`, { headers: authHeaders(token) }),
+        fetch(`${API_BASE}/api/classrooms/${id}/modules`, { headers: authHeaders(token) }),
         fetch(`${API_BASE}/session/info`, { headers: authHeaders(token) }),
       ]);
-      if (classRes.ok) {
-        const data = await classRes.json();
-        setClassroom(data);
-        setModules(data.modules || []);
-        setContents(data.contents || []);
-        if (data.modules?.length > 0) setActiveModule(data.modules[0]._id);
+      if (classRoomsRes.ok) {
+        const all = await classRoomsRes.json();
+        const found = Array.isArray(all) ? all.find((c: any) => c._id === id) : null;
+        setClassroom(found || null);
+      }
+      if (modulesRes.ok) {
+        const mods = await modulesRes.json();
+        setModules(Array.isArray(mods) ? mods : []);
+        if (Array.isArray(mods) && mods.length > 0) setActiveModule(mods[0]._id);
+
+        const loaded: ContentItem[] = [];
+        await Promise.all(mods.map(async (m: any) => {
+          const res = await fetch(`${API_BASE}/api/modules/${m._id}/content`, { headers: authHeaders(token) });
+          if (res.ok) {
+            const list = await res.json();
+            if (Array.isArray(list)) loaded.push(...list);
+          }
+        }));
+        setContents(loaded);
       }
       if (infoRes.ok) {
         const info = await infoRes.json();
@@ -87,8 +103,8 @@ export default function ClassroomView() {
   const toggleComplete = async (contentId: string, currentStatus: boolean) => {
     try {
       const token = await getSessionToken();
-      await fetch(`${API_BASE}/api/classrooms/${id}/content/${contentId}/complete`, {
-        method: 'PUT',
+      await fetch(`${API_BASE}/api/content/${contentId}/complete`, {
+        method: 'POST',
         headers: authHeaders(token),
         body: JSON.stringify({ isCompleted: !currentStatus }),
       });
@@ -97,12 +113,13 @@ export default function ClassroomView() {
   };
 
   const filteredContents = contents.filter((c) => {
+    const ft = c.type || c.fileType || '';
     if (activeModule && c.moduleId !== activeModule) return false;
     if (filterTab === 'All') return true;
-    if (filterTab === 'Lectures') return c.fileType === 'video' || c.fileType === 'lecture';
-    if (filterTab === 'Notes') return c.fileType === 'pdf' || c.fileType === 'note';
-    if (filterTab === 'Assignment') return c.fileType === 'assignment';
-    if (filterTab === 'Updates') return c.fileType === 'announcement' || c.fileType === 'update';
+    if (filterTab === 'Lectures') return ft === 'video' || ft === 'lecture';
+    if (filterTab === 'Notes') return ft === 'pdf' || ft === 'note' || ft === 'document';
+    if (filterTab === 'Assignment') return ft === 'assignment';
+    if (filterTab === 'Updates') return ft === 'announcement' || ft === 'update';
     return true;
   });
 
@@ -110,13 +127,14 @@ export default function ClassroomView() {
   const activeModuleData = modules.find((m) => m._id === activeModule);
 
   const getIcon = (fileType: string) => {
-    if (fileType === 'video' || fileType === 'lecture') {
+    const ft = fileType || '';
+    if (ft === 'video' || ft === 'lecture') {
       return { icon: <Video size={20} color={theme.blue} />, color: theme.blue, bg: 'rgba(59,130,246,0.12)' };
     }
-    if (fileType === 'pdf' || fileType === 'note') {
+    if (ft === 'pdf' || ft === 'note' || ft === 'document') {
       return { icon: <FileText size={20} color={theme.amber} />, color: theme.amber, bg: 'rgba(245,158,11,0.12)' };
     }
-    if (fileType === 'image') {
+    if (ft === 'image') {
       return { icon: <Image size={20} color={theme.green} />, color: theme.green, bg: 'rgba(16,185,129,0.12)' };
     }
     return { icon: <FileText size={20} color={theme.violet} />, color: theme.violet, bg: 'rgba(124,58,237,0.12)' };
@@ -159,25 +177,35 @@ export default function ClassroomView() {
           </View>
         </Gradient>
 
+        {isFaculty && (
+          <Pressable
+            onPress={() => router.push(`/(app)/faculty/manage-class/${id}` as any)}
+            style={[styles.manageBtn, { backgroundColor: theme.surface2, borderColor: theme.border }]}
+          >
+            <FileText size={16} color={theme.violet} />
+            <Text style={[styles.manageText, { color: theme.violet }]}>Manage Content</Text>
+          </Pressable>
+        )}
+
         {modules.length > 0 && (
           <>
             <SectionHeader title="Modules" />
             <FilterChips
-              options={modules.map((m) => ({ value: m._id, label: m.name }))}
+              options={modules.map((m) => ({ value: m._id, label: m.title || m.name }))}
               value={activeModule || ''}
               onChange={(v) => setActiveModule(v)}
             />
           </>
         )}
 
-        <SectionHeader title={activeModuleData ? `${activeModuleData.name}` : 'Content'} />
+        <SectionHeader title={activeModuleData ? `${activeModuleData.title || activeModuleData.name}` : 'Content'} />
         <FilterChips options={tabs.map((t) => ({ value: t, label: t }))} value={filterTab} onChange={setFilterTab} />
 
         {filteredContents.length === 0 ? (
           <EmptyState icon={<BookOpen size={44} color={theme.faint} />} message="No content yet" />
         ) : (
           filteredContents.map((item) => {
-            const { icon, color, bg } = getIcon(item.fileType);
+            const { icon, color, bg } = getIcon(item.type || item.fileType || '');
             return (
               <ListCard key={item._id}>
                 <LRow
@@ -232,4 +260,6 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(124,58,237,0.12)',
   },
   date: { fontSize: 10, fontWeight: '600' },
+  manageBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6, borderWidth: 1, borderRadius: 14, paddingVertical: 12, marginBottom: 16 },
+  manageText: { fontSize: 13, fontWeight: '700' },
 });

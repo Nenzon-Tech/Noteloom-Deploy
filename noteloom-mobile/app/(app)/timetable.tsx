@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, Pressable, ActivityIndicator, StyleSheet } from 'react-native';
+import { View, Text, ActivityIndicator, StyleSheet } from 'react-native';
 import { MapPin } from 'lucide-react-native';
 import { useTheme } from '../../contexts/ThemeContext';
+import { useSession } from '../../hooks/useSession';
 import { API_BASE } from '../../lib/constants';
 import { authHeaders } from '../../lib/api';
 import { getSessionToken } from '../../lib/storage';
@@ -17,32 +18,60 @@ type Day = 'mon' | 'tue' | 'wed' | 'thu' | 'fri';
 
 export default function Timetable() {
   const { theme } = useTheme();
+  const { user } = useSession();
   const [entries, setEntries] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [day, setDay] = useState<Day>('mon');
 
-  useEffect(() => { fetchTimetable(); }, []);
+  useEffect(() => { if (user?.id) fetchTimetable(); }, [user?.id]);
 
   const fetchTimetable = async () => {
     try {
       const token = await getSessionToken();
-      const response = await fetch(`${API_BASE}/api/routine`, { headers: authHeaders(token) });
-      if (response.ok) {
-        const data = await response.json();
-        setEntries(Array.isArray(data) ? data : []);
+
+      // Resolve the student's own batch from the batch list (students array)
+      const batchRes = await fetch(`${API_BASE}/api/batches`, { headers: authHeaders(token) });
+      let batchId: string | null = null;
+      if (batchRes.ok) {
+        const batches = await batchRes.json();
+        const match = (Array.isArray(batches) ? batches : []).find(b =>
+          Array.isArray(b?.students) && b.students.some((s: any) => String(s || '') === String(user?.id))
+        );
+        batchId = match?._id || null;
+      }
+      if (!batchId) { setEntries([]); return; }
+
+      const routineRes = await fetch(`${API_BASE}/api/routine/batch/${batchId}`, { headers: authHeaders(token) });
+      if (routineRes.ok) {
+        const routines = await routineRes.json();
+        const flattened = (Array.isArray(routines) ? routines : []).flatMap((r: any) =>
+          (Array.isArray(r.periods) ? r.periods : []).map((p: any) => ({
+            _id: `${r._id}-${p.periodNumber}`,
+            subject: p.subject || 'Break',
+            room: p.roomNo || '—',
+            faculty: p.facultyName || '',
+            timeSlot: fmtTime(p.startTime),
+            timeEnd: fmtTime(p.end),
+            day: (r.dayOfWeek || '').toLowerCase().slice(0, 3),
+            isBreak: !!p.isBreak,
+          }))
+        );
+        setEntries(flattened);
       }
     } catch {}
     finally { setLoading(false); }
   };
 
-  const fallback = [
-    { _id: 't1', subject: 'Operating Systems', room: 'Room 401 · Prof. R. Ghosh', timeSlot: '09:00 AM', day: 'mon' },
-    { _id: 't2', subject: 'Database Management Systems', room: 'Lab 2 · Prof. S. Banerjee', timeSlot: '10:00 AM', day: 'mon' },
-    { _id: 't3', subject: 'Data Structures & Algorithms', room: 'Room 305 · Dr. M. Chatterjee', timeSlot: '12:00 PM', day: 'mon' },
-    { _id: 't4', subject: 'Computer Networks', room: 'Room 208 · Dr. P. Mukherjee', timeSlot: '02:00 PM', day: 'mon' },
-  ];
+  const fmtTime = (t?: string) => {
+    if (!t) return '';
+    const [h, m] = t.split(':').map(Number);
+    if (Number.isNaN(h)) return t;
+    const meridiem = h >= 12 ? 'PM' : 'AM';
+    const hour = h % 12 || 12;
+    return `${hour}:${String(m ?? 0).padStart(2, '0')} ${meridiem}`;
+  };
 
-  const list = (entries.length ? entries : fallback).filter(e => (e.day || 'mon').toLowerCase().startsWith(day.slice(0, 3)) || e.day?.toLowerCase() === day);
+  const list = entries.filter(e => e.day === day);
 
   const first = list[0];
 
@@ -75,7 +104,7 @@ export default function Timetable() {
                 dateMain={e.timeSlot.split(' ')[0]}
                 dateStyle={isFirst ? { backgroundColor: 'transparent', borderWidth: 0 } : { backgroundColor: theme.surface2 }}
                 title={e.subject}
-                subtitle={e.room}
+                subtitle={e.isBreak ? 'Break' : `${e.room}${e.faculty ? ' · ' + e.faculty : ''}`}
                 subtitleIcon={<MapPin size={11} color={theme.faint} />}
                 onPress={() => {}}
               />

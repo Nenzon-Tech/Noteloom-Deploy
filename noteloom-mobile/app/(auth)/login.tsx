@@ -295,6 +295,7 @@ export default function LoginPage() {
                   description={r.desc}
                   selected={role === r.value}
                   onPress={() => setRole(r.value)}
+                  style={styles.roleCell}
                 />
               ))}
             </View>
@@ -465,6 +466,7 @@ export default function LoginPage() {
                   description={r.desc}
                   selected={role === r.value}
                   onPress={() => pickRole(r.value)}
+                  style={styles.roleCell}
                 />
               ))}
             </View>
@@ -603,6 +605,7 @@ const styles = StyleSheet.create({
   passWrap: { position: 'relative' },
   eye: { position: 'absolute', right: 12, top: 15, zIndex: 2 },
   roleGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginVertical: 16 },
+  roleCell: { flexBasis: '47%' },
   authSec: { fontSize: 10, textAlign: 'center', marginTop: 18 },
   bioArea: { marginTop: 14 },
   bioDivider: { flexDirection: 'row', alignItems: 'center', gap: 10, marginBottom: 14 },

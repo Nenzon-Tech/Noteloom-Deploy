@@ -1,12 +1,18 @@
-import React, { useState } from 'react';
-import { View, ActivityIndicator } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { View, ActivityIndicator, StyleSheet } from 'react-native';
 import Svg, { Rect } from 'react-native-svg';
 import { useTheme } from '../../../contexts/ThemeContext';
 import { useSession } from '../../../hooks/useSession';
+import { API_BASE } from '../../../lib/constants';
+import { authHeaders } from '../../../lib/api';
+import { getSessionToken } from '../../../lib/storage';
 import { Screen } from '../../../components/ui/Screen';
 import { SubHeader } from '../../../components/ui/SubHeader';
 import { AdmitCard } from '../../../components/ui/AdmitCard';
 import { GradButton } from '../../../components/ui/GradButton';
+import { SectionHeader } from '../../../components/ui/SectionHeader';
+import { EmptyState } from '../../../components/ui/EmptyState';
+import { RecRow } from '../../../components/ui/RecRow';
 import { Download } from 'lucide-react-native';
 
 const QRMock = () => {
@@ -26,36 +32,96 @@ const QRMock = () => {
   );
 };
 
+interface AdmitData {
+  candidate?: {
+    name?: string;
+    program?: string;
+    stream?: string;
+    registrationNo?: string;
+    examRollNo?: string;
+    examCenter?: string;
+  };
+  history?: { id: number; label: string; status: string; payment: string; isCurrent?: boolean }[];
+  schedule?: { code: string; subject: string; type?: string }[];
+  instructions?: string[];
+}
+
 export default function AdmitCardScreen() {
   const { theme } = useTheme();
   const { user } = useSession();
+  const [data, setData] = useState<AdmitData | null>(null);
+  const [loading, setLoading] = useState(true);
   const [generating, setGenerating] = useState(false);
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const token = await getSessionToken();
+        const uid = user?.id || '';
+        if (!uid) return;
+        const response = await fetch(`${API_BASE}/api/coe/admit-card/${uid}`, { headers: authHeaders(token) });
+        if (response.ok) {
+          setData(await response.json());
+        }
+      } catch {}
+      finally { setLoading(false); }
+    })();
+  }, [user?.id]);
 
   const handleDownload = async () => {
     setGenerating(true);
     setTimeout(() => setGenerating(false), 1500);
   };
 
+  const cand = data?.candidate || {};
+  const history = data?.history || [];
+  const currentSem = history.find(h => h.isCurrent) || history[history.length - 1];
+
   return (
     <View style={{ flex: 1, backgroundColor: theme.bg }}>
       <Screen>
-        <SubHeader title="Admit Card" />
-        <AdmitCard
-          title="Note Loom"
-          pill="Mid-Sem 2026"
-          qr={<QRMock />}
-          code={`IEM · ${user?.uid || '2023CS0765'} · SEM-06`}
-          cells={[
-            { label: 'Student', value: user?.name || 'Arpan Maity' },
-            { label: 'Course', value: 'CSE · Sem 6' },
-            { label: 'Exam Date', value: '12 Mar 2026' },
-            { label: 'Venue', value: 'Block B · Hall 2' },
-          ]}
-        />
-        <GradButton fullWidth size="md" onPress={handleDownload} icon={<Download size={18} color="#fff" />}>
-          {generating ? <ActivityIndicator color="#fff" /> : 'Download Admit Card'}
-        </GradButton>
+        <SubHeader title="Admit Card" subtitle={currentSem?.label || 'Examination'} />
+        {loading ? (
+          <ActivityIndicator color={theme.violet} style={{ paddingVertical: 60 }} />
+        ) : !data ? (
+          <EmptyState message="No admit card available yet. Complete your exam form first." />
+        ) : (
+          <>
+            <AdmitCard
+              title="Note Loom"
+              pill={currentSem?.status || 'Generated'}
+              qr={<QRMock />}
+              code={`${cand.registrationNo || 'N/A'} · ${cand.examRollNo || 'N/A'}`}
+              cells={[
+                { label: 'Student', value: cand.name || 'N/A' },
+                { label: 'Program', value: `${cand.program || ''} · ${cand.stream || ''}` },
+                { label: 'Reg. No', value: cand.registrationNo || 'N/A' },
+                { label: 'Roll No', value: cand.examRollNo || 'N/A' },
+              ]}
+            />
+            <GradButton fullWidth size="md" onPress={handleDownload} icon={<Download size={18} color="#fff" />}>
+              {generating ? <ActivityIndicator color="#fff" /> : 'Download Admit Card'}
+            </GradButton>
+
+            <SectionHeader title="Exam Schedule" />
+            {data.schedule?.length ? (
+              data.schedule.map((s, i) => (
+                <RecRow
+                  key={i}
+                  dateTop="SUB"
+                  dateMain={s.code || 'N/A'}
+                  title={s.subject || 'Subject'}
+                  subtitle={`${s.type || 'Regular'} · ${cand.examCenter || 'Main Block'}`}
+                />
+              ))
+            ) : (
+              <EmptyState message="Schedule not released yet" />
+            )}
+          </>
+        )}
       </Screen>
     </View>
   );
 }
+
+const styles = StyleSheet.create({});

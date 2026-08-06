@@ -33,10 +33,16 @@ export default function ManageUsers() {
   const fetchUsers = async () => {
     try {
       const token = await getSessionToken();
-      const response = await fetch(`${API_BASE}/api/admin/users`, {
-        headers: authHeaders(token),
-      });
-      if (response.ok) setUsers(await response.json());
+      const [stuRes, facRes] = await Promise.all([
+        fetch(`${API_BASE}/api/college-admin/users/student`, { headers: authHeaders(token) }),
+        fetch(`${API_BASE}/api/college-admin/users/faculty`, { headers: authHeaders(token) }),
+      ]);
+      const stu = stuRes.ok ? await stuRes.json() : [];
+      const fac = facRes.ok ? await facRes.json() : [];
+      setUsers([
+        ...(Array.isArray(stu) ? stu.map(u => ({ ...u, role: 'student' })) : []),
+        ...(Array.isArray(fac) ? fac.map(u => ({ ...u, role: 'faculty' })) : []),
+      ]);
     } catch (err) { console.error(err); }
     finally { setLoading(false); }
   };
@@ -44,10 +50,10 @@ export default function ManageUsers() {
   const toggleUserStatus = async (userId: string, currentStatus: string) => {
     try {
       const token = await getSessionToken();
-      const newStatus = currentStatus === 'active' ? 'suspended' : 'active';
-      await fetch(`${API_BASE}/api/admin/users/${userId}/status`, {
-        method: 'PUT',
-        headers: authHeaders(token),
+      const newStatus = currentStatus === 'suspended' ? 'active' : 'suspended';
+      await fetch(`${API_BASE}/api/college-admin/users/${userId}/status`, {
+        method: 'PATCH',
+        headers: { ...authHeaders(token), 'Content-Type': 'application/json' },
         body: JSON.stringify({ status: newStatus }),
       });
       setUsers((prev) => prev.map((u) => u._id === userId ? { ...u, status: newStatus } : u));

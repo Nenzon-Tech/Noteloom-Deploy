@@ -1,48 +1,83 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { View, StyleSheet } from 'react-native';
 import { useTheme } from '../../../contexts/ThemeContext';
+import { API_BASE } from '../../../lib/constants';
+import { authHeaders } from '../../../lib/api';
+import { getSessionToken } from '../../../lib/storage';
 import { Screen } from '../../../components/ui/Screen';
 import { SubHeader } from '../../../components/ui/SubHeader';
 import { FilterChips } from '../../../components/ui/FilterChips';
 import { AprRow } from '../../../components/ui/AprRow';
 import { EmptyState } from '../../../components/ui/EmptyState';
 
-type AprFilter = 'all' | 'student' | 'faculty';
+type AprFilter = 'all' | 'pending';
+
+interface RequestItem {
+  _id: string;
+  collegeName?: string;
+  adminName?: string;
+  adminEmail?: string;
+  requestedBy?: string;
+  status?: string;
+  createdAt?: string;
+}
 
 export default function AdminApprovals() {
   const { theme } = useTheme();
   const [filter, setFilter] = useState<AprFilter>('all');
-  const [rows, setRows] = useState([
-    { _id: 'a1', initial: 'P', name: 'Priyanka Saha', meta: 'New admission · CSE · Roll 2023CS0891 · 2h ago', type: 'student' as const },
-    { _id: 'a2', initial: 'V', name: 'Vivek Tiwari', meta: 'New admission · ECE · Roll 2023EC0507 · 5h ago', type: 'student' as const },
-    { _id: 'a3', initial: 'N', name: 'Dr. N. Bhattacharya', meta: 'New faculty · ME Dept · Ref FR-118 · 1d ago', type: 'faculty' as const, gradient: ['#3b82f6', '#6366f1'] as [string, string] },
-    { _id: 'a4', initial: 'S', name: 'Mrs. S. Bose', meta: 'New faculty · EE Dept · Ref FR-121 · 2d ago', type: 'faculty' as const, gradient: ['#f59e0b', '#ea580c'] as [string, string] },
-  ]);
+  const [rows, setRows] = useState<RequestItem[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const remove = (id: string) => setRows(prev => prev.filter(r => r._id !== id));
-  const list = rows.filter(r => filter === 'all' || r.type === filter);
+  const fetchRequests = useCallback(async () => {
+    try {
+      const token = await getSessionToken();
+      const response = await fetch(`${API_BASE}/api/college-admin/requests`, { headers: authHeaders(token) });
+      if (response.ok) {
+        const data = await response.json();
+        setRows(Array.isArray(data) ? data.filter((r: RequestItem) => r.status === 'pending') : []);
+      }
+    } catch {}
+    finally { setLoading(false); }
+  }, []);
+
+  useEffect(() => { fetchRequests(); }, [fetchRequests]);
+
+  const decide = async (id: string, action: 'approve' | 'reject') => {
+    try {
+      const token = await getSessionToken();
+      await fetch(`${API_BASE}/api/college-admin/requests/${id}/${action}`, {
+        method: 'POST',
+        headers: authHeaders(token),
+      });
+    } catch {}
+    setRows(prev => prev.filter(r => r._id !== id));
+  };
+
+  const list = rows.filter(r => filter === 'all' || r.status === filter);
 
   return (
     <View style={{ flex: 1, backgroundColor: theme.bg }}>
       <Screen>
         <SubHeader title="Approvals" subtitle={`${rows.length} pending requests`} />
         <FilterChips<AprFilter>
-          options={[{ value: 'all', label: 'All' }, { value: 'student', label: 'Students' }, { value: 'faculty', label: 'Faculty' }]}
+          options={[{ value: 'all', label: 'All' }, { value: 'pending', label: 'Pending' }]}
           value={filter}
           onChange={setFilter}
         />
-        {list.length === 0 ? (
+        {loading ? (
+          <EmptyState message="Loading requests…" />
+        ) : list.length === 0 ? (
           <EmptyState message="Nothing pending" />
         ) : (
           list.map(r => (
             <AprRow
               key={r._id}
-              initial={r.initial}
-              name={r.name}
-              meta={r.meta}
-              gradient={r.gradient}
-              onApprove={() => remove(r._id)}
-              onReject={() => remove(r._id)}
+              initial={(r.adminName || 'A')[0]}
+              name={r.adminName || 'Unknown'}
+              meta={`${r.collegeName || 'College'} · ${r.adminEmail || ''} · ${r.createdAt ? new Date(r.createdAt).toLocaleDateString() : 'recent'}`}
+              gradient={['#3b82f6', '#6366f1']}
+              onApprove={() => decide(r._id, 'approve')}
+              onReject={() => decide(r._id, 'reject')}
             />
           ))
         )}

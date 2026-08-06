@@ -2,10 +2,13 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, Pressable, Switch, StyleSheet } from 'react-native';
 import { useRouter } from 'expo-router';
 import * as LocalAuthentication from 'expo-local-authentication';
-import { Bell, Library, ShieldCheck, Moon, Sun, MessageCircle, LogOut, ChevronRight, Fingerprint } from 'lucide-react-native';
+import { Bell, Library, ShieldCheck, Moon, Sun, LogOut, ChevronRight, Fingerprint } from 'lucide-react-native';
 import { useTheme } from '../../contexts/ThemeContext';
 import { useSession } from '../../hooks/useSession';
 import { isBiometricEnabled, setBiometricEnabled } from '../../lib/storage';
+import { API_BASE } from '../../lib/constants';
+import { authHeaders } from '../../lib/api';
+import { getSessionToken } from '../../lib/storage';
 import { Screen } from '../../components/ui/Screen';
 import { GHeader, Wordmark } from '../../components/ui/GHeader';
 import { Gradient } from '../../components/ui/Gradient';
@@ -19,12 +22,22 @@ export default function Profile() {
   const { user, profile, logout, authenticateWithBiometrics } = useSession();
   const router = useRouter();
   const [biometricEnabled, setBiometricEnabledState] = useState(false);
+  const [courseCount, setCourseCount] = useState<number | null>(null);
 
   useEffect(() => {
     let mounted = true;
     (async () => {
       const enabled = await isBiometricEnabled();
       if (mounted) setBiometricEnabledState(enabled);
+
+      try {
+        const token = await getSessionToken();
+        const res = await fetch(`${API_BASE}/api/classrooms`, { headers: authHeaders(token) });
+        if (res.ok) {
+          const data = await res.json();
+          if (mounted) setCourseCount(Array.isArray(data) ? data.length : null);
+        }
+      } catch {}
     })();
     return () => { mounted = false; };
   }, []);
@@ -46,9 +59,10 @@ export default function Profile() {
 
   const handleSignOut = async () => { await logout(); router.replace('/college-selection'); };
 
-  const name = user?.name || 'Arpan Maity';
+  const name = user?.name || 'NoteLoom User';
   const roleLabel = profile?.role === 'faculty' ? 'Faculty' : profile?.role === 'college_admin' ? 'Admin' : 'Student';
-  const uid = user?.uid || profile?.college || '2023CS0765';
+  const uid = user?.uid || profile?.college || 'N/A';
+  const college = profile?.college || 'Note Loom';
 
   return (
     <View style={{ flex: 1, backgroundColor: theme.bg }}>
@@ -60,24 +74,24 @@ export default function Profile() {
           <View style={styles.coverDecor} />
           <View style={styles.pfTop}>
             <Gradient colors={['#818cf8', '#c084fc']} angle={135} radius={18} style={styles.pfAva}>
-              <Text style={styles.pfAvaText}>{name?.[0]?.toUpperCase() || 'A'}</Text>
+              <Text style={styles.pfAvaText}>{name?.[0]?.toUpperCase() || 'N'}</Text>
             </Gradient>
             <View style={styles.pfInfo}>
               <Text style={styles.pfName}>{name}</Text>
-              <Text style={styles.pfMeta}>3rd Year · CSE · UID {uid}</Text>
+              <Text style={styles.pfMeta}>{college} · UID {uid}</Text>
               <Pill onDark>{roleLabel} · Active</Pill>
             </View>
           </View>
           <View style={styles.pfStats}>
-            <View style={styles.st}><Text style={styles.stVal}>6</Text><Text style={styles.stLbl}>Courses</Text></View>
-            <View style={styles.st}><Text style={styles.stVal}>84%</Text><Text style={styles.stLbl}>Attendance</Text></View>
-            <View style={styles.st}><Text style={styles.stVal}>8.6</Text><Text style={styles.stLbl}>CGPA</Text></View>
+            <View style={styles.st}><Text style={styles.stVal}>{courseCount ?? '–'}</Text><Text style={styles.stLbl}>Courses</Text></View>
+            <View style={styles.st}><Text style={styles.stVal}>Active</Text><Text style={styles.stLbl}>Session</Text></View>
+            <View style={styles.st}><Text style={styles.stVal}>–</Text><Text style={styles.stLbl}>CGPA</Text></View>
           </View>
         </Gradient>
 
         <SectionHeader title="Account" />
         <ListCard>
-          <LRow icon={<Bell size={17} color="#7c3aed" />} iconBg="rgba(124,58,237,0.12)" title="Notifications" subtitle="3 unread · exam alerts" />
+          <LRow icon={<Bell size={17} color="#7c3aed" />} iconBg="rgba(124,58,237,0.12)" title="Notifications" subtitle="Campus announcements" onPress={() => router.push('/(app)/notice-board')} />
           <LRow icon={<Library size={17} color="#10b981" />} iconBg="rgba(16,185,129,0.12)" title="My Library" subtitle="Saved notes & PYQs" onPress={() => router.push('/(app)/library')} />
           <LRow
             icon={<Fingerprint size={17} color="#2563eb" />}

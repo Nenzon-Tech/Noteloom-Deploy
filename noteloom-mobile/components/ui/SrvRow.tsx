@@ -31,7 +31,8 @@ export const SrvRow = ({ icon, iconBg, iconColor, title, meta, action, actionCol
   const body = (
     <>
       {avatar}
-      {icon && <View style={[styles.icon, { backgroundColor: iconBg }]}>{icon}</View>}      <View style={styles.info}>
+      {icon && <View style={[styles.icon, { backgroundColor: iconBg }]}>{icon}</View>}
+      <View style={styles.info}>
         <Text style={[styles.title, { color: theme.fg }]} numberOfLines={1}>{title}</Text>
         <Text style={[styles.meta, { color: theme.faint }]} numberOfLines={1}>{meta}</Text>
       </View>
@@ -45,7 +46,7 @@ export const SrvRow = ({ icon, iconBg, iconColor, title, meta, action, actionCol
             actionColor === 'ghost' && { backgroundColor: theme.surface2 },
           ]}
         >
-          <Text style={[styles.actText, { color: actionColor === 'ghost' ? theme.muted : actPalette[actionColor].text }]}>
+          <Text style={[styles.actText, { color: actionColor === 'ghost' ? theme.muted : actPalette[actionColor].text }]} numberOfLines={1}>
             {action}
           </Text>
         </Pressable>
@@ -69,8 +70,8 @@ const styles = StyleSheet.create({
   info: { flex: 1, minWidth: 0 },
   title: { fontSize: 13, fontWeight: '700' },
   meta: { fontSize: 10, marginTop: 2 },
-  act: { paddingVertical: 9, paddingHorizontal: 12, borderRadius: 9 },
-  actText: { fontSize: 11, fontWeight: '600' },
+  act: { paddingVertical: 9, paddingHorizontal: 12, borderRadius: 9, flexShrink: 0 },
+  actText: { fontSize: 11, fontWeight: '600', flexShrink: 1 },
 });
 
 export default SrvRow;

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { View, ActivityIndicator } from 'react-native';
-import { ClipboardList, Users, Calendar, CheckCircle, XCircle } from 'lucide-react-native';
+import { ClipboardList, Calendar, CheckCircle, XCircle } from 'lucide-react-native';
 import { useTheme } from '../../../contexts/ThemeContext';
 import { API_BASE } from '../../../lib/constants';
 import { authHeaders } from '../../../lib/api';
@@ -13,18 +13,23 @@ import { EmptyState } from '../../../components/ui/EmptyState';
 
 export default function ExamManagement() {
   const { theme } = useTheme();
-  const [exams, setExams] = useState<any[]>([]);
+  const [session, setSession] = useState<any>(null);
+  const [records, setRecords] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => { fetchExams(); }, []);
+  useEffect(() => { fetchStatus(); }, []);
 
-  const fetchExams = async () => {
+  const fetchStatus = async () => {
     try {
       const token = await getSessionToken();
-      const response = await fetch(`${API_BASE}/api/exams`, {
+      const response = await fetch(`${API_BASE}/api/coe/admin/exam-status`, {
         headers: authHeaders(token),
       });
-      if (response.ok) setExams(await response.json());
+      if (response.ok) {
+        const data = await response.json();
+        setSession(data.session || null);
+        setRecords(Array.isArray(data.records) ? data.records : []);
+      }
     } catch {}
     finally { setLoading(false); }
   };
@@ -32,27 +37,29 @@ export default function ExamManagement() {
   return (
     <View style={{ flex: 1, backgroundColor: theme.bg }}>
       <Screen>
-        <SubHeader title="Exam Management" subtitle="Scheduled examinations" />
+        <SubHeader title="Exam Management" subtitle={session ? session.sessionName : 'No active session'} />
 
-        <SectionHeader title="Active Exams" />
+        <SectionHeader title="Student Form Status" />
 
         {loading ? (
           <ActivityIndicator color={theme.violet} style={{ paddingVertical: 60 }} />
-        ) : exams.length === 0 ? (
-          <EmptyState icon={<ClipboardList size={44} color={theme.faint} />} message="No exams scheduled" />
+        ) : records.length === 0 ? (
+          <EmptyState icon={<ClipboardList size={44} color={theme.faint} />} message={session ? 'No students found' : 'No active examination session'} />
         ) : (
-          exams.map((exam) => {
-            const d = exam.date ? new Date(exam.date) : null;
-            const active = exam.status === 'active';
+          records.map((r) => {
+            const submitted = r.status === 'Submitted';
             return (
               <RecRow
-                key={exam._id}
-                dateTop={d ? d.toLocaleString('en', { month: 'short' }) : '—'}
-                dateMain={d ? String(d.getDate()) : '—'}
-                title={exam.name}
-                subtitle={exam.totalStudents ? `${exam.totalStudents} students` : 'Scheduled'}
-                subtitleIcon={exam.totalStudents ? <Users size={12} color={theme.faint} /> : <Calendar size={12} color={theme.faint} />}
-                trailing={active ? <CheckCircle size={18} color={theme.green} /> : <XCircle size={18} color={theme.red} />}
+                key={r.studentId || r.rollNo}
+                dateBox={
+                  <View style={{ alignItems: 'center', justifyContent: 'center', width: 50, height: 52 }}>
+                    <CheckCircle size={20} color={submitted ? theme.green : theme.red} />
+                  </View>
+                }
+                title={r.name}
+                subtitle={`${r.course || 'Course'} · Sem ${r.semester ?? '—'} · ${r.rollNo || 'N/A'}`}
+                subtitleIcon={<Calendar size={12} color={theme.faint} />}
+                trailing={null}
               />
             );
           })

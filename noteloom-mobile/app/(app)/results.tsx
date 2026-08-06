@@ -31,12 +31,20 @@ export default function Results() {
   const fetchResults = async () => {
     try {
       const token = await getSessionToken();
-      const response = await fetch(`${API_BASE}/api/student/marks`, {
+      const response = await fetch(`${API_BASE}/api/coe/my-results`, {
         headers: authHeaders(token),
       });
       if (response.ok) {
         const data = await response.json();
-        setResults(Array.isArray(data) ? data : []);
+        const list = Array.isArray(data.results) ? data.results : [];
+        setResults(list.map(r => ({
+          _id: r._id,
+          subject: r.subject,
+          examType: r.batch || 'Semester',
+          marks: r.marksObtained,
+          totalMarks: r.totalMarks,
+          semester: r.semester,
+        })));
       }
     } catch {}
     finally { setLoading(false); }

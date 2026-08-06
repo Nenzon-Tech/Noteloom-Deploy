@@ -1,57 +1,99 @@
-import React from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { View, StyleSheet } from 'react-native';
 import { useTheme } from '../../../contexts/ThemeContext';
+import { useSession } from '../../../hooks/useSession';
+import { API_BASE } from '../../../lib/constants';
+import { authHeaders } from '../../../lib/api';
+import { getSessionToken } from '../../../lib/storage';
 import { Screen } from '../../../components/ui/Screen';
 import { GHeader } from '../../../components/ui/GHeader';
 import { Avatar } from '../../../components/ui/Avatar';
 import { PubForm } from '../../../components/ui/PubForm';
 import { SectionHeader } from '../../../components/ui/SectionHeader';
 import { NoticeCard } from '../../../components/ui/NoticeCard';
+import { EmptyState } from '../../../components/ui/EmptyState';
+
+interface Notice {
+  _id: string;
+  type?: string;
+  title: string;
+  content: string;
+  posterName?: string;
+  posterRole?: string;
+  reactions?: { userId: string; userName: string }[];
+  comments?: { userName: string; text: string }[];
+  createdAt?: string;
+}
+
+const tagColor = (type?: string) =>
+  type === 'departmental' ? 'blue' : 'green';
 
 export default function AdminNotices() {
   const { theme } = useTheme();
+  const { user } = useSession();
+  const [notices, setNotices] = useState<Notice[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const notices = [
-    {
-      _id: 'an1',
-      tag: 'Campus',
-      tagColor: 'green' as const,
-      time: '1h',
-      title: 'Tech Fest registrations open',
-      body: 'Annual TechnoVation 2026 opens 15 Aug. Teams of up to 4, register at the student council.',
-      likes: 2100,
-      comments: 156,
-    },
-    {
-      _id: 'an2',
-      tag: 'Exam',
-      tagColor: 'blue' as const,
-      time: '3h',
-      title: 'SEM-06 examination hall plan',
-      body: 'Hall plan released for CSE & ECE. Verify seat allotment before 14 Aug.',
-      likes: 1800,
-      comments: 94,
-    },
-  ];
+  const fetchNotices = useCallback(async () => {
+    try {
+      const token = await getSessionToken();
+      const response = await fetch(`${API_BASE}/api/notices/staff`, { headers: authHeaders(token) });
+      if (response.ok) {
+        const data = await response.json();
+        setNotices(Array.isArray(data) ? data : []);
+      }
+    } catch {}
+    finally { setLoading(false); }
+  }, []);
+
+  useEffect(() => { fetchNotices(); }, [fetchNotices]);
+
+  const publish = async ({ title, body }: { title: string; body: string; audience: string }) => {
+    try {
+      const token = await getSessionToken();
+      await fetch(`${API_BASE}/api/notices`, {
+        method: 'POST',
+        headers: { ...authHeaders(token), 'Content-Type': 'application/json' },
+        body: JSON.stringify({ type: 'staff', title, content: body }),
+      });
+      await fetchNotices();
+    } catch {}
+  };
+
+  const react = async (id: string) => {
+    try {
+      const token = await getSessionToken();
+      await fetch(`${API_BASE}/api/notices/${id}/react`, { method: 'PATCH', headers: authHeaders(token) });
+      await fetchNotices();
+    } catch {}
+  };
 
   return (
     <View style={{ flex: 1, backgroundColor: theme.bg }}>
       <Screen>
-        <GHeader avatar={<Avatar label="RS" />} title="Campus Notice" subtitle="Admin desk" />
-        <PubForm title="Announce to campus" bodyLabel="Details" audiences={['All', 'Students', 'Faculty', 'Staff']} />
+        <GHeader avatar={<Avatar label={(user?.name || 'A')[0]} />} title="Campus Notice" subtitle="Admin desk" />
+        <PubForm title="Announce to campus" bodyLabel="Details" audiences={['All', 'Students', 'Faculty', 'Staff']} onPublish={publish} />
         <SectionHeader title="Recent" />
-        {notices.map(n => (
-          <NoticeCard
-            key={n._id}
-            tag={n.tag}
-            tagColor={n.tagColor}
-            time={n.time}
-            title={n.title}
-            body={n.body}
-            likes={n.likes}
-            comments={n.comments}
-          />
-        ))}
+        {loading ? (
+          <EmptyState message="Loading notices…" />
+        ) : notices.length === 0 ? (
+          <EmptyState message="No notices published yet" />
+        ) : (
+          notices.map(n => (
+            <NoticeCard
+              key={n._id}
+              tag={n.type === 'departmental' ? 'Departmental' : 'Staff'}
+              tagColor={tagColor(n.type) as 'green' | 'blue'}
+              time={n.createdAt ? new Date(n.createdAt).toLocaleString() : ''}
+              title={n.title}
+              body={n.content}
+              likes={n.reactions?.length || 0}
+              comments={n.comments?.length || 0}
+              commentsOpen={(n.comments || []).map(c => ({ author: c.userName || 'User', text: c.text }))}
+              attachment={undefined}
+            />
+          ))
+        )}
       </Screen>
     </View>
   );

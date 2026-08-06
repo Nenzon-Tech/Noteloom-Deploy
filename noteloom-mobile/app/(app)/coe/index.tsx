@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, ActivityIndicator } from 'react-native';
 import { useRouter } from 'expo-router';
 import { FileText, CheckCircle, XCircle, GraduationCap, ArrowRight } from 'lucide-react-native';
 import { useTheme } from '../../../contexts/ThemeContext';
+import { useSession } from '../../../hooks/useSession';
 import { API_BASE } from '../../../lib/constants';
 import { authHeaders } from '../../../lib/api';
 import { getSessionToken } from '../../../lib/storage';
@@ -14,15 +15,16 @@ import { Gradient } from '../../../components/ui/Gradient';
 export default function COE() {
   const { theme } = useTheme();
   const router = useRouter();
+  const { user } = useSession();
   const [status, setStatus] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => { fetchStatus(); }, []);
+  useEffect(() => { if (user?.id) fetchStatus(); }, [user?.id]);
 
   const fetchStatus = async () => {
     try {
       const token = await getSessionToken();
-      const response = await fetch(`${API_BASE}/api/coe/student/form-status`, {
+      const response = await fetch(`${API_BASE}/api/coe/student/eligibility/${user?.id}`, {
         headers: authHeaders(token),
       });
       if (response.ok) {
@@ -32,6 +34,11 @@ export default function COE() {
     } catch {}
     finally { setLoading(false); }
   };
+
+  const eligible = !!status?.eligible;
+  const message = eligible
+    ? `${status.session?.label || 'Examination'} · ${status.studentProfile?.rollNo || 'Roll N/A'}`
+    : status?.error || 'Verification complete';
 
   return (
     <View style={{ flex: 1, backgroundColor: theme.bg }}>
@@ -55,13 +62,13 @@ export default function COE() {
             <Text style={[styles.statusTitle, { color: theme.fg }]}>Exam Eligibility Status</Text>
             {status ? (
               <View style={styles.statusContent}>
-                <View style={[styles.statusIcon, { backgroundColor: status.eligible ? 'rgba(34,197,94,0.12)' : 'rgba(239,68,68,0.12)' }]}>
-                  {status.eligible ? <CheckCircle size={34} color={theme.green} /> : <XCircle size={34} color={theme.red} />}
+                <View style={[styles.statusIcon, { backgroundColor: eligible ? 'rgba(34,197,94,0.12)' : 'rgba(239,68,68,0.12)' }]}>
+                  {eligible ? <CheckCircle size={34} color={theme.green} /> : <XCircle size={34} color={theme.red} />}
                 </View>
-                <Text style={[styles.statusValue, { color: status.eligible ? theme.green : theme.red }]}>
-                  {status.eligible ? 'Eligible' : 'Not Eligible'}
+                <Text style={[styles.statusValue, { color: eligible ? theme.green : theme.red }]}>
+                  {eligible ? 'Eligible' : 'Not Eligible'}
                 </Text>
-                <Text style={[styles.statusDetail, { color: theme.faint }]}>{status.message || 'Verification complete'}</Text>
+                <Text style={[styles.statusDetail, { color: theme.faint }]}>{message}</Text>
               </View>
             ) : (
               <Text style={[styles.noData, { color: theme.faint }]}>No status information available</Text>

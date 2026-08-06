@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { View, Text, Pressable, StyleSheet, useWindowDimensions } from 'react-native';
 import { useTheme } from '../../contexts/ThemeContext';
 import { Gradient } from './Gradient';
@@ -16,13 +16,15 @@ interface QuickItem {
 export const QuickGrid = ({ items, columns = 4 }: { items: QuickItem[]; columns?: number }) => {
   const { theme } = useTheme();
   const { width: screenWidth } = useWindowDimensions();
+  const [containerWidth, setContainerWidth] = useState(0);
 
   const gap = 10;
-  const horizontalPadding = 32; // 16px on each side of Screen
-  const itemWidth = Math.floor((screenWidth - horizontalPadding - gap * (columns - 1)) / columns);
+  const itemWidth = containerWidth
+    ? Math.floor((containerWidth - gap * (columns - 1)) / columns)
+    : Math.floor((screenWidth - 32 - gap * (columns - 1)) / columns);
 
   return (
-    <View style={[styles.grid, { gap }]}>
+    <View style={[styles.grid, { gap }]} onLayout={e => setContainerWidth(e.nativeEvent.layout.width)}>
       {items.map(item => (
         <Pressable
           key={item.key}
@@ -45,14 +47,13 @@ export const QuickGrid = ({ items, columns = 4 }: { items: QuickItem[]; columns?
 };
 
 const styles = StyleSheet.create({
-  grid: { flexDirection: 'row', flexWrap: 'wrap', marginTop: 16 },
+  grid: { flexDirection: 'row', flexWrap: 'wrap', marginTop: 16, rowGap: 10 },
   cell: {
     alignItems: 'center',
     paddingVertical: 13,
     paddingHorizontal: 4,
     borderRadius: 16,
     borderWidth: 1,
-    marginBottom: 10,
   },
   icon: { width: 38, height: 38, borderRadius: 12, alignItems: 'center', justifyContent: 'center' },
   label: { fontSize: 11, fontWeight: '700', marginTop: 7, textAlign: 'center' },
