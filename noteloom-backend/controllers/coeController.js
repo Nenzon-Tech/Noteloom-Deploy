@@ -1,6 +1,7 @@
 const ExamSession = require('../models/ExamSession');
 const StudentExamForm = require('../models/StudentExamForm');
 const ExamResult = require('../models/ExamResult');
+const SemesterFeedback = require('../models/SemesterFeedback');
 const StudentProfile = require('../models/StudentProfile');
 const Subject = require('../models/Subject');
 const { StudentSubjectMap } = require('../models/COE_Extended');
@@ -425,6 +426,20 @@ exports.getFeedbackData = async (req, res) => {
             }).select('name code type credits semester');
         }
 
+        // Attach already-submitted feedback status per subject
+        const feedbackDocs = await SemesterFeedback.find({
+            userId: req.params.userId,
+            tenantId: req.tenant.id
+        }).select('subjectId semester rating comments submittedAt');
+
+        const submittedMap = new Map();
+        feedbackDocs.forEach(f => submittedMap.set(f.subjectId.toString(), {
+            semester: f.semester,
+            rating: f.rating,
+            comments: f.comments,
+            submittedAt: f.submittedAt
+        }));
+
         res.json({
             profile: {
                 name: profile.userId?.name || 'N/A',
@@ -435,11 +450,99 @@ exports.getFeedbackData = async (req, res) => {
                 batch: batch?.batchName || "Unassigned Batch",
                 currentSemester: currentSem
             },
-            subjects: subjects
+            subjects: subjects.map(s => ({
+                id: s._id,
+                code: s.code,
+                name: s.name,
+                type: s.type,
+                credits: s.credits,
+                semester: s.semester,
+                feedbackSubmitted: submittedMap.has(s._id.toString()),
+                feedback: submittedMap.get(s._id.toString()) || null
+            }))
         });
 
     } catch (e) {
         console.error("Feedback Data Fetch Error:", e);
+        res.status(500).json({ error: e.message });
+    }
+};
+
+// 20. SUBMIT STUDENT FEEDBACK
+exports.submitFeedback = async (req, res) => {
+    try {
+        const { subjectId, subjectCode, semester, rating, comments, sessionId } = req.body;
+        if (!subjectId) return res.status(400).json({ error: "subjectId is required" });
+
+        const feedback = await SemesterFeedback.findOneAndUpdate(
+            { studentId: req.user.id, subjectId, tenantId: req.tenant.id },
+            {
+                $set: {
+                    tenantId: req.tenant.id,
+                    userId: req.user.id,
+                    studentId: req.user.id,
+                    subjectCode: subjectCode || '',
+                    semester: semester || null,
+                    sessionId: sessionId || null,
+                    rating: Math.min(5, Math.max(1, Number(rating) || 5)),
+                    comments: comments || '',
+                    submittedAt: new Date()
+                }
+            },
+            { upsert: true, new: true }
+        );
+
+        res.json({ success: true, message: "Feedback submitted successfully", feedback });
+    } catch (e) {
+        console.error("Feedback Submit Error:", e);
+        res.status(500).json({ error: e.message });
+    }
+};
+
+// 21. GET MY RESULTS (student self lookup via session)
+exports.getMyResults = async (req, res) => {
+    try {
+        const profile = await StudentProfile.findOne({
+            userId: req.user.id,
+            tenantId: req.tenant.id
+        });
+        if (!profile || !profile.rollNo) {
+            return res.json({ rollNo: null, results: [] });
+        }
+
+        const results = await ExamResult.find({
+            studentRollNo: profile.rollNo,
+            isPublished: true
+        }).sort({ semester: -1, subjectCode: 1 });
+
+        const codes = [...new Set(results.map(r => r.subjectCode))];
+        const subjects = await Subject.find({ code: { $in: codes } }).select('code name credits type semester');
+        const subjectMap = {};
+        subjects.forEach(s => { subjectMap[s.code] = s.name; });
+
+        const enriched = results.map(r => {
+            const total = r.totalMarks || 0;
+            return {
+                _id: r._id,
+                subjectCode: r.subjectCode,
+                subject: subjectMap[r.subjectCode] || r.subjectCode,
+                batch: r.batch,
+                semester: r.semester,
+                marksObtained: r.marksObtained,
+                totalMarks: total,
+                percentage: total > 0 ? parseFloat(((r.marksObtained / total) * 100).toFixed(2)) : null,
+                isPassed: (r.marksObtained || 0) >= 40
+            };
+        });
+
+        res.json({
+            rollNo: profile.rollNo,
+            course: profile.course,
+            stream: profile.stream,
+            results: enriched
+        });
+    } catch (e) {
+        console.error("My Results Error:", e);
         res.status(500).json({ error: e.message });
     }
 };

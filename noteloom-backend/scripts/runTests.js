@@ -240,6 +240,8 @@ async function testProtectedRoutes() {
     ['GET',  '/api/library/digital',           'Library Digital'],
     ['GET',  '/api/library/physical',          'Library Physical'],
     ['GET',  '/api/attendance/faculty/init?batchId=test', 'Attendance Init'],
+    ['GET',  '/api/attendance/my-records',  'Attendance My Records'],
+    ['GET',  '/api/coe/student/submit-feedback', 'COE Feedback'],
     ['GET',  '/api/coe/sessions/all',          'COE Sessions'],
     ['GET',  '/api/coe/questions',             'COE Questions'],
     ['GET',  '/api/coe/active-session',        'COE Active Session'],

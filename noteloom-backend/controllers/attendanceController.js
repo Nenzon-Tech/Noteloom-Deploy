@@ -126,7 +126,75 @@ exports.getAttendanceReport = async (req, res) => {
   }
 };
 
-// 3. POST /mark
+// 3. GET /my-records | /my-attendance  (Student's own attendance)
+exports.getMyAttendance = async (req, res) => {
+  try {
+    const { startDate, endDate, batchId } = req.query;
+
+    // Resolve the calling user's student profile (supplies batch + rollNo)
+    const profile = await StudentProfile.findOne({
+      userId: req.user.id,
+      tenantId: req.tenant.id
+    });
+    if (!profile) return res.status(404).json({ error: "Student profile not found" });
+
+    const filter = {
+      tenantId: req.tenant.id,
+      'records.studentId': req.user.id
+    };
+    if (batchId) filter.batchId = batchId;
+    if (startDate || endDate) {
+      filter.date = {};
+      if (startDate) filter.date.$gte = new Date(startDate);
+      if (endDate) {
+        const end = new Date(endDate);
+        end.setHours(23, 59, 59, 999);
+        filter.date.$lte = end;
+      }
+    }
+
+    const attendanceDocs = await Attendance.find(filter).populate('subjectId', 'name code');
+
+    const statusMap = { Present: 'present', Absent: 'absent', Late: 'late', Leave: 'excused' };
+
+    const records = [];
+    attendanceDocs.forEach(doc => {
+      const own = doc.records.find(r => r.studentId && r.studentId.toString() === req.user.id.toString());
+      if (!own) return;
+      records.push({
+        _id: doc._id,
+        subject: doc.subjectId?.name || 'Lecture',
+        subjectCode: doc.subjectId?.code || '',
+        date: doc.date,
+        status: statusMap[own.status] || 'excused',
+        periodId: doc.periodId || null
+      });
+    });
+
+    // Summary stats (overall percentage across the returned window)
+    const present = records.filter(r => r.status === 'present').length;
+    const late = records.filter(r => r.status === 'late').length;
+    const absent = records.filter(r => r.status === 'absent').length;
+    const excused = records.filter(r => r.status === 'excused').length;
+    const total = records.length;
+    const attended = present + late;
+    const overall = total > 0 ? parseFloat(((attended / total) * 100).toFixed(1)) : 0;
+
+    res.json({
+      rollNo: profile.rollNo,
+      course: profile.course,
+      stream: profile.stream,
+      currentSemester: profile.currentSemester,
+      summary: { total, present, absent, late, excused, overall },
+      records
+    });
+  } catch (e) {
+    console.error("My Attendance Error:", e);
+    res.status(500).json({ error: e.message });
+  }
+};
+
+// 4. POST /mark
 exports.markAttendance = async (req, res) => {
   try {
     const { batchId, periodId, subjectId, date, records } = req.body;

@@ -12,6 +12,12 @@ router.get('/faculty/init', attendanceController.initFacultyAttendance);
 // GET /api/attendance/report
 router.get('/report', attendanceController.getAttendanceReport);
 
+// GET /api/attendance/my-records  (Student's own records — web)
+router.get('/my-records', attendanceController.getMyAttendance);
+
+// GET /api/attendance/my-attendance  (Student's own records — mobile)
+router.get('/my-attendance', attendanceController.getMyAttendance);
+
 // POST /api/attendance/mark
 router.post('/mark', attendanceController.markAttendance);
 
