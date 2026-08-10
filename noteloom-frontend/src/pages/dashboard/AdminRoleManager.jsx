@@ -274,14 +274,49 @@ export default function AdminRoleManager() {
       {/* DASHBOARD MAIN CONTENT */}
       <div className="flex-1 max-w-7xl mx-auto px-4 py-8 pt-28 pb-12 w-full space-y-6">
         
-        {/* Back Button */}
-        <button
-          onClick={() => navigate('/dashboard')}
-          className="flex items-center gap-2 text-sm font-medium text-purple-600 hover:text-purple-700 dark:text-purple-400 dark:hover:text-purple-300 transition-colors"
-        >
-          <ArrowLeft className="w-4 h-4" />
-          <span>Back to Dashboard</span>
-        </button>
+        {/* Navigation Breadcrumb / Top Bar */}
+        <div className="flex items-center justify-between flex-wrap gap-4">
+          <button
+            onClick={() => navigate('/dashboard')}
+            className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold transition-all border ${
+              isDarkMode
+                ? 'bg-gray-800/80 border-gray-700 hover:bg-gray-700 text-purple-400 hover:text-purple-300'
+                : 'bg-white border-gray-200 hover:bg-gray-100 text-purple-600 hover:text-purple-700 shadow-sm'
+            }`}
+          >
+            <ArrowLeft className="w-4 h-4" />
+            <span>Back to Dashboard</span>
+          </button>
+
+          <div className="flex items-center gap-3">
+            {localStorage.getItem('selectedCollegeCode') && (
+              <span className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold border ${
+                isDarkMode ? 'bg-blue-950/40 border-blue-500/30 text-blue-400' : 'bg-blue-50 border-blue-200 text-blue-700'
+              }`}>
+                <Shield className="w-3.5 h-3.5" />
+                College Code: {localStorage.getItem('selectedCollegeCode')}
+              </span>
+            )}
+            
+            <button
+              onClick={() => navigate('/dashboard/manage-users')}
+              className={`px-3.5 py-2 rounded-xl text-xs font-bold border transition-all flex items-center gap-1.5 ${
+                isDarkMode ? 'bg-gray-800 border-gray-700 text-gray-300 hover:bg-gray-700' : 'bg-white border-gray-200 text-gray-700 hover:bg-gray-100 shadow-sm'
+              }`}
+            >
+              <Users className="w-3.5 h-3.5" />
+              Manage Users
+            </button>
+
+            <button
+              onClick={() => navigate('/dashboard/account-creation')}
+              className="px-4 py-2 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white text-xs font-bold transition-all flex items-center gap-1.5 shadow-lg shadow-blue-500/25"
+            >
+              <UserPlus className="w-4 h-4" />
+              + Create Account
+            </button>
+          </div>
+        </div>
 
         {/* Title Header Card */}
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700">

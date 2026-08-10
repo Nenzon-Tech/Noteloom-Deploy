@@ -98,8 +98,6 @@ router.get('/users/:role', async (req, res) => {
 
     // 3. Fetch the corresponding Profiles to get the real IDs (UID/RollNo)
     let profiles = [];
-    
-    // 🟢 FIX: Added logic for 'college_admin'
     if (role === 'student') {
         profiles = await StudentProfile.find({ userId: { $in: userIds } });
     } else if (role === 'faculty') {
@@ -113,25 +111,25 @@ router.get('/users/:role', async (req, res) => {
         const u = m.userId.toObject();
         
         // Find matching profile
-        const profile = profiles.find(p => p.userId.toString() === u._id.toString());
+        const prof = profiles.find(p => p.userId.toString() === u._id.toString());
+        const profileObj = prof ? prof.toObject() : {};
         
         // DETERMINE THE CORRECT ID TO SHOW
-        // Check Profile fields first (uid, rollNo, employeeId), fall back to User.noteloomId
-        let displayUid = 'N/A';
-        if (profile) {
-            displayUid = profile.uid || profile.rollNo || profile.employeeId || profile.enrollmentId || 'N/A';
-        } else if (u.noteloomId) {
-            displayUid = u.noteloomId;
-        }
+        let displayUid = u.noteloomId || profileObj.uid || profileObj.rollNo || profileObj.employeeId || profileObj.enrollmentId || 'N/A';
 
         return {
           _id: u._id,
           name: u.name,
           email: u.email,
-          uid: displayUid,  // ✅ Now sends the actual ID from the profile
-          status: m.status,
+          role: role,
+          uid: displayUid,
+          noteloomId: u.noteloomId || displayUid,
+          status: m.status || 'active',
           createdAt: u.createdAt,
-          deletionScheduledAt: u.deletionScheduledAt
+          deletionScheduledAt: u.deletionScheduledAt,
+          phone: u.phone || profileObj.phoneNumber || '',
+          department: u.department || profileObj.department || profileObj.stream || '',
+          profile: profileObj
         };
       });
 

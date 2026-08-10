@@ -6,6 +6,8 @@ const studentProfileSchema = new mongoose.Schema({
   tenantId: { type: mongoose.Schema.Types.ObjectId, ref: 'Tenant', required: true },
   batchId: { type: mongoose.Schema.Types.ObjectId, ref: 'Batch' },
   profilePicture: String,
+  name: String,
+  email: String,
   phoneNumber: String,
   gender: String,
   admissionYear: Number,
@@ -17,8 +19,8 @@ const studentProfileSchema = new mongoose.Schema({
 });
 
 studentProfileSchema.index({ userId: 1, tenantId: 1 }, { unique: true });
-studentProfileSchema.index({ rollNo: 1, tenantId: 1 }, { unique: true });
+studentProfileSchema.index({ rollNo: 1, tenantId: 1 }, { unique: true, sparse: true });
 
 studentProfileSchema.index({ batchId: 1 });
 
-module.exports = mongoose.model('StudentProfile', studentProfileSchema);
+module.exports = mongoose.model('StudentProfile', studentProfileSchema);
