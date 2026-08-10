@@ -7,6 +7,7 @@ const FacultyProfile = require('../models/FacultyProfile');
 const Classroom = require('../models/Classroom');
 const Department = require('../models/Department');
 const Subject = require('../models/Subject');
+const Membership = require('../models/Membership');
 
 // ==========================================
 // 1. BATCH CONTROLLER ACTIONS
@@ -25,6 +26,40 @@ exports.createBatch = async (req, res) => {
       createdBatches.push(batch);
     }
     res.json(createdBatches);
+  } catch (err) { res.status(500).json({ error: err.message }); }
+};
+
+exports.updateBatch = async (req, res) => {
+  try {
+    if (req.role !== 'college_admin') return res.status(403).json({ error: 'Not authorized' });
+
+    const batch = await Batch.findOne({ _id: req.params.id, tenantId: req.tenant.id });
+    if (!batch) return res.status(404).json({ error: 'Batch not found' });
+
+    const { batchName, admissionYear, admissionMonth, section, streamCode, faculty } = req.body;
+    if (batchName !== undefined) batch.batchName = batchName;
+    if (admissionYear !== undefined) batch.admissionYear = Number(admissionYear);
+    if (admissionMonth !== undefined) batch.admissionMonth = admissionMonth;
+    if (section !== undefined) batch.section = section;
+    if (streamCode !== undefined) batch.streamCode = streamCode;
+
+    if (Array.isArray(faculty)) {
+      const fids = faculty.map(f => {
+        try { return new mongoose.Types.ObjectId(f); } catch (e) { return null; }
+      }).filter(Boolean);
+      const memberships = await Membership.find({
+        tenantId: req.tenant.id,
+        role: 'faculty',
+        userId: { $in: fids }
+      });
+      batch.faculty = memberships.map(m => m.userId);
+    }
+
+    await batch.save();
+    const updated = await Batch.findById(batch._id)
+      .populate('faculty', 'name email')
+      .populate('departmentId');
+    res.json(updated);
   } catch (err) { res.status(500).json({ error: err.message }); }
 };
 
