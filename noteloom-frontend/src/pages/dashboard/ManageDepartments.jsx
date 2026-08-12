@@ -76,11 +76,13 @@ const ManageDepartments = () => {
 
   // --- Batch Edit State ---
   const [editingBatch, setEditingBatch] = useState(null); // The batch being edited
+  const [facultyList, setFacultyList] = useState([]); // All faculty in tenant (for assignment)
   const [batchEditForm, setBatchEditForm] = useState({
     batchName: '',
     admissionYear: '',
     admissionMonth: '',
-    section: ''
+    section: '',
+    faculty: []
   });
 
   // --- NEW FUNCTIONS ---
@@ -208,6 +210,16 @@ const ManageDepartments = () => {
     } catch(e) { console.error(e); }
   };
 
+  // --- NEW: Fetch faculty members for batch assignment ---
+  const fetchFaculty = async () => {
+    try {
+      const res = await fetch(`${API_BASE}/api/college-admin/users/faculty`, {
+        headers: { 'Authorization': `Bearer ${localStorage.getItem('sessionToken')}` }
+      });
+      if (res.ok) setFacultyList(await res.json());
+    } catch (e) { console.error(e); }
+  };
+
   // --- NEW: Fetch Subjects for selected department ---
   const fetchSubjects = async () => {
     if (!selectedDept) return;
@@ -266,6 +278,7 @@ const ManageDepartments = () => {
     fetchSession();
     fetchDepartments(); 
     fetchBatches();
+    fetchFaculty();
   }, []);
 
   // --- Handlers ---
@@ -468,7 +481,8 @@ const ManageDepartments = () => {
       batchName: batch.batchName || '',
       admissionYear: batch.admissionYear,
       admissionMonth: batch.admissionMonth,
-      section: batch.section
+      section: batch.section,
+      faculty: (batch.faculty || []).map(f => typeof f === 'string' ? f : f._id)
     });
     setShowEditBatchModal(true);
   };
@@ -597,6 +611,43 @@ const ManageDepartments = () => {
                   >
                     {months.map(m => <option key={m} value={m}>{m}</option>)}
                   </select>
+                </div>
+
+                <div className="space-y-2">
+                  <label className="text-xs font-bold uppercase opacity-50">Assigned Faculty (who can post departmental notices to this batch)</label>
+                  <div className={`max-h-44 overflow-y-auto rounded-xl border p-3 space-y-1.5 ${theme.inputBg}`}>
+                    {facultyList.length === 0 && (
+                      <p className="text-xs opacity-50">No faculty members found in this college.</p>
+                    )}
+                    {facultyList.map(f => {
+                      const selected = batchEditForm.faculty.includes(f._id);
+                      return (
+                        <button
+                          type="button"
+                          key={f._id}
+                          onClick={() => {
+                            setBatchEditForm(prev => ({
+                              ...prev,
+                              faculty: selected
+                                ? prev.faculty.filter(id => id !== f._id)
+                                : [...prev.faculty, f._id]
+                            }));
+                          }}
+                          className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-sm transition-colors ${
+                            selected
+                              ? 'bg-blue-600 text-white'
+                              : 'hover:bg-gray-200 dark:hover:bg-gray-700'
+                          }`}
+                        >
+                          <span className="flex items-center gap-2 truncate">
+                            <CheckCircle size={15} className={selected ? '' : 'opacity-30'} />
+                            <span className="truncate">{f.name}</span>
+                          </span>
+                          <span className="text-xs opacity-60 truncate max-w-[40%]">{f.uid}</span>
+                        </button>
+                      );
+                    })}
+                  </div>
                 </div>
 
                 <div className="flex justify-end gap-3 mt-6">

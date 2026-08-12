@@ -36,6 +36,7 @@ module.exports = {
     { key: 'library', title: 'Digital Library Resources', icon: 'Library', description: 'Access digital resources' },
     { key: 'approvals', title: 'Faculty Approval', icon: 'ShieldCheck', description: 'Approve new faculty accounts' },
     { key: 'timetable', title: 'Timetable & Schedule', icon: 'Calendar', description: 'View and manage class routines' },
+    { key: 'org_calendar', title: "Organization's Calendar", icon: 'Calendar', description: 'Manage organization-wide academic events' },
     { key: 'manage_users', title: 'User Management', icon: 'Users', description: 'Manage student and staff profiles' },
     { key: 'account_creation', title: 'Account Creation Management', icon: 'UserPlus', description: 'Create and onboard new users' },
     { key: 'fees_exam_records', title: 'Sem. fees and Exam form Records', icon: 'Banknote', description: 'Track fees and exam submissions' },

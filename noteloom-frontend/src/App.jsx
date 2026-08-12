@@ -132,6 +132,8 @@ const PaymentHistory = lazy(() => import('@/pages/dashboard/PaymentHistory.jsx')
 const PaymentDetails = lazy(() => import('@/pages/dashboard/PaymentDetails.jsx'));
 const AcademicCalendar = lazy(() => import('@/pages/dashboard/AcademicCalendar.jsx'));
 const AdminUniversityMarks = lazy(() => import('@/pages/dashboard/AdminUniversityMarks.jsx'));
+const CollegeSettings = lazy(() => import('@/pages/dashboard/CollegeSettings.jsx'));
+const FinalYearProjectInfo = lazy(() => import('@/pages/dashboard/FinalYearProjectInfo.jsx'));
 
 // Classroom & Features
 const ClsContentDetails = lazy(() => import('@/components/features/classroom/ClsContentDetails'));
@@ -2149,6 +2151,22 @@ const App = () => {
               element={
                 <ProtectedRoute allowedRoles={["student", "faculty", "college_admin"]}>
                   <AcademicCalendar />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/dashboard/settings" 
+              element={
+                <ProtectedRoute allowedRoles={["college_admin"]}>
+                  <CollegeSettings />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/dashboard/update-info" 
+              element={
+                <ProtectedRoute allowedRoles={["student"]}>
+                  <FinalYearProjectInfo />
                 </ProtectedRoute>
               } 
             />

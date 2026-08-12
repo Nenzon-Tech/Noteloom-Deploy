@@ -10,6 +10,7 @@ router.get('/', academicController.getBatches);
 router.post('/:batchId/enroll', academicController.enrollStudent);
 router.get('/my-batches', academicController.getMyBatches);
 router.get('/:batchId/students', academicController.getBatchStudents);
+router.put('/:id', academicController.updateBatch);
 router.delete('/:id', academicController.deleteBatch);
 
 module.exports = router;
