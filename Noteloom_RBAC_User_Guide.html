@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Noteloom RBAC Feature & Testing Guide</title>
+<style>
+  @page {
+    size: A4;
+    margin: 20mm 15mm 20mm 15mm;
+  }
+  body {
+    font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    color: #1e293b;
+    background-color: #ffffff;
+    line-height: 1.6;
+    margin: 0;
+    padding: 0;
+  }
+  .header-cover {
+    background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 50%, #9333ea 100%);
+    color: #ffffff;
+    padding: 40px 30px;
+    border-radius: 16px;
+    margin-bottom: 30px;
+    box-shadow: 0 10px 25px rgba(124, 58, 237, 0.25);
+  }
+  .header-cover h1 {
+    font-size: 28px;
+    margin: 0 0 10px 0;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+  }
+  .header-cover p {
+    font-size: 14px;
+    margin: 0;
+    opacity: 0.9;
+  }
+  .badge {
+    display: inline-block;
+    padding: 4px 10px;
+    font-size: 11px;
+    font-weight: 700;
+    border-radius: 20px;
+    text-transform: uppercase;
+    margin-right: 6px;
+  }
+  .badge-purple { background-color: #e9d5ff; color: #6b21a8; }
+  .badge-blue { background-color: #dbeafe; color: #1e40af; }
+  .badge-amber { background-color: #fef3c7; color: #92400e; }
+  .badge-green { background-color: #dcfce7; color: #166534; }
+
+  h2 {
+    font-size: 20px;
+    color: #0f172a;
+    border-bottom: 2px solid #e2e8f0;
+    padding-bottom: 8px;
+    margin-top: 30px;
+    margin-bottom: 15px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  h3 {
+    font-size: 16px;
+    color: #334155;
+    margin-top: 20px;
+    margin-bottom: 8px;
+  }
+  p, li {
+    font-size: 13px;
+    color: #334155;
+  }
+  ul, ol {
+    padding-left: 20px;
+    margin-top: 5px;
+    margin-bottom: 15px;
+  }
+  li {
+    margin-bottom: 6px;
+  }
+  .card {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 18px;
+    margin-bottom: 20px;
+  }
+  .card-highlight {
+    background: #f0fdf4;
+    border-color: #bbf7d0;
+  }
+  .card-warning {
+    background: #fffbeb;
+    border-color: #fef08a;
+  }
+  .step-box {
+    background: #ffffff;
+    border-left: 4px solid #7c3aed;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    padding: 14px 18px;
+    margin-bottom: 15px;
+    border-radius: 0 10px 10px 0;
+  }
+  .step-title {
+    font-weight: 700;
+    color: #4f46e5;
+    font-size: 14px;
+    margin-bottom: 4px;
+  }
+  .matrix-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 15px;
+    font-size: 12px;
+  }
+  .matrix-table th {
+    background: #f1f5f9;
+    color: #334155;
+    padding: 10px 12px;
+    text-align: left;
+    border: 1px solid #cbd5e1;
+    font-weight: 700;
+  }
+  .matrix-table td {
+    padding: 10px 12px;
+    border: 1px solid #e2e8f0;
+  }
+  .footer-note {
+    margin-top: 40px;
+    text-align: center;
+    font-size: 11px;
+    color: #94a3b8;
+    border-top: 1px solid #e2e8f0;
+    padding-top: 15px;
+  }
+</style>
+</head>
+<body>
+
+  <!-- COVER HEADER -->
+  <div class="header-cover">
+    <h1>Noteloom Platform — RBAC & Custom Role Management</h1>
+    <p>Complete Feature Documentation, Architecture Overview & End-to-End Testing Guide</p>
+    <div style="margin-top: 15px;">
+      <span class="badge badge-purple">Version 2.0</span>
+      <span class="badge badge-blue">Multi-Tenancy RBAC</span>
+      <span class="badge badge-amber">Lock Enforcement</span>
+      <span class="badge badge-green">Branch: shuv</span>
+    </div>
+  </div>
+
+  <!-- 1. OVERVIEW -->
+  <h2>1. Overview & Architecture</h2>
+  <p>
+    The <strong>College Admin Role-Based Access Control (RBAC) System</strong> introduces granular sub-role management within the <code>college_admin</code> tier. Rather than every college admin having monolithic full access, admins can now hold multiple specific functional roles (e.g. <code>Accounts & Finance</code>, <code>COE / Exam Cell</code>, <code>Academic Affairs</code>, <code>Library Management</code>, <code>HR / Leave Manager</code>, <code>LMS Content</code>).
+  </p>
+  <div class="card">
+    <div style="font-weight:700; color:#0f172a; margin-bottom:8px;">Core Architectural Highlights:</div>
+    <ul>
+      <li><strong>Multi-Role Assignment:</strong> An admin user can hold multiple roles simultaneously (e.g. both <code>coe</code> AND <code>accounts</code>). Permitted section access is the union of all assigned roles.</li>
+      <li><strong>Global Role Templates (IT Portal):</strong> IT Admins can create global role templates that act as baseline configurations available across all institutions.</li>
+      <li><strong>College-Specific Customization & Naming:</strong> IT Admins can customize role display names specifically for any college (e.g., renaming <code>COE / Exam Cell</code> to <code>Examination & Evaluation Cell</code>).</li>
+      <li><strong>Tab Visibility Access Matrix:</strong> College Super Admins can toggle feature access for each role on a granular matrix grid.</li>
+      <li><strong>Configuration Lock & Security:</strong> College Super Admins can <code>Lock</code> the configuration. When locked, backend APIs block write operations with HTTP <code>423 Locked</code> and frontend buttons are disabled.</li>
+      <li><strong>Global Toast Notifications:</strong> Integrated with <code>ErrorPopupContext</code> for floating toast alerts across all operations.</li>
+    </ul>
+  </div>
+
+  <!-- 2. ROLE TYPES & BADGES -->
+  <h2>2. Role Classification & Badging</h2>
+  <table class="matrix-table">
+    <thead>
+      <tr>
+        <th>Role Type</th>
+        <th>Badge Tag</th>
+        <th>Description</th>
+        <th>Created By</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Seeded System Role</strong></td>
+        <td><span class="badge badge-amber">SEEDED</span></td>
+        <td>Default platform roles (Super Admin, Accounts, COE, Academic, Library, HR, LMS).</td>
+        <td>System Built-in</td>
+      </tr>
+      <tr>
+        <td><strong>Global Custom Template</strong></td>
+        <td><span class="badge badge-purple">GLOBAL CUSTOM</span></td>
+        <td>System-wide role templates created in the IT Portal for onboarding colleges.</td>
+        <td>IT Admin</td>
+      </tr>
+      <tr>
+        <td><strong>College Specific Role</strong></td>
+        <td><span class="badge badge-blue">COLLEGE SPECIFIC</span></td>
+        <td>Custom roles created exclusively for a single institution.</td>
+        <td>IT Admin / College Admin</td>
+      </tr>
+      <tr>
+        <td><strong>Default Assignment</strong></td>
+        <td><span class="badge badge-green">DEFAULT ASSIGNMENT</span></td>
+        <td>Roles automatically granted to all colleges upon registration.</td>
+        <td>Auto-Assigned</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- 3. STEP-BY-STEP TESTING GUIDE -->
+  <h2>3. Step-by-Step End-to-End Testing Guide</h2>
+
+  <!-- TEST 1 -->
+  <div class="step-box">
+    <div class="step-title">Test Scenario 1: IT Portal — Create Global Custom Role Template</div>
+    <ol>
+      <li>Log in to the IT Portal at <code>http://localhost:5173/it-admin</code> (Credentials: <code>admin@noteloom.in</code> / <code>admin123</code>).</li>
+      <li>Navigate to the <strong>Custom Role Builder</strong> tab in the navigation bar.</li>
+      <li>Under <em>Global System & Custom Role Templates</em>, click <strong>+ Create Global Role</strong>.</li>
+      <li>Enter Role Label: <code>Principal's Office</code>, Description: <code>Executive oversight and departmental notices</code>. Select default tab permissions (e.g. <code>Notice Board</code>, <code>Academic & Depts</code>).</li>
+      <li>Click <strong>Create Global Role</strong>. Verify a floating success toast appears and the role card displays under Global Templates.</li>
+    </ol>
+  </div>
+
+  <!-- TEST 2 -->
+  <div class="step-box">
+    <div class="step-title">Test Scenario 2: IT Portal — Customize Role Name for a Specific College</div>
+    <ol>
+      <li>In the <strong>Custom Role Builder</strong> tab, scroll down to <em>College Role Assignments & Customizations</em>.</li>
+      <li>Select the target college from the dropdown (e.g. <em>Institute of Engineering Management</em>).</li>
+      <li>Locate the <code>COE / Exam Cell</code> role card and click the <strong>Edit (Pencil) icon</strong>.</li>
+      <li>Enter the new display name: <code>Examination & Evaluation Cell</code> and click <strong>Save Custom Name</strong>.</li>
+      <li>Verify the role card updates to display the custom name.</li>
+    </ol>
+  </div>
+
+  <!-- TEST 3 -->
+  <div class="step-box">
+    <div class="step-title">Test Scenario 3: College Admin Portal — Multi-Role Staff Assignment</div>
+    <ol>
+      <li>Log in as College Super Admin at <code>http://localhost:5173/dashboard/admin-roles</code>.</li>
+      <li>Notice the top <strong>← Back to Dashboard</strong> button leading to <code>/dashboard</code>.</li>
+      <li>Click <strong>+ Add / Assign Admin</strong>.</li>
+      <li>Enter Name, Email, Password, and check multiple roles (e.g. <code>COE / Exam Cell</code> AND <code>HR / Leave Manager</code>).</li>
+      <li>Click <strong>Save Admin</strong>. Verify the user appears in the table with dual-role pill badges.</li>
+    </ol>
+  </div>
+
+  <!-- TEST 4 -->
+  <div class="step-box">
+    <div class="step-title">Test Scenario 4: College Admin Portal — Tab Visibility Matrix</div>
+    <ol>
+      <li>On <code>http://localhost:5173/dashboard/admin-roles</code>, switch to the <strong>Tab Visibility Matrix</strong> sub-tab.</li>
+      <li>Locate the customized role (e.g. <code>Examination & Evaluation Cell</code>) and check/uncheck feature tabs.</li>
+      <li>Click <strong>Save Matrix Changes</strong>. Verify the floating green success popup appears.</li>
+    </ol>
+  </div>
+
+  <!-- TEST 5 -->
+  <div class="step-box">
+    <div class="step-title">Test Scenario 5: Strict Configuration Lock & Security Verification</div>
+    <ol>
+      <li>Click the top-right <strong>Lock Configuration</strong> button.</li>
+      <li>Observe the amber status banner: <em>🔒 Tab & Role Configuration is Currently Locked</em>.</li>
+      <li>Verify that <strong>Add / Assign Admin</strong>, Edit (pencil), and Delete (trash) buttons become disabled.</li>
+      <li>Attempt to click any action: Verify an error popup appears: <code>"Configuration is locked! Unlock it before modifying admin roles."</code></li>
+      <li>Click <strong>Unlock Configuration</strong> to unfreeze. Verify write controls become active again.</li>
+    </ol>
+  </div>
+
+  <!-- 4. REST API ENDPOINTS SUMMARY -->
+  <h2>4. API Endpoints Summary</h2>
+  <table class="matrix-table">
+    <thead>
+      <tr>
+        <th>Method</th>
+        <th>Endpoint</th>
+        <th>Access Level</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><code>GET</code></td>
+        <td><code>/api/college-admin/my-roles</code></td>
+        <td>College Admin</td>
+        <td>Get current admin's sub-roles & permitted tabs</td>
+      </tr>
+      <tr>
+        <td><code>GET</code></td>
+        <td><code>/api/college-admin/available-roles</code></td>
+        <td>College Admin</td>
+        <td>List all available roles (Seeded + Global + Custom Labels)</td>
+      </tr>
+      <tr>
+        <td><code>POST</code></td>
+        <td><code>/api/college-admin/admin-roles</code></td>
+        <td>Super Admin + Unlocked</td>
+        <td>Assign roles to admin user (Blocked when locked)</td>
+      </tr>
+      <tr>
+        <td><code>PUT</code></td>
+        <td><code>/api/college-admin/role-tab-config</code></td>
+        <td>Super Admin + Unlocked</td>
+        <td>Save tab visibility matrix (Blocked when locked)</td>
+      </tr>
+      <tr>
+        <td><code>POST</code></td>
+        <td><code>/api/college-admin/role-tab-config/lock</code></td>
+        <td>Super Admin</td>
+        <td>Lock configuration</td>
+      </tr>
+      <tr>
+        <td><code>POST</code></td>
+        <td><code>/api/college-admin/role-tab-config/unlock</code></td>
+        <td>Super Admin</td>
+        <td>Unlock configuration</td>
+      </tr>
+      <tr>
+        <td><code>PATCH</code></td>
+        <td><code>/it-admin/colleges/:id/custom-roles/:key/label</code></td>
+        <td>IT Admin</td>
+        <td>Customize role display name for a specific college</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="footer-note">
+    Noteloom Deploy Platform &copy; 2026. Generated for team review. Git Branch: <strong>shuv</strong>
+  </div>
+
+</body>
+</html>

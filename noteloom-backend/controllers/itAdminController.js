@@ -6,6 +6,9 @@ const User = require('../models/User');
 const Tenant = require('../models/Tenant');
 const Session = require('../models/Session');
 const Membership = require('../models/Membership');
+const AdminProfile = require('../models/AdminProfile');
+const GlobalRoleConfig = require('../models/GlobalRoleConfig');
+const CollegeRoleConfig = require('../models/CollegeRoleConfig');
 const ITUserProfile = require('../models/ITUserProfile');
 const CollegeAdminRequest = require('../models/CollegeAdminRequest');
 const SystemConfig = require('../models/SystemConfig');
@@ -377,3 +380,294 @@ exports.updateCollege = async (req, res) => {
     res.status(500).json({ error: 'Failed to update college details' });
   }
 };
+
+// ==========================================
+// IT PORTAL — COLLEGE ADMIN RBAC MANAGERS
+// ==========================================
+
+// Get all admins for a specific college
+exports.getCollegeAdmins = async (req, res) => {
+  try {
+    const tenantId = req.params.id;
+    const memberships = await Membership.find({ tenantId, role: 'college_admin' }).populate('userId', 'name email createdAt');
+    const validMemberships = memberships.filter(m => m.userId);
+    const userIds = validMemberships.map(m => m.userId._id);
+    const profiles = await AdminProfile.find({ userId: { $in: userIds }, tenantId });
+
+    const admins = validMemberships.map(m => {
+      const u = m.userId.toObject();
+      const profile = profiles.find(p => p.userId.toString() === u._id.toString());
+      return {
+        _id: u._id,
+        name: u.name,
+        email: u.email,
+        adminRoles: profile && profile.adminRoles && profile.adminRoles.length > 0 ? profile.adminRoles : ['super_admin'],
+        status: m.status
+      };
+    });
+
+    res.json(admins);
+  } catch (error) {
+    console.error('IT get college admins error:', error);
+    res.status(500).json({ error: 'Failed to fetch college admins' });
+  }
+};
+
+// Add admin to a specific college
+exports.addCollegeAdmin = async (req, res) => {
+  try {
+    const tenantId = req.params.id;
+    const { name, email, password, adminRoles } = req.body;
+    const roles = Array.isArray(adminRoles) && adminRoles.length > 0 ? adminRoles : ['super_admin'];
+
+    let user = await User.findOne({ email });
+    if (!user) {
+      if (!name || !password) return res.status(400).json({ error: 'Name and password required for new user' });
+      const hashedPassword = await bcrypt.hash(password, 10);
+      user = await User.create({ name, email, password: hashedPassword, role: 'college_admin' });
+    } else {
+      user.role = 'college_admin';
+      await user.save();
+    }
+
+    await Membership.findOneAndUpdate(
+      { userId: user._id, tenantId },
+      { role: 'college_admin', status: 'active' },
+      { upsert: true, new: true }
+    );
+
+    const profile = await AdminProfile.findOneAndUpdate(
+      { userId: user._id, tenantId },
+      { adminRoles: roles, assignedBy: req.itUser.id, assignedAt: new Date() },
+      { upsert: true, new: true }
+    );
+
+    res.json({ message: 'College admin added successfully', admin: { _id: user._id, name: user.name, email: user.email, adminRoles: profile.adminRoles } });
+  } catch (error) {
+    console.error('IT add college admin error:', error);
+    res.status(500).json({ error: 'Failed to add college admin' });
+  }
+};
+
+// Update college admin roles
+exports.updateCollegeAdminRoles = async (req, res) => {
+  try {
+    const { id: tenantId, userId } = req.params;
+    const { adminRoles } = req.body;
+
+    if (!Array.isArray(adminRoles) || adminRoles.length === 0) {
+      return res.status(400).json({ error: 'At least one role is required' });
+    }
+
+    const profile = await AdminProfile.findOneAndUpdate(
+      { userId, tenantId },
+      { adminRoles, assignedBy: req.itUser.id, assignedAt: new Date() },
+      { new: true, upsert: true }
+    );
+
+    res.json({ message: 'Roles updated', adminRoles: profile.adminRoles });
+  } catch (error) {
+    console.error('IT update college admin roles error:', error);
+    res.status(500).json({ error: 'Failed to update admin roles' });
+  }
+};
+
+// Remove college admin
+exports.removeCollegeAdmin = async (req, res) => {
+  try {
+    const { id: tenantId, userId } = req.params;
+    await Membership.findOneAndUpdate({ userId, tenantId }, { status: 'suspended' });
+    await AdminProfile.deleteOne({ userId, tenantId });
+    res.json({ message: 'College admin removed successfully' });
+  } catch (error) {
+    console.error('IT remove college admin error:', error);
+    res.status(500).json({ error: 'Failed to remove college admin' });
+  }
+};
+
+// ==========================================
+// IT PORTAL — GLOBAL CUSTOM ROLES
+// ==========================================
+
+const SEEDED_ROLES = [
+  { key: 'super_admin', label: 'Super Admin', description: 'Full access — bypasses all role restrictions', isBuiltIn: true, isSeeded: true, assignmentType: 'default_assignment', defaultPermissions: ['accounts', 'coe', 'academic', 'library', 'hr', 'lms', 'timetable', 'notices', 'attendance'] },
+  { key: 'accounts', label: 'Accounts & Finance', description: 'Fee management, payment records, financial reports', isBuiltIn: true, isSeeded: true, assignmentType: 'default_assignment', defaultPermissions: ['accounts'] },
+  { key: 'coe', label: 'COE / Exam Cell', description: 'Exam forms, admit cards, results, question bank', isBuiltIn: true, isSeeded: true, assignmentType: 'default_assignment', defaultPermissions: ['coe'] },
+  { key: 'academic', label: 'Academic Affairs', description: 'Departments, batches, timetable, attendance', isBuiltIn: true, isSeeded: true, assignmentType: 'default_assignment', defaultPermissions: ['academic', 'timetable', 'attendance'] },
+  { key: 'library', label: 'Library Management', description: 'Physical books, digital library approvals', isBuiltIn: true, isSeeded: true, assignmentType: 'default_assignment', defaultPermissions: ['library'] },
+  { key: 'hr', label: 'HR / Leave Manager', description: 'Staff leave management and approval', isBuiltIn: true, isSeeded: true, assignmentType: 'default_assignment', defaultPermissions: ['hr'] },
+  { key: 'lms', label: 'LMS / Content', description: 'Class modules, lesson content, curriculum', isBuiltIn: true, isSeeded: true, assignmentType: 'default_assignment', defaultPermissions: ['lms'] }
+];
+
+exports.getGlobalRoles = async (req, res) => {
+  try {
+    const customGlobalRoles = await GlobalRoleConfig.find().populate('restrictToTenants', 'name collegeCode').sort({ createdAt: -1 });
+    
+    const formattedCustomRoles = customGlobalRoles.map(r => {
+      const obj = r.toObject();
+      const hasRestrictions = obj.restrictToTenants && obj.restrictToTenants.length > 0;
+      return {
+        ...obj,
+        isSeeded: false,
+        assignmentType: hasRestrictions ? 'custom_assignment' : 'default_assignment'
+      };
+    });
+
+    res.json({
+      seededRoles: SEEDED_ROLES,
+      customRoles: formattedCustomRoles,
+      allRoles: [...SEEDED_ROLES, ...formattedCustomRoles]
+    });
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to fetch global roles' });
+  }
+};
+
+exports.createGlobalRole = async (req, res) => {
+  try {
+    const { key, label, description, defaultPermissions, restrictToTenants, assignmentType } = req.body;
+    const roleKey = key.toLowerCase().replace(/[^a-z0-9_]/g, '_');
+
+    const isReserved = SEEDED_ROLES.some(r => r.key === roleKey);
+    if (isReserved) return res.status(400).json({ error: 'Role key is reserved by a seeded system role' });
+
+    const existing = await GlobalRoleConfig.findOne({ key: roleKey });
+    if (existing) return res.status(400).json({ error: 'Role key already exists' });
+
+    const newRole = await GlobalRoleConfig.create({
+      key: roleKey,
+      label,
+      description,
+      defaultPermissions: defaultPermissions || [],
+      restrictToTenants: restrictToTenants || [],
+      assignmentType: assignmentType || ((restrictToTenants && restrictToTenants.length > 0) ? 'custom_assignment' : 'default_assignment'),
+      createdBy: req.itUser.id
+    });
+
+    res.json(newRole);
+  } catch (error) {
+    console.error('Create global role error:', error);
+    res.status(500).json({ error: 'Failed to create global role' });
+  }
+};
+
+exports.updateGlobalRole = async (req, res) => {
+  try {
+    const { key } = req.params;
+    const { label, description, defaultPermissions, restrictToTenants, isActive } = req.body;
+
+    const updated = await GlobalRoleConfig.findOneAndUpdate(
+      { key },
+      { label, description, defaultPermissions, restrictToTenants, isActive, updatedBy: req.itUser.id, updatedAt: new Date() },
+      { new: true }
+    );
+
+    if (!updated) return res.status(404).json({ error: 'Global role not found' });
+    res.json(updated);
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to update global role' });
+  }
+};
+
+exports.deleteGlobalRole = async (req, res) => {
+  try {
+    const { key } = req.params;
+    await GlobalRoleConfig.deleteOne({ key });
+    res.json({ message: 'Global role deleted successfully' });
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to delete global role' });
+  }
+};
+
+// ==========================================
+// IT PORTAL — COLLEGE-SPECIFIC CUSTOM ROLES
+// ==========================================
+
+exports.getCollegeCustomRoles = async (req, res) => {
+  try {
+    const tenantId = req.params.id;
+    const config = await CollegeRoleConfig.findOne({ tenantId });
+    res.json(config?.collegeCustomRoles || []);
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to fetch college custom roles' });
+  }
+};
+
+exports.createCollegeCustomRole = async (req, res) => {
+  try {
+    const tenantId = req.params.id;
+    const { key, label, description, defaultPermissions } = req.body;
+    const roleKey = key.toLowerCase().replace(/[^a-z0-9_]/g, '_');
+
+    let config = await CollegeRoleConfig.findOne({ tenantId });
+    if (!config) {
+      config = await CollegeRoleConfig.create({ tenantId, collegeCustomRoles: [] });
+    }
+
+    const exists = config.collegeCustomRoles.some(r => r.key === roleKey);
+    if (exists) return res.status(400).json({ error: 'Custom role key already exists for this college' });
+
+    config.collegeCustomRoles.push({
+      key: roleKey,
+      label,
+      description,
+      defaultPermissions: defaultPermissions || []
+    });
+
+    await config.save();
+    res.json(config.collegeCustomRoles);
+  } catch (error) {
+    console.error('Create college custom role error:', error);
+    res.status(500).json({ error: 'Failed to create college custom role' });
+  }
+};
+
+exports.deleteCollegeCustomRole = async (req, res) => {
+  try {
+    const { id: tenantId, roleKey } = req.params;
+    let config = await CollegeRoleConfig.findOne({ tenantId });
+    if (config) {
+      config.collegeCustomRoles = config.collegeCustomRoles.filter(r => r.key !== roleKey);
+      await config.save();
+    }
+    res.json({ message: 'College custom role deleted successfully' });
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to delete college custom role' });
+  }
+};
+
+// Update custom label for ANY role (seeded, global, custom) for a specific college
+exports.updateCollegeRoleLabel = async (req, res) => {
+  try {
+    const { id: tenantId, roleKey } = req.params;
+    const { label } = req.body;
+
+    if (!label) return res.status(400).json({ error: 'Role label is required' });
+
+    let config = await CollegeRoleConfig.findOne({ tenantId });
+    if (!config) {
+      config = await CollegeRoleConfig.create({ tenantId, customRoleLabels: new Map() });
+    }
+
+    if (!config.customRoleLabels) {
+      config.customRoleLabels = new Map();
+    }
+
+    config.customRoleLabels.set(roleKey, label);
+
+    const customRoleIndex = config.collegeCustomRoles.findIndex(r => r.key === roleKey);
+    if (customRoleIndex !== -1) {
+      config.collegeCustomRoles[customRoleIndex].label = label;
+    }
+
+    config.updatedBy = req.itUser.id;
+    config.updatedAt = new Date();
+    await config.save();
+
+    res.json({ message: 'College role label updated successfully', roleKey, label });
+  } catch (error) {
+    console.error('Update college role label error:', error);
+    res.status(500).json({ error: 'Failed to update college role label' });
+  }
+};
+

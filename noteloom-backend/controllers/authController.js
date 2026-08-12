@@ -86,33 +86,75 @@ exports.verifyEmail = async (req, res) => {
 // 4. SIGNUP (Strict Code-Based Logic)
 exports.roleSignup = async (req, res) => {
   try {
-    const { 
+    let { 
       email, fullName, password, collegeCode, role = 'student',
       phoneNumber, gender, admissionYear, course, stream, year, rollNo, currentSemester,
       department, designation, qualification, experience, specialization, employeeId,
-      adminLevel, responsibilities, approvalAuthority, accessLevel
+      adminLevel, responsibilities, approvalAuthority, accessLevel, adminRoles
     } = req.body;
 
-    // Check Existing User
+    if (!email || !fullName || !password) {
+      return res.status(400).json({ error: 'Full name, email, and password are required' });
+    }
+
+    // Clean strings
+    email = String(email).trim().toLowerCase();
+    fullName = String(fullName).trim();
+
+    // Check Existing User by Email
     const existingUser = await User.findOne({ email });
     if (existingUser) {
-      return res.status(400).json({ error: 'User already registered' });
+      const existingMembership = await Membership.findOne({ userId: existingUser._id }).populate('tenantId');
+      return res.status(400).json({ 
+        error: 'User already registered with this email.',
+        collegeName: existingMembership?.tenantId?.name || 'an existing institution'
+      });
     }
 
-    // Find Tenant
-    let tenant = await Tenant.findOne({ collegeCode: collegeCode });
+    // Find Tenant by collegeCode or through caller session
+    let tenant = null;
+    if (collegeCode) {
+      tenant = await Tenant.findOne({ collegeCode: String(collegeCode).trim() });
+    }
+
     if (!tenant) {
-      return res.status(404).json({ error: 'Institution code not found' });
+      // Check if caller is an authenticated admin with a session
+      const authHeader = req.headers.authorization || req.cookies?.sessionToken;
+      if (authHeader) {
+        const token = authHeader.replace('Bearer ', '').trim();
+        const session = await Session.findOne({ sessionToken: token, expiresAt: { $gt: new Date() } }).populate('tenantId');
+        if (session && session.tenantId) {
+          tenant = session.tenantId;
+          collegeCode = tenant.collegeCode;
+        }
+      }
     }
 
-    // Create User
-    const hashedPassword = await bcrypt.hash(password, 10);
-    const user = new User({ email, name: fullName, password: hashedPassword, emailVerified: true });
-    await user.save();
+    if (!tenant) {
+      return res.status(404).json({ error: 'Institution not found. Please provide a valid College Code.' });
+    }
 
-    // Create Membership
-    const membership = new Membership({ userId: user._id, tenantId: tenant._id, role: role });
-    await membership.save();
+    // Check unique constraints per tenant before saving
+    if (role === 'student' && rollNo) {
+      const existingRoll = await StudentProfile.findOne({ rollNo: String(rollNo).trim(), tenantId: tenant._id });
+      if (existingRoll) {
+        return res.status(400).json({ error: `A student with Roll Number "${rollNo}" already exists in this institution.` });
+      }
+    }
+
+    if ((role === 'faculty' || role === 'college_admin') && employeeId) {
+      if (role === 'faculty') {
+        const existingEmp = await FacultyProfile.findOne({ employeeId: String(employeeId).trim(), tenantId: tenant._id });
+        if (existingEmp) {
+          return res.status(400).json({ error: `A faculty member with Employee ID "${employeeId}" already exists.` });
+        }
+      } else if (role === 'college_admin') {
+        const existingAdmin = await AdminProfile.findOne({ employeeId: String(employeeId).trim(), tenantId: tenant._id });
+        if (existingAdmin) {
+          return res.status(400).json({ error: `An administrator with Employee ID "${employeeId}" already exists.` });
+        }
+      }
+    }
 
     // Generate UID
     let middleCode = '';
@@ -120,45 +162,125 @@ exports.roleSignup = async (req, res) => {
     
     if (role === 'college_admin') {
       middleCode = '900'; 
+    } else if (role === 'faculty') {
+      middleCode = '500';
     } else {
-      middleCode = new Date().getFullYear().toString(); 
+      const admYr = admissionYear ? String(admissionYear) : new Date().getFullYear().toString();
+      middleCode = admYr.slice(-2); // e.g. 26
     }
 
     const roleMemberCount = await Membership.countDocuments(countQuery);
-    const sequence = roleMemberCount.toString().padStart(5, '0');
+    const sequence = (roleMemberCount + 1).toString().padStart(4, '0');
     const generatedUid = `${tenant.collegeCode}${middleCode}${sequence}`;
+
+    // Create User
+    const hashedPassword = await bcrypt.hash(password, 10);
+    const user = new User({ 
+      email, 
+      name: fullName, 
+      password: hashedPassword, 
+      emailVerified: true,
+      role: role,
+      noteloomId: generatedUid,
+      department: department || stream || 'General',
+      college: tenant.name
+    });
+    await user.save();
+
+    // Create Membership
+    const membership = new Membership({ 
+      userId: user._id, 
+      tenantId: tenant._id, 
+      role: role,
+      status: 'active'
+    });
+    await membership.save();
 
     // Create Profile
     if (role === 'student') {
       await StudentProfile.create({
-        userId: user._id, tenantId: tenant._id, uid: generatedUid,
-        name: fullName, email,
-        phoneNumber, gender, admissionYear, course, stream, year, rollNo, currentSemester
+        userId: user._id, 
+        tenantId: tenant._id, 
+        uid: generatedUid,
+        name: fullName, 
+        email,
+        phoneNumber: phoneNumber || '', 
+        gender: gender || 'Other', 
+        admissionYear: Number(admissionYear) || new Date().getFullYear(), 
+        course: course || 'B.Tech', 
+        stream: stream || 'General', 
+        year: year || '1st', 
+        rollNo: rollNo || generatedUid, 
+        currentSemester: Number(currentSemester) || 1
       });
     } else if (role === 'faculty') {
       await FacultyProfile.create({
-        userId: user._id, tenantId: tenant._id, uid: generatedUid,
-        name: fullName, email,
-        department, designation, qualification, experience, specialization, employeeId
+        userId: user._id, 
+        tenantId: tenant._id, 
+        uid: generatedUid,
+        name: fullName, 
+        email,
+        department: department || 'General', 
+        designation: designation || 'Faculty', 
+        qualification: qualification || 'Post Graduate', 
+        experience: Number(experience) || 0, 
+        specialization: specialization || 'General', 
+        employeeId: employeeId || generatedUid,
+        phoneNumber: phoneNumber || ''
       });
     } else if (role === 'college_admin') {
+      // Determine RBAC permissions from adminRoles array or adminLevel
+      let computedRoles = ['super_admin'];
+      if (Array.isArray(adminRoles) && adminRoles.length > 0) {
+        computedRoles = adminRoles;
+      } else if (adminLevel === 'Department Admin') {
+        computedRoles = ['academic', 'lms'];
+      } else if (adminLevel === 'Accounts Admin' || adminLevel === 'Finance Admin') {
+        computedRoles = ['accounts'];
+      } else if (adminLevel === 'Exam Cell Admin' || adminLevel === 'COE Admin') {
+        computedRoles = ['coe'];
+      } else if (adminLevel === 'Library Admin') {
+        computedRoles = ['library'];
+      } else if (adminLevel === 'HR Admin') {
+        computedRoles = ['hr'];
+      } else {
+        computedRoles = ['super_admin'];
+      }
+
       await AdminProfile.create({
-        userId: user._id, tenantId: tenant._id, uid: generatedUid,
-        name: fullName, email,
-        adminLevel, responsibilities, employeeId,
-        approvalAuthority: approvalAuthority || 'None',
-        accessLevel: accessLevel || 'Standard'
+        userId: user._id, 
+        tenantId: tenant._id, 
+        uid: generatedUid,
+        name: fullName, 
+        email,
+        adminLevel: adminLevel || 'College Admin', 
+        responsibilities: responsibilities || '', 
+        employeeId: employeeId || generatedUid,
+        approvalAuthority: approvalAuthority || 'Full',
+        accessLevel: accessLevel || 'Standard',
+        adminRoles: computedRoles,
+        assignedAt: new Date()
       });
     }
 
-    res.json({ message: 'User created successfully', uid: generatedUid });
+    res.json({ 
+      success: true,
+      message: 'Account created successfully', 
+      uid: generatedUid,
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        role: role
+      }
+    });
 
   } catch (error) {
     console.error('Signup error:', error);
     if (error.code === 11000) {
-      return res.status(400).json({ error: 'A user with this ID or Roll Number already exists.' });
+      return res.status(400).json({ error: 'A user with this Email, Roll Number, or Employee ID already exists.' });
     }
-    res.status(500).json({ error: 'Internal server error' });
+    res.status(500).json({ error: error.message || 'Internal server error' });
   }
 };
 

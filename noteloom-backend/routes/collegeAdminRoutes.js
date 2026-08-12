@@ -10,6 +10,8 @@ const AdminProfile = require('../models/AdminProfile'); // 🟢 ADDED THIS IMPOR
 const Membership = require('../models/Membership'); 
 const Tenant = require('../models/Tenant');
 const { uploadCloud } = require('../config/cloudinary');
+const roleController = require('../controllers/collegeAdminRoleController');
+const { requireSuperAdmin, checkConfigLock } = require('../middleware/requireAdminRole');
 
 // -----------------------------------------------------------
 // 0. College Settings Routes (Global College Name & Logo)
@@ -146,7 +148,23 @@ router.patch('/settings', (req, res, next) => {
     console.error('Update College Settings Error:', error);
     res.status(500).json({ error: 'Failed to update college settings' });
   }
-}); 
+});
+
+// -----------------------------------------------------------
+// 0.1 College Admin Role & Tab Config Routes
+// -----------------------------------------------------------
+router.get('/my-roles', roleController.getMyRoles);
+router.get('/available-roles', roleController.getAvailableRoles);
+
+router.get('/admin-roles', requireSuperAdmin, roleController.getAdminRolesList);
+router.post('/admin-roles', requireSuperAdmin, checkConfigLock, roleController.createOrAssignAdmin);
+router.patch('/admin-roles/:userId', requireSuperAdmin, checkConfigLock, roleController.updateAdminRoles);
+router.delete('/admin-roles/:userId', requireSuperAdmin, checkConfigLock, roleController.removeAdmin);
+
+router.get('/role-tab-config', requireSuperAdmin, roleController.getRoleTabConfig);
+router.put('/role-tab-config', requireSuperAdmin, checkConfigLock, roleController.saveRoleTabConfig);
+router.post('/role-tab-config/lock', requireSuperAdmin, roleController.lockConfig);
+router.post('/role-tab-config/unlock', requireSuperAdmin, roleController.unlockConfig);
 
 // -----------------------------------------------------------
 // 1. Get All Requests (Existing)
@@ -219,8 +237,6 @@ router.get('/users/:role', async (req, res) => {
 
     // 3. Fetch the corresponding Profiles to get the real IDs (UID/RollNo)
     let profiles = [];
-    
-    // 🟢 FIX: Added logic for 'college_admin'
     if (role === 'student') {
         profiles = await StudentProfile.find({ userId: { $in: userIds } });
     } else if (role === 'faculty') {
@@ -234,25 +250,25 @@ router.get('/users/:role', async (req, res) => {
         const u = m.userId.toObject();
         
         // Find matching profile
-        const profile = profiles.find(p => p.userId.toString() === u._id.toString());
+        const prof = profiles.find(p => p.userId.toString() === u._id.toString());
+        const profileObj = prof ? prof.toObject() : {};
         
         // DETERMINE THE CORRECT ID TO SHOW
-        // Check Profile fields first (uid, rollNo, employeeId), fall back to User.noteloomId
-        let displayUid = 'N/A';
-        if (profile) {
-            displayUid = profile.uid || profile.rollNo || profile.employeeId || profile.enrollmentId || 'N/A';
-        } else if (u.noteloomId) {
-            displayUid = u.noteloomId;
-        }
+        let displayUid = u.noteloomId || profileObj.uid || profileObj.rollNo || profileObj.employeeId || profileObj.enrollmentId || 'N/A';
 
         return {
           _id: u._id,
           name: u.name,
           email: u.email,
-          uid: displayUid,  // ✅ Now sends the actual ID from the profile
-          status: m.status,
+          role: role,
+          uid: displayUid,
+          noteloomId: u.noteloomId || displayUid,
+          status: m.status || 'active',
           createdAt: u.createdAt,
-          deletionScheduledAt: u.deletionScheduledAt
+          deletionScheduledAt: u.deletionScheduledAt,
+          phone: u.phone || profileObj.phoneNumber || '',
+          department: u.department || profileObj.department || profileObj.stream || '',
+          profile: profileObj
         };
       });
 

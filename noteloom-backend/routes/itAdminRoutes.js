@@ -34,4 +34,22 @@ router.get('/tenants-list', itAdminController.getTenantsList);
 router.get('/menu-config/:tenantId', itAdminController.getMenuConfig);
 router.post('/menu-config', itAdminController.saveMenuConfig);
 
+// College Admins Management (Per College)
+router.get('/colleges/:id/admins', itAdminController.getCollegeAdmins);
+router.post('/colleges/:id/admins', itAdminController.addCollegeAdmin);
+router.patch('/colleges/:id/admins/:userId', itAdminController.updateCollegeAdminRoles);
+router.delete('/colleges/:id/admins/:userId', itAdminController.removeCollegeAdmin);
+
+// Global Custom Roles Management
+router.get('/global-roles', itAdminController.getGlobalRoles);
+router.post('/global-roles', itAdminController.createGlobalRole);
+router.put('/global-roles/:key', itAdminController.updateGlobalRole);
+router.delete('/global-roles/:key', itAdminController.deleteGlobalRole);
+
+// College Custom Roles Management
+router.get('/colleges/:id/custom-roles', itAdminController.getCollegeCustomRoles);
+router.post('/colleges/:id/custom-roles', itAdminController.createCollegeCustomRole);
+router.patch('/colleges/:id/custom-roles/:roleKey/label', itAdminController.updateCollegeRoleLabel);
+router.delete('/colleges/:id/custom-roles/:roleKey', itAdminController.deleteCollegeCustomRole);
+
 module.exports = router;

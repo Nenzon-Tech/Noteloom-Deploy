@@ -16,7 +16,7 @@ const signupSchema = z.object({
     password: z.string().min(6, "Password must be at least 6 characters"),
     fullName: z.string().min(2, "Name must be at least 2 characters"),
     role: z.enum(['student', 'faculty', 'college_admin']).default('student'),
-    collegeCode: z.string().regex(/^\d{4}$/, "College code must be exactly 4 digits")
+    collegeCode: z.string().optional()
   }).passthrough()
 });
 

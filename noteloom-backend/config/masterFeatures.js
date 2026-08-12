@@ -41,6 +41,7 @@ module.exports = {
     { key: 'account_creation', title: 'Account Creation Management', icon: 'UserPlus', description: 'Create and onboard new users' },
     { key: 'fees_exam_records', title: 'Sem. fees and Exam form Records', icon: 'Banknote', description: 'Track fees and exam submissions' },
     { key: 'manage_departments', title: 'Manage Departments', icon: 'Building', description: 'Add or edit college departments' },
+    { key: 'admin_roles', title: 'Admin Roles & Permissions', icon: 'ShieldCheck', description: 'Configure college admin access roles' },
     { key: 'coe_manage', title: 'COE Manage', icon: 'FileCog', description: 'Controller of Examinations controls' },
     { key: 'exam_management', title: 'Exam Management', icon: 'FileText', description: 'Schedule and configure exams' },
     { key: 'university_marks', title: 'University Marks System', icon: 'GraduationCap', description: 'Manage and publish university marks' }

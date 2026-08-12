@@ -9,6 +9,7 @@ import ITDashboardFooter from '@/components/features/dashboard/ITDashboardFooter
 import CollegeBannerLogo from '@/components/common/CollegeBannerLogo.jsx';
 import ThemeToggle from '@/components/common/ThemeToggle.jsx';
 import UserProfileDropdown from '@/components/common/UserProfileDropdown.jsx';
+import ITRoleBuilder from './ITRoleBuilder.jsx';
 
 
 
@@ -290,6 +291,7 @@ const ITAdminDashboard = () => {
             {[
               { id: 'overview', label: 'Overview' },
               { id: 'college-management', label: 'College Management' },
+              { id: 'role-builder', label: 'Custom Role Builder' },
               { id: 'college-requests', label: `Requests (${collegeRequests.filter(r => r.status === 'pending').length})` }
             ].map(tab => (
               <button
@@ -366,6 +368,9 @@ const ITAdminDashboard = () => {
             </div>
           </div>
         )}
+
+        {/* --- ROLE BUILDER TAB --- */}
+        {activeTab === 'role-builder' && <ITRoleBuilder />}
 
         {/* --- COLLEGE MANAGEMENT TAB --- */}
         {activeTab === 'college-management' && (
