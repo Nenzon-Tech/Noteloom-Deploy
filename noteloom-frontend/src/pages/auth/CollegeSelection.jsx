@@ -97,7 +97,7 @@ fetchColleges();
               
               {/* RESTORED: BookOpen Icon & Original Fonts */}
               {/* <BookOpen className="w-8 h-8 text-purple-600" /> */}
-              <span className="text-xl font-bold tracking-tight bg-gradient-to-r from-indigo-600 to-fuchsia-600 bg-clip-text text-transparent">Note Loom</span>
+              <span className="text-xl font-bold tracking-tight bg-gradient-to-r from-indigo-600 to-fuchsia-600 bg-clip-text text-transparent">EduSpace</span>
               <span className="text-xs px-2 py-1 rounded-full bg-gradient-to-r from-green-400/70 to-green-600/70 text-white border border-green-500/70">
                 Beta
               </span>

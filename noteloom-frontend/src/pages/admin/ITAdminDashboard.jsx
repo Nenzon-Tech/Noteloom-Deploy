@@ -38,7 +38,7 @@ const ITAdminDashboard = () => {
       adminEmail: 'admin.rajesh@iitb.ac.in',
       requestDate: new Date('2025-10-01'),
       status: 'pending',
-      message: 'We would like to integrate Note Loom for our Computer Science department.'
+      message: 'We would like to integrate EduSpace for our Computer Science department.'
     },
     {
       _id: '2',
@@ -55,7 +55,7 @@ const ITAdminDashboard = () => {
     {
       _id: '1',
       name: 'Amit Singh',
-      email: 'amit.singh@noteloom.in',
+      email: 'amit.singh@eduspace.in',
       requestDate: new Date('2025-09-28'),
       status: 'pending',
       experience: '5 years in EdTech',
@@ -64,7 +64,7 @@ const ITAdminDashboard = () => {
     {
       _id: '2',
       name: 'Kavya Patel',
-      email: 'kavya.patel@noteloom.in',
+      email: 'kavya.patel@eduspace.in',
       requestDate: new Date('2025-10-02'),
       status: 'pending',
       experience: '3 years in Educational Management',
@@ -131,7 +131,7 @@ const ITAdminDashboard = () => {
   };
 
   const handleToggleCollegeStatus = async (id, currentStatus, name) => {
-    if (name === 'Note Loom System') return alert("Cannot disable System Tenant");
+    if (name === 'EduSpace System' || name === 'Note Loom System') return alert("Cannot disable System Tenant");
     const newStatus = currentStatus === 'active' ? 'suspended' : 'active';
     if (!confirm(`Are you sure you want to ${newStatus === 'active' ? 'Enable' : 'Disable'} this college?`)) return;
 
@@ -151,7 +151,7 @@ const ITAdminDashboard = () => {
 
   const handleDeleteCollege = async (id, name) => {
     if (itUser.role !== 'noteloom_admin') return alert("Only Admin can delete.");
-    if (name === 'Note Loom System') return alert("Cannot delete System Tenant");
+    if (name === 'EduSpace System' || name === 'Note Loom System') return alert("Cannot delete System Tenant");
     if (!confirm(`WARNING: This will suspend the college and schedule permanent deletion in 3 MONTHS.\n\nAre you sure?`)) return;
 
     try {
@@ -234,8 +234,8 @@ const ITAdminDashboard = () => {
 };
 
   const getDashboardTitle = () => {
-    if (itUser?.role === 'noteloom_admin') return 'Note Loom Admin';
-    if (itUser?.role === 'noteloom_manager') return 'Note Loom Manager';
+    if (itUser?.role === 'noteloom_admin') return 'EduSpace Admin';
+    if (itUser?.role === 'noteloom_manager') return 'EduSpace Manager';
     return 'IT Portal';
   };
 

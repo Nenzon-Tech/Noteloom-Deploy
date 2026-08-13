@@ -26,6 +26,18 @@ export default defineConfig({
   build: {
     sourcemap: false,
     cssSourcemap: false,
+    chunkSizeWarningLimit: 1000,
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          'vendor-core': ['react', 'react-dom', 'react-router-dom'],
+          'vendor-ui': ['framer-motion', 'lucide-react'],
+          'vendor-viz': ['mermaid'],
+          'vendor-docs': ['jspdf', 'jspdf-autotable'],
+          'vendor-utils': ['axios', 'lodash', 'date-fns', 'dompurify']
+        }
+      }
+    }
   },
   resolve: {
     alias: {

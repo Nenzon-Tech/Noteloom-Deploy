@@ -73,8 +73,8 @@ const ITLoginPage = () => {
               >
                 <ArrowLeft className={`w-4 h-4 ${isDarkMode ? 'text-white' : 'text-gray-900'}`} />
               </button>
-              {/* FIXED: Only "Note Loom" text, no book icon */}
-              <span className="text-xl font-bold tracking-tight bg-gradient-to-r from-indigo-600 to-fuchsia-600 bg-clip-text text-transparent">Note Loom</span>
+              {/* FIXED: Only "EduSpace" text, no book icon */}
+              <span className="text-xl font-bold tracking-tight bg-gradient-to-r from-indigo-600 to-fuchsia-600 bg-clip-text text-transparent">EduSpace</span>
               <span className="text-xs px-2 py-1 rounded-full bg-gradient-to-r from-red-400/70 to-red-600/70 text-white border border-red-500/70">
                 IT Portal
               </span>
@@ -101,8 +101,8 @@ const ITLoginPage = () => {
             <p className={`mt-2 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>Administrative Login</p>
             <div className="mt-4 p-3 bg-blue-100 dark:bg-blue-900 rounded-lg">
               <p className="text-sm text-blue-800 dark:text-blue-200 font-medium">Test Accounts:</p>
-              <p className="text-xs text-blue-700 dark:text-blue-300">Admin: admin@noteloom.in / admin123</p>
-              <p className="text-xs text-blue-700 dark:text-blue-300">Manager: manager@noteloom.in / admin123</p>
+              <p className="text-xs text-blue-700 dark:text-blue-300">Admin: admin@eduspace.in / admin123</p>
+              <p className="text-xs text-blue-700 dark:text-blue-300">Manager: manager@eduspace.in / admin123</p>
             </div>
           </div>
 

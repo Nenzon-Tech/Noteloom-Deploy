@@ -62,7 +62,7 @@ const CookieConsent = () => {
                 </div>
                 
                 <p className="text-sm text-slate-300 leading-relaxed">
-                  Note Loom uses cookies to keep you securely logged in, remember your theme preference, and optimize your overall learning dashboard experience. You can choose which non-essential cookies you allow. 
+                  EduSpace uses cookies to keep you securely logged in, remember your theme preference, and optimize your overall learning dashboard experience. You can choose which non-essential cookies you allow. 
                   Read our full{' '}
                   <button 
                     onClick={() => setShowPolicy(true)}
@@ -188,8 +188,8 @@ const CookieConsent = () => {
                 <div className="flex items-center space-x-3 text-purple-400">
                   <Shield className="w-6 h-6" />
                   <div>
-                    <h2 className="text-lg font-bold tracking-tight text-white">Note Loom Cookie Policy</h2>
-                    <p className="text-[10px] text-slate-400">Document Ref: NL-LEGAL-COOKIE-2026-001  •  v1.0</p>
+                    <h2 className="text-lg font-bold tracking-tight text-white">EduSpace Cookie Policy</h2>
+                    <p className="text-[10px] text-slate-400">Document Ref: ES-LEGAL-COOKIE-2026-001  •  v1.0</p>
                   </div>
                 </div>
                 <button
@@ -205,7 +205,7 @@ const CookieConsent = () => {
                 <div className="space-y-2">
                   <p className="text-xs text-slate-400 font-semibold">Effective Date: July 4, 2026</p>
                   <p>
-                    Note Loom ("we", "us", or "our") uses cookies and similar technologies on the Note Loom platform. This Cookie Policy explains how cookies are used, their purposes, and how you can manage your preferences in compliance with global data protection laws, including the **EU GDPR**, **India DPDPA 2023**, and the **California Consumer Privacy Act (CCPA)**.
+                    EduSpace ("we", "us", or "our") uses cookies and similar technologies on the EduSpace platform. This Cookie Policy explains how cookies are used, their purposes, and how you can manage your preferences in compliance with global data protection laws, including the **EU GDPR**, **India DPDPA 2023**, and the **California Consumer Privacy Act (CCPA)**.
                   </p>
                 </div>
 
@@ -219,7 +219,7 @@ const CookieConsent = () => {
                     Cookies are small text files stored on your browser or device by web servers. They allow platforms to remember your login session, prevent security threats (such as CSRF), and store non-sensitive configuration parameters.
                   </p>
                   <p>
-                    We use **First-Party Cookies** (cookies set directly by Note Loom) configured with high-security flags to ensure that unauthorized third-party scripts cannot read your private token credentials.
+                    We use **First-Party Cookies** (cookies set directly by EduSpace) configured with high-security flags to ensure that unauthorized third-party scripts cannot read your private token credentials.
                   </p>
                 </div>
 
@@ -256,10 +256,10 @@ const CookieConsent = () => {
                     <span>4. Contact & Support</span>
                   </h3>
                   <p>
-                    If you have any questions or concerns regarding Note Loom's cookie security policies or data storage practices, please reach out to our support team at:
+                    If you have any questions or concerns regarding EduSpace's cookie security policies or data storage practices, please reach out to our support team at:
                   </p>
                   <p className="font-semibold text-white pl-4">
-                    Email: support@noteloom.in  
+                    Email: support@eduspace.in  
                   </p>
                 </div>
               </div>

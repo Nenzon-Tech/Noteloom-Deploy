@@ -31,7 +31,7 @@ const TrustBar = () => {
         {/* Updated Messaging Structure */}
         <div className="flex flex-col items-center mb-8 text-center">
           {/* <span className="px-3 py-1 mb-3 text-[10px] font-bold tracking-widest uppercase rounded-full bg-indigo-500/10 text-indigo-500 dark:text-indigo-400 border border-indigo-500/20 transition-colors duration-700">
-            The Note Loom Model
+            The EduSpace Model
           </span> */}
           <p className={`w-full max-w-2xl text-sm md:text-base font-medium tracking-wide transition-colors duration-700 ${
             isDarkMode ? 'text-white/70' : 'text-slate-600'

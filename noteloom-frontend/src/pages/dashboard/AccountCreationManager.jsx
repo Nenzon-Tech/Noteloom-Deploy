@@ -82,7 +82,7 @@ const AccountCreationManager = () => {
 
   // College identifier from storage / session
   const storedCollegeCode = localStorage.getItem('selectedCollegeCode') || '';
-  const storedCollegeName = localStorage.getItem('selectedCollege') || profile?.college || 'NoteLoom Institution';
+  const storedCollegeName = localStorage.getItem('selectedCollege') || profile?.college || 'EduSpace Institution';
 
   // Form State
   const initialFormData = {
@@ -310,7 +310,7 @@ const AccountCreationManager = () => {
             ? `${formData.designation} • Dept: ${formData.department} • Emp ID: ${formData.employeeId}`
             : `${formData.adminLevel} • Emp ID: ${formData.employeeId}`
         });
-        setMessage({ type: 'success', text: `Account created successfully! NoteLoom UID: ${result.uid}` });
+        setMessage({ type: 'success', text: `Account created successfully! EduSpace UID: ${result.uid}` });
       } else {
         setMessage({ type: 'error', text: result.error || 'Failed to create account. Please verify input fields.' });
       }
@@ -543,7 +543,7 @@ const AccountCreationManager = () => {
                   isDarkMode ? 'bg-black/40 border-green-500/20' : 'bg-white border-emerald-200 shadow-sm'
                 }`}>
                   <div>
-                    <span className="text-[11px] font-bold uppercase tracking-wider text-emerald-700 dark:text-green-400/80">Permanent NoteLoom System UID</span>
+                    <span className="text-[11px] font-bold uppercase tracking-wider text-emerald-700 dark:text-green-400/80">Permanent EduSpace System UID</span>
                     <div className="text-xl font-mono font-black text-emerald-700 dark:text-green-300 tracking-wider mt-0.5">
                       {createdAccount.uid}
                     </div>
@@ -611,7 +611,7 @@ const AccountCreationManager = () => {
                       <input
                         type="email"
                         name="email"
-                        placeholder="e.g. rahul.sharma@noteloom.edu"
+                        placeholder="e.g. rahul.sharma@eduspace.edu"
                         required
                         value={formData.email}
                         onChange={handleInputChange}

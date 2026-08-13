@@ -152,7 +152,7 @@ const StudentExamPortal = lazy(() => import('@/components/features/coe/StudentEx
 
 // ✅ Helper: Identify system tenant
 const isSystemTenant = (tenant) =>
-  tenant?.name === 'Note Loom System';
+  tenant?.name === 'EduSpace System' || tenant?.name === 'Note Loom System';
 
 
 // API Base URL
@@ -336,7 +336,7 @@ const LogoWithFallback = ({ collegeLogoUrl, collegeName, className, fallbackClas
       ) : (
         <img
           src={noteLoomLogoUrl}
-          alt="Note Loom Logo"
+          alt="EduSpace Logo"
           className={`${fallbackClassName || className} opacity-100 transition-opacity duration-300`}
           onLoad={() => setIsLoading(false)}
           onError={() => setIsLoading(false)}
@@ -373,7 +373,7 @@ const Footer = () => {
           <div className="lg:col-span-2 flex flex-col justify-between">
             <div>
               <div className="flex items-center space-x-2 mb-6">
-                <span className="text-xl font-bold">Note Loom</span>
+                <span className="text-xl font-bold">EduSpace</span>
               </div>
               <p className={`mb-6 leading-relaxed text-sm sm:text-base ${
                 isDarkMode ? 'text-gray-300' : 'text-gray-600'
@@ -382,7 +382,7 @@ const Footer = () => {
                 <br />
                 Empowering educational institutions with comprehensive learning management solutions.
                 <br /><br />
-                <strong>Email:</strong> support@noteloom.in
+                <strong>Email:</strong> support@eduspace.in
               </p>
             </div>
             
@@ -516,7 +516,7 @@ const Footer = () => {
             <div className={`text-xs sm:text-sm flex items-center text-center md:text-left ${
               isDarkMode ? 'text-gray-400' : 'text-gray-600'
             }`}>
-              <span>© 2026 Note Loom. All rights reserved.</span>
+              <span>© 2026 EduSpace. All rights reserved.</span>
             </div>
             
             <div className="flex flex-wrap justify-center gap-4 text-xs sm:text-sm">
@@ -559,14 +559,14 @@ const CollegeDashboardFooter = () => {
     }`}>
       <div className="max-w-7xl mx-auto">
         <div className="flex flex-col md:flex-row justify-between items-center space-y-2 md:space-y-0">
-          {/* Left side - College/Note Loom Logo */}
+          {/* Left side - College/EduSpace Logo */}
           <div className="flex items-center space-x-2">
             <CollegeBannerLogo />
             {!COLLEGE_CONFIG.bannerUrl && (
               <span className={`text-xs font-medium ${
                 isDarkMode ? 'text-gray-400' : 'text-gray-600'
               }`}>
-                Powered by Note Loom
+                Powered by EduSpace
               </span>
             )}
           </div>
@@ -583,7 +583,7 @@ const CollegeDashboardFooter = () => {
             <span className={`${
               isDarkMode ? 'text-gray-500' : 'text-gray-400'
             }`}>
-              © 2026 Note Loom
+              © 2026 EduSpace
             </span>
           </div>
         </div>
@@ -635,12 +635,12 @@ const ITDashboardFooter = () => {
     }`}>
       <div className="max-w-7xl mx-auto">
         <div className="flex flex-col md:flex-row justify-between items-center space-y-2 md:space-y-0">
-          {/* Left side - Note Loom Beta */}
+          {/* Left side - EduSpace Beta */}
           <div className="flex items-center space-x-2">
             <span className={`text-sm font-medium ${
               isDarkMode ? 'text-white' : 'text-gray-900'
             }`}>
-              Note Loom Beta
+              EduSpace Beta
             </span>
             <span className={`text-xs ${
               isDarkMode ? 'text-gray-400' : 'text-gray-600'

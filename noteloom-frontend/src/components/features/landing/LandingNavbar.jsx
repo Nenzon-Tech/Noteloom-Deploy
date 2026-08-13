@@ -29,7 +29,7 @@ const LandingNavbar = ({ navigate }) => {
         {/* Logo Section */}
         <div className="flex items-center gap-3">
           <span className="text-xl font-bold tracking-tight bg-gradient-to-r from-indigo-600 to-fuchsia-600 bg-clip-text text-transparent">
-            Note Loom
+            EduSpace
           </span>
           <span className="text-xs px-2 py-1 rounded-full bg-gradient-to-r from-green-400/70 to-green-600/70 text-white border border-green-500/70">
             Beta

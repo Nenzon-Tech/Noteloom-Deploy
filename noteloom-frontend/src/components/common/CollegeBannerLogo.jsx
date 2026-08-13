@@ -6,7 +6,7 @@ const CollegeBannerLogo = ({ className = "" }) => {
 
   // Reconstruct config safely from localStorage
   const collegeName =
-    localStorage.getItem("selectedCollege") || "Note Loom";
+    localStorage.getItem("selectedCollege") || "EduSpace";
 
   const logoUrl = localStorage.getItem("selectedCollegeLogo");
   const bannerUrl = null; // keep for future use if needed
@@ -29,7 +29,7 @@ const CollegeBannerLogo = ({ className = "" }) => {
       ) : (
         /* ✅ Gradient fallback text */
         <span className="text-xl font-bold tracking-tight bg-gradient-to-r from-indigo-600 to-fuchsia-600 bg-clip-text text-transparent select-none">
-          Note Loom
+          EduSpace
         </span>
       )}
     </div>
