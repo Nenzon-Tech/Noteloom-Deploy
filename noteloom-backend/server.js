@@ -17,6 +17,7 @@ const lmsRoutes = require('./routes/lmsRoutes');
 const batchRoutes = require('./routes/batchRoutes');
 const timetableRoutes = require('./routes/timetableRoutes');
 const noticeRoutes = require('./routes/noticeRoutes');
+const projectRoutes = require('./routes/projectRoutes');
 const coeRoutes = require('./routes/coeRoutes');
 const systemRoutes = require('./routes/systemRoutes');
 const sessionRoutes = require('./routes/sessionRoutes');
@@ -125,6 +126,7 @@ app.use('/api/batches', batchRoutes);
 
 // 6. Schedules & Notices
 app.use('/api/notices', noticeRoutes);
+app.use('/api/projects', projectRoutes);
 
 // 7. Exam, System & Leaves
 app.use('/api/coe', coeRoutes);

@@ -8,7 +8,7 @@ module.exports = {
     { key: 'org_calendar', title: "Organisation's Calendar", icon: 'Calendar', description: 'View academic events' },
     { key: 'payment_details', title: 'Payment Details', icon: 'Receipt', description: 'View transaction history' },
     { key: 'fees', title: 'Dues & Pay Fees', icon: 'IndianRupee', description: 'Pay pending dues' },
-    { key: 'update_info', title: 'Final Year Project Info.', icon: 'User', description: 'Update your final year project' },
+    { key: 'update_info', title: 'Final Year Project', icon: 'FolderKanban', description: 'Build and submit your final year project' },
     { key: 'results', title: 'University Marks System', icon: 'GraduationCap', description: 'Check semester marks' },
     { key: 'feedback', title: 'Sem. Feedback', icon: 'MessageSquare', description: 'Submit semester feedback' },
     { key: 'exam_form', title: 'Exam Form', icon: 'FormInputIcon', description: 'Fill exam form' },
@@ -25,6 +25,7 @@ module.exports = {
     { key: 'leave_apply', title: 'Apply Leave', icon: 'Briefcase', description: 'Apply for casual or sick leave' },
     { key: 'dept_notices', title: 'Departmental Notices', icon: 'MessageSquare', description: 'View department announcements' },
     { key: 'staff_notices', title: 'Staff Notices', icon: 'MessageSquare', description: 'View staff announcements' },
+    { key: 'project_submissions', title: 'Project Submissions', icon: 'FolderKanban', description: 'Review final year project submissions' },
     { key: 'coe_manage', title: 'COE Manage', icon: 'FileCog', description: 'Controller of Examinations controls' },
     { key: 'org_calendar', title: "Organization's Calender", icon: 'Calendar', description: 'View academic events' },
     { key: 'timetable', title: 'Timetable & Schedule', icon: 'Calendar', description: 'Manage routines and lesson plans' },
@@ -43,6 +44,7 @@ module.exports = {
     { key: 'manage_departments', title: 'Manage Departments', icon: 'Building', description: 'Add or edit college departments' },
     { key: 'coe_manage', title: 'COE Manage', icon: 'FileCog', description: 'Controller of Examinations controls' },
     { key: 'exam_management', title: 'Exam Management', icon: 'FileText', description: 'Schedule and configure exams' },
-    { key: 'university_marks', title: 'University Marks System', icon: 'GraduationCap', description: 'Manage and publish university marks' }
+    { key: 'university_marks', title: 'University Marks System', icon: 'GraduationCap', description: 'Manage and publish university marks' },
+    { key: 'project_submissions', title: 'Project Submissions', icon: 'FolderKanban', description: 'Review final year project submissions' }
   ]
 };

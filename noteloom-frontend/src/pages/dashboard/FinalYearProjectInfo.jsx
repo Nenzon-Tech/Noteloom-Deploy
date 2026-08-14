@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
 import {
   BookOpen,
@@ -39,9 +39,13 @@ import {
   Lightbulb,
   Building2,
   FileArchive,
+  Send,
+  BadgeCheck,
+  Clock,
 } from 'lucide-react';
 import { useTheme } from '@/context/ThemeContext.jsx';
 import { useSessionManager } from '@/hooks/useSessionManager.js';
+import { API_BASE } from '@/utils/config';
 import GlassHeader from '@/components/common/GlassHeader.jsx';
 import ThemeToggle from '@/components/common/ThemeToggle.jsx';
 import UserProfileDropdown from '@/components/common/UserProfileDropdown.jsx';
@@ -195,6 +199,9 @@ const FinalYearProjectInfo = () => {
   const [saveMessage, setSaveMessage] = useState('');
   const [saveError, setSaveError] = useState('');
   const [isSaving, setIsSaving] = useState(false);
+  const [submissions, setSubmissions] = useState([]);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitMessage, setSubmitMessage] = useState('');
 
   const storageKey = useMemo(() => {
     return `fypInfo:${user?.uid || user?.email || 'guest'}`;
@@ -219,6 +226,26 @@ const FinalYearProjectInfo = () => {
       }
     }
   }, [storageKey, user]);
+
+  const fetchMySubmissions = useCallback(async () => {
+    const token = localStorage.getItem('sessionToken');
+    if (!token) return;
+    try {
+      const resp = await fetch(`${API_BASE}/api/projects/mine`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      if (resp.ok) {
+        const data = await resp.json();
+        if (Array.isArray(data)) setSubmissions(data);
+      }
+    } catch (error) {
+      console.error('Failed to load submissions:', error);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (user && isSessionValid) fetchMySubmissions();
+  }, [user, isSessionValid, fetchMySubmissions]);
 
   const handleChange = (field, value) => {
     setForm((prev) => ({ ...prev, [field]: value }));
@@ -274,6 +301,64 @@ const FinalYearProjectInfo = () => {
     setSaveMessage('');
     setSaveError('');
   };
+
+  const handleSubmit = async () => {
+    const missing = requiredChecks.filter((c) => !isFilled(form[c.key]));
+    if (missing.length) {
+      setSaveError(`Missing required items: ${missing.map((m) => m.label).join(', ')}`);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      return;
+    }
+
+    setIsSubmitting(true);
+    setSaveMessage('');
+    setSaveError('');
+    setSubmitMessage('');
+
+    try {
+      const token = localStorage.getItem('sessionToken');
+      const fd = new FormData();
+      Object.keys(defaultForm).forEach((key) => {
+        if (FILE_KEYS.includes(key)) return;
+        const value = form[key];
+        if (value !== undefined && value !== null && String(value).trim() !== '') fd.append(key, value);
+      });
+      Object.keys(defaultForm).forEach((key) => {
+        if (!FILE_KEYS.includes(key)) return;
+        const value = form[key];
+        if (!value) return;
+        if (Array.isArray(value)) value.forEach((file) => file && fd.append(key, file));
+        else fd.append(key, value);
+      });
+
+      const resp = await fetch(`${API_BASE}/api/projects`, {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${token}` },
+        body: fd
+      });
+      const data = await resp.json().catch(() => ({}));
+      if (!resp.ok) throw new Error(data.error || 'Submission failed. Please try again.');
+
+      localStorage.removeItem(storageKey);
+      setForm(defaultForm);
+      setSubmitMessage('Project submitted successfully! Your submission is now pending faculty review.');
+      await fetchMySubmissions();
+    } catch (error) {
+      console.error('Submit failed:', error);
+      setSaveError(error.message);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const latestSubmission = submissions[0] || null;
+  const reviewMeta = {
+    pending: { label: 'Pending Review', cls: isDarkMode ? 'bg-amber-500/15 text-amber-300 border-amber-500/30' : 'bg-amber-50 text-amber-700 border-amber-300', icon: Clock },
+    approved: { label: 'Approved', cls: isDarkMode ? 'bg-emerald-500/15 text-emerald-300 border-emerald-500/30' : 'bg-emerald-50 text-emerald-700 border-emerald-300', icon: BadgeCheck },
+    rejected: { label: 'Rejected', cls: isDarkMode ? 'bg-red-500/15 text-red-300 border-red-500/30' : 'bg-red-50 text-red-600 border-red-300', icon: AlertCircle },
+    revision: { label: 'Revision Requested', cls: isDarkMode ? 'bg-sky-500/15 text-sky-300 border-sky-500/30' : 'bg-sky-50 text-sky-700 border-sky-300', icon: RefreshCw },
+  };
+  const latestMeta = latestSubmission ? reviewMeta[latestSubmission.reviewStatus] || reviewMeta.pending : null;
 
   const scopedFields = useMemo(() => getScopedFields(form.projectType), [form.projectType]);
 
@@ -403,7 +488,7 @@ const FinalYearProjectInfo = () => {
                   </p>
                 </div>
               </div>
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-3 flex-wrap justify-end">
                 <button
                   onClick={handleReset}
                   className={`inline-flex items-center gap-2 rounded-xl border px-4 py-2.5 text-sm font-semibold transition ${isDarkMode ? 'border-gray-700 text-gray-300 hover:bg-gray-800' : 'border-slate-200 text-slate-600 hover:bg-slate-100'}`}
@@ -414,14 +499,49 @@ const FinalYearProjectInfo = () => {
                 <button
                   onClick={handleSave}
                   disabled={isSaving}
-                  className="inline-flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white px-5 py-2.5 font-semibold shadow-lg shadow-purple-600/30 disabled:opacity-60 transition-all"
+                  className={`inline-flex items-center gap-2 rounded-xl border px-4 py-2.5 text-sm font-semibold transition ${isDarkMode ? 'border-gray-700 text-gray-200 hover:bg-gray-800' : 'border-slate-300 text-slate-700 hover:bg-slate-100'}`}
                 >
                   <Save className="w-4 h-4" />
                   {isSaving ? 'Saving...' : 'Save Draft'}
                 </button>
+                <button
+                  onClick={handleSubmit}
+                  disabled={isSubmitting}
+                  className="inline-flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white px-5 py-2.5 font-semibold shadow-lg shadow-emerald-600/30 disabled:opacity-60 transition-all"
+                >
+                  <Send className="w-4 h-4" />
+                  {isSubmitting ? 'Submitting...' : 'Submit Project'}
+                </button>
               </div>
             </div>
           </div>
+
+          {/* ===== Submission status banner ===== */}
+          {submitMessage && (
+            <div className={`mb-6 rounded-xl border px-4 py-3 text-sm ${isDarkMode ? 'border-emerald-700/40 bg-emerald-900/20 text-emerald-300' : 'border-emerald-200 bg-emerald-50 text-emerald-700'}`}>
+              <CheckCircle className="inline w-4 h-4 mr-1.5 -mt-0.5" />
+              {submitMessage}
+            </div>
+          )}
+          {latestSubmission && latestMeta && (
+            <div className={`relative overflow-hidden rounded-2xl border px-5 py-4 mb-6 flex flex-col md:flex-row md:items-center gap-3 ${latestMeta.cls}`}>
+              <latestMeta.icon className="w-5 h-5 shrink-0" />
+              <div className="flex-1">
+                <p className="text-sm font-bold">
+                  Latest Submission: {latestSubmission.projectTitle}
+                  <span className="ml-2 text-xs font-medium opacity-80">({new Date(latestSubmission.createdAt).toLocaleDateString()})</span>
+                </p>
+                <p className="text-xs opacity-80 mt-0.5">
+                  Status: {latestMeta.label}
+                  {latestSubmission.reviewComment ? ` — ${latestSubmission.reviewComment}` : ''}
+                  {latestSubmission.reviewerName ? ` (reviewed by ${latestSubmission.reviewerName})` : ''}
+                </p>
+              </div>
+              {submissions.length > 1 && (
+                <span className="text-xs font-semibold opacity-70">{submissions.length} total submissions</span>
+              )}
+            </div>
+          )}
 
           {/* ===== Compact progress (mobile) ===== */}
           <div className="lg:hidden mb-4">

@@ -8,7 +8,7 @@ import {
   ListTodo as ListTodoIcon, FormInputIcon, Receipt, User, PenBoxIcon, 
   CheckCircle, Upload, Clock, Briefcase, Settings, ShieldCheck, UserPlus, 
   Building, FileCog, Circle, ArrowRight, Layout, Database, Sparkles,
-  Library, 
+  Library, FolderKanban, 
 } from "lucide-react";
 import { useTheme } from '@/context/ThemeContext.jsx';
 import { useSessionManager } from '@/hooks/useSessionManager.js';
@@ -26,7 +26,7 @@ const iconMap = {
   BookOpen, ClipboardList, MessageSquare, Users, Calendar, Banknote, IndianRupee, 
   FolderPlus, GraduationCap, ListTodoIcon, FormInputIcon, FileText, Receipt, 
   User, PenBoxIcon, CheckCircle, Upload, Clock, Briefcase, Settings, ShieldCheck, 
-  UserPlus, Building, FileCog, Library, Default: Circle
+  UserPlus, Building, FileCog, Library, FolderKanban, Default: Circle
 };
 
 // Helper component for Section Headers
