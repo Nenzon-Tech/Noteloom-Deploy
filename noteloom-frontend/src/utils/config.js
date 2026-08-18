@@ -11,7 +11,7 @@ export const API_BASE = typeof rawApiBase === 'string'
 
 export const COLLEGE_CONFIG = {
   // Default values
-  logoUrl: "webdata/clg-logo/IEM-Kolkata.png", 
+  logoUrl: "webdata/clg-logo/EduSpace_img.png", 
   bannerUrl: "", 
   collegeName: "Institute of Engineering Management Kolkata",
   useDefaultFooter: false

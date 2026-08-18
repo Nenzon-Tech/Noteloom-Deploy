@@ -167,7 +167,7 @@ const AddEditContentPage = () => {
                     itUser?.role === 'eduspace_admin' ? 'bg-red-600' : 'bg-orange-600'
                   }`}>
                     <Shield className="w-4 h-4 mr-2" />
-                    {itUser?.role === 'eduspace_admin' ? 'Note Loom Admin' : 'Note Loom Manager'}
+                    {itUser?.role === 'eduspace_admin' ? 'EduSpace Admin' : 'EduSpace Manager'}
                   </span>
                 </div>
                 

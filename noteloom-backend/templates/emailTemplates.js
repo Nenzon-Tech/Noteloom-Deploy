@@ -20,13 +20,13 @@ const getVerificationEmailHtml = (code) => {
     <body>
       <div class="container">
         <div class="header">
-          <h1>🎓 Note Loom</h1>
+          <h1>🎓 EduSpace</h1>
           <p>Exams Made Simple</p>
         </div>
         <div class="content">
           <h2>Sign Up - Email Verification Required</h2>
           <p>Hello!</p>
-          <p>Thank you for signing up with Note Loom. To complete your registration, please use the verification code below:</p>
+          <p>Thank you for signing up with EduSpace. To complete your registration, please use the verification code below:</p>
           
           <div class="verification-code">${code}</div>
           
@@ -40,10 +40,10 @@ const getVerificationEmailHtml = (code) => {
             </ul>
           </div>
           
-          <p>Best regards,<br><strong>The Note Loom Team</strong></p>
+          <p>Best regards,<br><strong>The EduSpace Team</strong></p>
         </div>
         <div class="footer">
-          <p>© 2025 Note Loom. All rights reserved.</p>
+          <p>© 2025 EduSpace. All rights reserved.</p>
         </div>
       </div>
     </body>
@@ -68,7 +68,7 @@ const getOverdueBookAlertHtml = (studentName, bookTitle, copyId, dueDate, daysOv
     <body>
       <div class="container">
         <div class="header">
-          <h1>🎓 Note Loom Library</h1>
+          <h1>🎓 EduSpace Library</h1>
           <p>Overdue Book Notice</p>
         </div>
         <div class="content">
@@ -85,10 +85,10 @@ const getOverdueBookAlertHtml = (studentName, bookTitle, copyId, dueDate, daysOv
           
           <p>Fines accumulate daily at a rate of ₹10/day. Please contact the library administrator to return the book and settle the fine.</p>
           
-          <p>Best regards,<br><strong>Note Loom Library Administrator</strong></p>
+          <p>Best regards,<br><strong>EduSpace Library Administrator</strong></p>
         </div>
         <div class="footer">
-          <p>© 2026 Note Loom. All rights reserved.</p>
+          <p>© 2026 EduSpace. All rights reserved.</p>
         </div>
       </div>
     </body>

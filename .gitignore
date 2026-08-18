@@ -67,6 +67,18 @@ Thumbs.db
 **/public/webdata/uploads/
 **/uploads/
 
+# Local OCR language data
+tesseract_data/
+**/tesseract_data/
+*.traineddata
+
+# Vercel
+.vercel/
+**/.vercel/
+
+# Local cleanup backup
+/unused-backup/
+
 # Documents/Report files
 *.docx
 *.pdf

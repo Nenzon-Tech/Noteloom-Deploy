@@ -44,12 +44,12 @@ const ITDashboardFooter = () => {
     }`}>
       <div className="max-w-7xl mx-auto">
         <div className="flex flex-col md:flex-row justify-between items-center space-y-2 md:space-y-0">
-          {/* Left side - Note Loom Beta */}
+          {/* Left side - EduSpace Beta */}
           <div className="flex items-center space-x-2">
             <span className={`text-sm font-medium ${
               isDarkMode ? 'text-white' : 'text-gray-900'
             }`}>
-              Note Loom Beta
+              EduSpace Beta
             </span>
             <span className={`text-xs ${
               isDarkMode ? 'text-gray-400' : 'text-gray-600'

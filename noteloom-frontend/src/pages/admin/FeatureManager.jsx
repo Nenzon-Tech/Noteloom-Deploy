@@ -28,7 +28,7 @@ const FeatureManager = () => {
     college_admin: []
   });
 
-  const isSystemTenant = (tenant) => tenant?.name === 'Note Loom System';
+  const isSystemTenant = (tenant) => tenant?.name === 'EduSpace System';
 
   // 1. Fetch Tenants
   useEffect(() => {

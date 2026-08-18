@@ -41,12 +41,12 @@ EduSpace is a state-of-the-art, secure, multi-tenant Software-as-a-Service (SaaS
 *   **Speech-to-Text Video Transcription**: Transcribes lecture videos using Whisper model fallbacks if direct video parsing limits are reached.
 
 ### 8. 📱 React Native Mobile App (Android)
-*   **Expo Router + NativeWind**: The `eduspace-mobile` folder is a cross-platform React Native app built on Expo SDK 57, React Native 0.86, and Tailwind via NativeWind v4.
+*   **Expo Router + NativeWind**: The `noteloom-mobile` folder is a cross-platform React Native app built on Expo SDK 57, React Native 0.86, and Tailwind via NativeWind v4.
 *   **Role-Based Portals**: Dedicated Student, Faculty, College Admin, and IT Admin experiences with protected routes, bottom tab navigation, and biometric (face-ID / fingerprint) unlock via SecureStore.
 *   **Full Academic Suite**: Dashboard, attendance, timetable, academic calendar, leave requests, results, fees & payment history, exam (COE) portal with QR admit cards, library, notice board, feedback, AI study assistant chat, and AI PDF summarizer.
 *   **Video-First LMS**: Lecture modules with `expo-video` streaming, content progress tracking, and downloadable course material.
 *   **Theming**: Central `ThemeContext` with a global gradient design system and reusable UI components under `components/ui`.
-*   **Latest Build (v1.0.1)**: Rebuilt video player on the native `expo-video` engine, smoother lecture streaming, upgraded Expo SDK dependencies, version bumped to 1.0.1 (versionCode 2) — see `RELEASE_NOTES_v1.0.1.md`.
+*   **Latest Build (v1.0.1)**: Rebuilt video player on the native `expo-video` engine, smoother lecture streaming, upgraded Expo SDK dependencies, version bumped to 1.0.1 (versionCode 2).
 
 ---
 
@@ -201,7 +201,7 @@ graph TD
 
 ### Prerequisite Environment Variables
 
-Create a `.env` file in the root of the **`eduspace-backend`** folder using the following schema:
+Create a `.env` file in the root of the **`noteloom-backend`** folder using the following schema:
 
 ```env
 MONGODB_URI=your_mongodb_connection_string
@@ -226,7 +226,7 @@ CLOUDINARY_API_KEY=your_cloudinary_api_key
 CLOUDINARY_API_SECRET=your_cloudinary_api_secret
 ```
 
-Create a `.env` file in the root of the **`eduspace-frontend`** folder using the following schema:
+Create a `.env` file in the root of the **`noteloom-frontend`** folder using the following schema:
 
 ```env
 VITE_API_BASE=http://localhost:4000
@@ -236,13 +236,13 @@ VITE_API_BASE=http://localhost:4000
 
 1.  **Clone the Repository**:
     ```bash
-    git clone https://github.com/Nenzon-Tech/EduSpace-Deploy.git
-    cd EduSpace-Deploy
+    git clone https://github.com/Nenzon-Tech/Noteloom-Deploy.git
+    cd Noteloom-Deploy
     ```
 
 2.  **Start the Backend API Server**:
     ```bash
-    cd eduspace-backend
+    cd noteloom-backend
     npm install
     # Seed default SaaS config and IT administrators
     npm run seed
@@ -251,7 +251,7 @@ VITE_API_BASE=http://localhost:4000
 
 3.  **Start the Frontend App**:
     ```bash
-    cd ../eduspace-frontend
+    cd ../noteloom-frontend
     npm install
     npm run dev
     ```
@@ -262,10 +262,10 @@ VITE_API_BASE=http://localhost:4000
 
 ### Running the Mobile App (Android / Expo)
 
-The mobile app lives in the **`eduspace-mobile`** folder. It talks to the same EduSpace backend API.
+The mobile app lives in the **`noteloom-mobile`** folder. It talks to the same EduSpace backend API.
 
 ```bash
-cd eduspace-mobile
+cd noteloom-mobile
 npm install --legacy-peer-deps
 
 # Start the Expo dev server
@@ -278,10 +278,10 @@ npm run android    # or: npx expo run:android
 npx eas build --platform android
 ```
 
-Create a `.env` in `eduspace-mobile` pointing at your backend:
+Create a `.env` in `noteloom-mobile` pointing at your backend:
 
 ```env
 EXPO_PUBLIC_API_BASE=http://localhost:4000
 ```
 
-> Full release notes for the latest build are in `RELEASE_NOTES_v1.0.1.md`.
+> Full release notes for the latest build are in `RELEASE_NOTES_v2.2.5.md`.

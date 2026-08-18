@@ -131,7 +131,7 @@ const ITAdminDashboard = () => {
   };
 
   const handleToggleCollegeStatus = async (id, currentStatus, name) => {
-    if (name === 'EduSpace System' || name === 'Note Loom System') return alert("Cannot disable System Tenant");
+    if (name === 'EduSpace System') return alert("Cannot disable System Tenant");
     const newStatus = currentStatus === 'active' ? 'suspended' : 'active';
     if (!confirm(`Are you sure you want to ${newStatus === 'active' ? 'Enable' : 'Disable'} this college?`)) return;
 
@@ -151,7 +151,7 @@ const ITAdminDashboard = () => {
 
   const handleDeleteCollege = async (id, name) => {
     if (itUser.role !== 'eduspace_admin') return alert("Only Admin can delete.");
-    if (name === 'EduSpace System' || name === 'Note Loom System') return alert("Cannot delete System Tenant");
+    if (name === 'EduSpace System') return alert("Cannot delete System Tenant");
     if (!confirm(`WARNING: This will suspend the college and schedule permanent deletion in 3 MONTHS.\n\nAre you sure?`)) return;
 
     try {
@@ -433,7 +433,7 @@ const ITAdminDashboard = () => {
                     <div>
                       <div className="flex items-center gap-2">
                         <h4 className="font-bold text-lg">{college.name}</h4>
-                        {college.name === 'Note Loom System' && <span className="text-xs bg-blue-900 text-blue-200 px-2 rounded">SYSTEM HQ</span>}
+                        {college.name === 'EduSpace System' && <span className="text-xs bg-blue-900 text-blue-200 px-2 rounded">SYSTEM HQ</span>}
                       </div>
                       <div className="text-sm opacity-70">
                         Code: <span className="font-mono">{college.collegeCode}</span> • Status: <span className={college.status === 'active' ? 'text-green-400 font-bold' : 'text-red-400 font-bold'}>{college.status.toUpperCase()}</span>
@@ -442,7 +442,7 @@ const ITAdminDashboard = () => {
                     </div>
                   </div>
 
-                  {college.name !== 'Note Loom System' && (
+                  {college.name !== 'EduSpace System' && (
                     <div className="flex items-center space-x-3">
                       {/* NEW EDIT BUTTON */}
 <button

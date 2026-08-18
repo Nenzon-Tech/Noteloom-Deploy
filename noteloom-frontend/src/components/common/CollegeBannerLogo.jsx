@@ -27,10 +27,12 @@ const CollegeBannerLogo = ({ className = "" }) => {
           }}
         />
       ) : (
-        /* ✅ Gradient fallback text */
-        <span className="text-xl font-bold tracking-tight bg-gradient-to-r from-indigo-600 to-fuchsia-600 bg-clip-text text-transparent select-none">
-          EduSpace
-        </span>
+        /* ✅ EduSpace brand logo fallback */
+        <img
+          src="/webdata/clg-logo/Eduspace_name_logo.png"
+          alt="EduSpace"
+          className="h-8 w-auto max-w-32 object-contain"
+        />
       )}
     </div>
   );

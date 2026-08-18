@@ -18,7 +18,7 @@ const CollegeDashboardFooter = () => {
     }`}>
       <div className="max-w-7xl mx-auto">
         <div className="flex flex-col md:flex-row justify-between items-center space-y-2 md:space-y-0">
-          {/* Left side - College/Note Loom Logo */}
+          {/* Left side - College/EduSpace Logo */}
           <div className="flex items-center gap-2">
   {/* Dynamic logo OR fallback gradient text */}
   <CollegeBannerLogo className="scale-90" />
@@ -29,7 +29,7 @@ const CollegeDashboardFooter = () => {
       isDarkMode ? 'text-gray-400' : 'text-gray-600'
     }`}
   >
-    Powered by Note Loom
+    Powered by EduSpace
   </span>
 </div>
 
@@ -46,7 +46,7 @@ const CollegeDashboardFooter = () => {
             <span className={`${
               isDarkMode ? 'text-gray-500' : 'text-gray-400'
             }`}>
-              © 2026 Note Loom
+              © 2026 EduSpace
             </span>
           </div>
         </div>

@@ -13,9 +13,9 @@ const emailTransporter = nodemailer.createTransport({
 const sendEmail = async (email, code) => {
   try {
     const mailOptions = {
-      from: `"Note Loom" <${process.env.EMAIL_USER}>`,
+      from: `"EduSpace" <${process.env.EMAIL_USER}>`,
       to: email,
-      subject: `Note Loom - Sign Up Email Verification Code`,
+      subject: `EduSpace - Sign Up Email Verification Code`,
       html: getVerificationEmailHtml(code)
     };
 
@@ -31,7 +31,7 @@ const sendEmail = async (email, code) => {
 const sendOverdueBookEmail = async (email, studentName, bookTitle, copyId, dueDate, daysOverdue, fineAmount) => {
   try {
     const mailOptions = {
-      from: `"Note Loom Library" <${process.env.EMAIL_USER}>`,
+      from: `"EduSpace Library" <${process.env.EMAIL_USER}>`,
       to: email,
       subject: `⚠️ Library Notice: Overdue Book Alert [${bookTitle}]`,
       html: getOverdueBookAlertHtml(studentName, bookTitle, copyId, dueDate, daysOverdue, fineAmount)

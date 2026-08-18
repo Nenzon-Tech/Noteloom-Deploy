@@ -38,7 +38,7 @@ useEffect(() => {
         location: college.location || "Location Not Set", 
         category: college.category || (college.type === 'college' ? 'Engineering' : 'University'),
         collegeCode: college.collegeCode || "0000",
-        logoUrl: college.logoUrl || "/webdata/clg-logo/Note-Loom.svg",
+        logoUrl: college.logoUrl || "/webdata/clg-logo/EduSpace_img.png",
         // Strictly check for true to ensure the star badge persists
         featured: college.featured === true 
       }));

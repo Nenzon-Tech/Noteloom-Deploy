@@ -1,6 +1,6 @@
-﻿# 🖥️ Note Loom — Backend Server API
+﻿# 🖥️ EduSpace — Backend Server API
 
-The backend for the **Note Loom** multi-tenant college management platform. It provides a RESTful API built on **Node.js, Express, and MongoDB (Mongoose)**, powered by Google Gemini and Cloudflare AI services.
+The backend for the **EduSpace** multi-tenant college management platform. It provides a RESTful API built on **Node.js, Express, and MongoDB (Mongoose)**, powered by Google Gemini and Cloudflare AI services.
 
 The codebase implements a clean **MVC / Clean Layered Architecture** model, separating HTTP routing from core controller logic, data schemas, and third-party integrations.
 

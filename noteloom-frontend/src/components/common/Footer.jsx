@@ -28,7 +28,11 @@ const Footer = () => {
           <div className="lg:col-span-2 flex flex-col justify-between">
             <div>
               <div className="flex items-center space-x-2 mb-6">
-                <span className="text-xl font-bold">Note Loom</span>
+                <img
+                  src="/webdata/clg-logo/Eduspace_name_logo.png"
+                  alt="EduSpace"
+                  className="h-8 w-auto object-contain"
+                />
               </div>
               <p className={`mb-6 leading-relaxed text-sm sm:text-base ${
                 isDarkMode ? 'text-gray-300' : 'text-gray-600'
@@ -145,7 +149,7 @@ const Footer = () => {
             <div className={`text-xs sm:text-sm flex items-center text-center md:text-left ${
               isDarkMode ? 'text-gray-400' : 'text-gray-600'
             }`}>
-              <span>© 2026 Note Loom. All rights reserved.</span>
+              <span>© 2026 EduSpace. All rights reserved.</span>
             </div>
             
             <div className="flex flex-wrap justify-center gap-4 text-xs sm:text-sm">

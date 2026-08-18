@@ -40,7 +40,7 @@ exports.getPublicColleges = async (req, res) => {
     const colleges = await Tenant.find({
       type: 'college',
       status: 'active',
-      name: { $ne: 'Note Loom System' }
+      name: { $ne: 'EduSpace System' }
     }).sort({ name: 1 });
 
     res.json(colleges);
@@ -145,7 +145,7 @@ exports.getColleges = async (req, res) => {
   try {
     const colleges = await Tenant.find({ 
       type: 'college',
-      name: { $ne: 'Note Loom System' }
+      name: { $ne: 'EduSpace System' }
     }).sort({ createdAt: -1 });
     res.json(colleges);
   } catch (error) { res.status(500).json({ error: 'Fetch failed' }); }
@@ -198,7 +198,7 @@ exports.createCollege = async (req, res) => {
 exports.updateCollegeStatus = async (req, res) => {
   try {
     const tenant = await Tenant.findById(req.params.id);
-    if (tenant.name === 'Note Loom System') return res.status(403).json({ error: 'Protected' });
+    if (tenant.name === 'EduSpace System') return res.status(403).json({ error: 'Protected' });
 
     tenant.status = req.body.status;
     if (req.body.status === 'active') tenant.deletionScheduledAt = null;
@@ -215,7 +215,7 @@ exports.deleteCollege = async (req, res) => {
     }
 
     const tenant = await Tenant.findById(req.params.id);
-    if (tenant.name === 'Note Loom System') return res.status(403).json({ error: 'Protected' });
+    if (tenant.name === 'EduSpace System') return res.status(403).json({ error: 'Protected' });
 
     tenant.status = 'suspended';
     tenant.deletionScheduledAt = new Date(Date.now() + 90 * 24 * 60 * 60 * 1000);
@@ -265,7 +265,7 @@ exports.getTenantsList = async (req, res) => {
   try {
     const tenants = await Tenant.find({ 
       status: { $ne: 'deleted' },
-      name: { $ne: 'Note Loom System' }
+      name: { $ne: 'EduSpace System' }
     }, '_id name type status logoUrl').sort({ name: 1 });
 
     res.json(tenants);

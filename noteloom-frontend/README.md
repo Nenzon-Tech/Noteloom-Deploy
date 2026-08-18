@@ -1,10 +1,10 @@
-﻿# 🎓 Note Loom — College Management Platform
+﻿# 🎓 EduSpace — College Management Platform
 
-**Note Loom** is a full-stack, multi-tenant college management platform that covers academics, examinations, attendance, library management, AI-powered study tools, and a complete internal IT administration panel — all under a single unified system.
+**EduSpace** is a full-stack, multi-tenant college management platform that covers academics, examinations, attendance, library management, AI-powered study tools, and a complete internal IT administration panel — all under a single unified system.
 
 This is a Beta build it's prone to bugs and dosen't represents the final built.
 
-Copyright &copy; 2026 Note Loom. All Rights Reserved.
+Copyright &copy; 2026 EduSpace. All Rights Reserved.
 
 ---
 
@@ -30,11 +30,11 @@ Copyright &copy; 2026 Note Loom. All Rights Reserved.
 
 ## 🧠 Project Overview
 
-Note Loom is designed to serve **multiple colleges simultaneously** using a multi-tenant architecture. Each college (tenant) is isolated — their students, faculty, data, and features are completely separate from other colleges on the same platform.
+EduSpace is designed to serve **multiple colleges simultaneously** using a multi-tenant architecture. Each college (tenant) is isolated — their students, faculty, data, and features are completely separate from other colleges on the same platform.
 
 The platform has **three user-facing portals**:
 - **College Portal** — for Students, Faculty, and College Admins
-- **IT Portal** — for Note Loom system administrators (EduSpace Admins & Managers)
+- **IT Portal** — for EduSpace system administrators (EduSpace Admins & Managers)
 - **AI Assistant** — embedded within the college portal, powered by Google Gemini + Cloudflare AI
 
 ---
@@ -499,5 +499,5 @@ Open the link outputted in your terminal (typically `http://localhost:5173`) in 
 ## 👤 Author
 
 **Shuvankar**  
-Project: Note Loom - Beta  
+Project: EduSpace - Beta  
 Version: `V1.1.0` (Architectural Refactoring Update)

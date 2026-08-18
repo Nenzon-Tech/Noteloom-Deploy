@@ -390,7 +390,7 @@ exports.getPublicColleges = async (req, res) => {
     const colleges = await Tenant.find({
       type: 'college',
       status: 'active',
-      name: { $ne: 'Note Loom System' }
+      name: { $ne: 'EduSpace System' }
     }).sort({ name: 1 });
 
     res.json(colleges);

@@ -177,15 +177,15 @@ async function seedData() {
       { 
         type: 'college',
         subdomain: 'iem-kolkata',
-        logoUrl: 'webdata/clg-logo/IEM-Kolkata.png',
+        logoUrl: 'webdata/clg-logo/EduSpace_img.png',
         collegeCode: '1001'
       },
       { upsert: true, new: true }
     );
 
-    // B. Note Loom System (HQ)
+    // B. EduSpace System (HQ)
     const sysTenant = await Tenant.findOneAndUpdate(
-      { name: 'Note Loom System' },
+      { name: 'EduSpace System' },
       { 
         type: 'college',
         subdomain: 'sys-admin',
@@ -212,8 +212,8 @@ async function seedData() {
     const adminUser = await upsertUser('admin@email.in', 'College Admin', hashedPassword);
     
     // IT Users
-    const eduspaceAdmin = await upsertUser('admin@eduspace.in', 'Note Loom Admin', itHashedPassword);
-    const eduspaceManager = await upsertUser('manager@eduspace.in', 'Note Loom Manager', itHashedPassword);
+    const eduspaceAdmin = await upsertUser('admin@eduspace.in', 'EduSpace Admin', itHashedPassword);
+    const eduspaceManager = await upsertUser('manager@eduspace.in', 'EduSpace Manager', itHashedPassword);
 
     // --- 5. MANAGE MEMBERSHIPS (Upsert) ---
     console.log('🎟️ Verifying Memberships...');

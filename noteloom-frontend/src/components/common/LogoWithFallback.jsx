@@ -5,9 +5,9 @@ const LogoWithFallback = ({ collegeLogoUrl, collegeName, className, fallbackClas
   const [logoError, setLogoError] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
-  // Default Note Loom logo URL
+  // Default EduSpace logo URL
   // Ensure this path matches where your static assets are served from
-  const noteLoomLogoUrl = "/webdata/clg-logo/Note-Loom.svg";
+  const eduspaceLogoUrl = "/webdata/clg-logo/EduSpace_img.png";
 
   const handleLogoError = () => {
     setLogoError(true);
@@ -46,8 +46,8 @@ const LogoWithFallback = ({ collegeLogoUrl, collegeName, className, fallbackClas
         />
       ) : (
         <img
-          src={noteLoomLogoUrl}
-          alt="Note Loom Logo"
+          src={eduspaceLogoUrl}
+          alt="EduSpace Logo"
           className={`${fallbackClassName || className} opacity-100 transition-opacity duration-300`}
           onLoad={() => setIsLoading(false)}
           onError={() => setIsLoading(false)}
