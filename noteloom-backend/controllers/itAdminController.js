@@ -1,4 +1,4 @@
-const bcrypt = require('bcryptjs');
+﻿const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
 // Models
@@ -12,7 +12,7 @@ const CollegeRoleConfig = require('../models/CollegeRoleConfig');
 const ITUserProfile = require('../models/ITUserProfile');
 const CollegeAdminRequest = require('../models/CollegeAdminRequest');
 const SystemConfig = require('../models/SystemConfig');
-const NoteloomManagerRequest = require('../models/NoteloomManagerRequest');
+const EduSpaceManagerRequest = require('../models/EduSpaceManagerRequest');
 const masterFeatures = require('../config/masterFeatures');
 
 const JWT_SECRET = process.env.JWT_SECRET;
@@ -77,8 +77,8 @@ exports.login = async (req, res) => {
 
     // Normalize Role for Frontend
     let frontendRole = membership.role;
-    if (membership.role === 'it_admin') frontendRole = 'noteloom_admin';
-    if (membership.role === 'it_user')  frontendRole = 'noteloom_manager';
+    if (membership.role === 'it_admin') frontendRole = 'eduspace_admin';
+    if (membership.role === 'it_user')  frontendRole = 'eduspace_manager';
 
     // Create Session
     const sessionToken = jwt.sign(
@@ -153,7 +153,7 @@ exports.getColleges = async (req, res) => {
 
 exports.createCollege = async (req, res) => {
   try {
-    if (req.itUser.role !== 'noteloom_admin') {
+    if (req.itUser.role !== 'eduspace_admin') {
       return res.status(403).json({ error: 'Access Denied: Only Admin can create colleges.' });
     }
 
@@ -210,7 +210,7 @@ exports.updateCollegeStatus = async (req, res) => {
 
 exports.deleteCollege = async (req, res) => {
   try {
-    if (req.itUser.role !== 'noteloom_admin') {
+    if (req.itUser.role !== 'eduspace_admin') {
       return res.status(403).json({ error: 'Access Denied: Only Admin can delete colleges.' });
     }
 
@@ -238,22 +238,22 @@ exports.getCollegeRequests = async (req, res) => {
 
 exports.getManagerRequests = async (req, res) => {
   try {
-    if (req.itUser.role !== 'noteloom_admin') return res.status(403).json({ error: 'Access Denied' });
-    const requests = await NoteloomManagerRequest.find().sort({ createdAt: -1 });
+    if (req.itUser.role !== 'eduspace_admin') return res.status(403).json({ error: 'Access Denied' });
+    const requests = await EduSpaceManagerRequest.find().sort({ createdAt: -1 });
     res.json(requests);
   } catch (e) { res.status(500).json({ error: 'Error' }); }
 };
 
 exports.getUsers = async (req, res) => {
   try {
-    if (req.itUser.role !== 'noteloom_admin') return res.status(403).json({ error: 'Access Denied' });
+    if (req.itUser.role !== 'eduspace_admin') return res.status(403).json({ error: 'Access Denied' });
 
     const profiles = await ITUserProfile.find().populate('userId', 'name email role');
     const users = profiles.map(p => ({
       _id: p.userId?._id,
       name: p.userId?.name || 'Unknown',
       email: p.userId?.email || 'No Email',
-      role: p.userId?.role === 'it_admin' ? 'noteloom_admin' : 'noteloom_manager',
+      role: p.userId?.role === 'it_admin' ? 'eduspace_admin' : 'eduspace_manager',
       uid: p.uid
     }));
 
@@ -317,7 +317,7 @@ exports.getMenuConfig = async (req, res) => {
 
 exports.saveMenuConfig = async (req, res) => {
   try {
-    if (req.itUser.role !== 'noteloom_admin') {
+    if (req.itUser.role !== 'eduspace_admin') {
       return res.status(403).json({ error: 'Only Admin can change features.' });
     }
 

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+﻿import React, { useEffect, useState } from 'react';
 import { View, Text, Pressable, Switch, StyleSheet } from 'react-native';
 import { useRouter } from 'expo-router';
 import * as LocalAuthentication from 'expo-local-authentication';
@@ -59,7 +59,7 @@ export default function Profile() {
 
   const handleSignOut = async () => { await logout(); router.replace('/college-selection'); };
 
-  const name = user?.name || 'NoteLoom User';
+  const name = user?.name || 'EduSpace User';
   const roleLabel = profile?.role === 'faculty' ? 'Faculty' : profile?.role === 'college_admin' ? 'Admin' : 'Student';
   const uid = user?.uid || profile?.college || 'N/A';
   const college = profile?.college || 'Note Loom';
@@ -97,7 +97,7 @@ export default function Profile() {
             icon={<Fingerprint size={17} color="#2563eb" />}
             iconBg="rgba(59,130,246,0.12)"
             title="Biometric Login"
-            subtitle="Unlock NoteLoom with fingerprint at launch"
+            subtitle="Unlock EduSpace with fingerprint at launch"
             trailing={<Switch value={biometricEnabled} onValueChange={handleToggleBiometric} trackColor={{ false: theme.border, true: theme.violet }} thumbColor="#fff" />}
           />
           <LRow
@@ -122,7 +122,7 @@ export default function Profile() {
             last
           />
         </ListCard>
-        <Text style={[styles.version, { color: theme.faint }]}>NoteLoom App v1.0.1 · Beta</Text>
+        <Text style={[styles.version, { color: theme.faint }]}>EduSpace App v1.0.1 · Beta</Text>
       </Screen>
       <BottomNav />
     </View>

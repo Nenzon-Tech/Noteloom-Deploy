@@ -1,4 +1,4 @@
-import { API_BASE } from '@/utils/config';
+﻿import { API_BASE } from '@/utils/config';
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -254,7 +254,7 @@ const MarkAttendance = () => {
         const tableBody = data.map(student => {
           const percentage = maxAttendance === 0 ? 0 : ((student.presentCount / maxAttendance) * 100).toFixed(1);
           return [
-            student.username, // Noteloom ID
+            student.username, // EduSpace ID
             student.name,
             student.presentCount,
             `${percentage}%` // Relative %
@@ -409,7 +409,7 @@ const MarkAttendance = () => {
       const res = await fetch(`${API_BASE}/api/batches/${managingBatch._id}/enroll`, {
         method: 'POST',
         headers: { 'Authorization': `Bearer ${localStorage.getItem('sessionToken')}`, 'Content-Type': 'application/json' },
-        body: JSON.stringify({ noteloomId: newStudentId })
+        body: JSON.stringify({ eduspaceId: newStudentId })
       });
       const data = await res.json();
       if (res.ok) {
@@ -628,7 +628,7 @@ const MarkAttendance = () => {
                         </div>
                         <div>
                           <h3 className="font-bold">{student.name}</h3>
-                          {/* Showing Noteloom ID (Username) */}
+                          {/* Showing EduSpace ID (Username) */}
                           <p className="text-xs font-mono opacity-60 bg-gray-500/10 px-1.5 py-0.5 rounded w-fit mt-0.5">
                             ID: {student.username}
                           </p>
@@ -739,7 +739,7 @@ const MarkAttendance = () => {
                     </div>
                     <div className={`p-6 border-b ${isDarkMode ? 'border-gray-800 bg-gray-800/50' : 'border-gray-100 bg-gray-50'}`}>
                         <div className="flex gap-2">
-                            <div className="relative flex-1"><Search className="absolute left-3 top-3 w-4 h-4 opacity-40"/><input placeholder="Enter Noteloom ID (Username)" value={newStudentId} onChange={e => setNewStudentId(e.target.value)} className={`w-full pl-10 p-2.5 rounded-xl border outline-none ${isDarkMode ? 'bg-gray-900 border-gray-700' : 'bg-white border-gray-300'}`}/></div>
+                            <div className="relative flex-1"><Search className="absolute left-3 top-3 w-4 h-4 opacity-40"/><input placeholder="Enter EduSpace ID (Username)" value={newStudentId} onChange={e => setNewStudentId(e.target.value)} className={`w-full pl-10 p-2.5 rounded-xl border outline-none ${isDarkMode ? 'bg-gray-900 border-gray-700' : 'bg-white border-gray-300'}`}/></div>
                             <button onClick={handleEnrollStudent} disabled={actionLoading} className={`px-4 py-2 rounded-xl font-bold text-white transition-all ${actionLoading ? 'bg-purple-400' : 'bg-purple-600 hover:bg-purple-500'}`}>{actionLoading ? 'Adding...' : 'Enroll'}</button>
                         </div>
                     </div>

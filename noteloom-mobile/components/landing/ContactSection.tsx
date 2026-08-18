@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+﻿import React, { useState } from 'react';
 import {
   View, Text, TextInput, TouchableOpacity, StyleSheet,
   KeyboardAvoidingView, Platform,
@@ -15,8 +15,8 @@ const benefits = [
 ];
 
 const faqs = [
-  { question: 'How do I get my college on NoteLoom?', answer: 'Contact our team via the form or email us at support@noteloom.in. We will guide you through the onboarding process.' },
-  { question: 'Is NoteLoom free for students?', answer: 'Yes! NoteLoom is completely free for students. Institutions subscribe to provide access to their students.' },
+  { question: 'How do I get my college on EduSpace?', answer: 'Contact our team via the form or email us at support@eduspace.in. We will guide you through the onboarding process.' },
+  { question: 'Is EduSpace free for students?', answer: 'Yes! EduSpace is completely free for students. Institutions subscribe to provide access to their students.' },
   { question: 'What features are available?', answer: 'AI-powered learning tools, attendance management, examination portal, document vault, analytics, and campus notices.' },
 ];
 
@@ -26,7 +26,7 @@ export const ContactSection = () => {
   const [form, setForm] = useState({ name: '', email: '', subject: '', message: '' });
 
   const handleSubmit = () => {
-    triggerPopup('Contact form is under maintenance. Please email us at support@noteloom.in', 'info');
+    triggerPopup('Contact form is under maintenance. Please email us at support@eduspace.in', 'info');
     setForm({ name: '', email: '', subject: '', message: '' });
   };
 
@@ -101,7 +101,7 @@ export const ContactSection = () => {
         <View style={styles.contactLinks}>
           <View style={styles.contactLink}>
             <Mail size={14} color="#7c3aed" />
-            <Text style={[styles.contactText, { color: isDarkMode ? '#d1d5db' : '#4b5563' }]}>support@noteloom.in</Text>
+            <Text style={[styles.contactText, { color: isDarkMode ? '#d1d5db' : '#4b5563' }]}>support@eduspace.in</Text>
           </View>
           <View style={styles.contactLink}>
             <Phone size={14} color="#7c3aed" />

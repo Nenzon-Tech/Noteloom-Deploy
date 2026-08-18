@@ -1,5 +1,5 @@
-/**
- * NoteLoom Request Validation Middleware (Zod)
+﻿/**
+ * EduSpace Request Validation Middleware (Zod)
  */
 const validate = (schema) => (req, res, next) => {
   try {

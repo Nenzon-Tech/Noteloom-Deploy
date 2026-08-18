@@ -1,5 +1,5 @@
-/**
- * NoteLoom Backend — Feature E2E Flow Test
+﻿/**
+ * EduSpace Backend — Feature E2E Flow Test
  *
  * Verifies the REAL create → consume flows the app depends on:
  *   1. Faculty creates a classroom
@@ -83,7 +83,7 @@ function assert(condition, message) {
 
 // ─── Signup helpers ──────────────────────────────────────────────────────────
 async function signup(role, extra) {
-  const email = `e2e_${role}_${TS}@noteloom-e2e.com`;
+  const email = `e2e_${role}_${TS}@eduspace-e2e.com`;
   const base = {
     email, password: 'Password@123',
     fullName: `E2E ${role}`,
@@ -276,7 +276,7 @@ async function cleanup() {
 // ─── MAIN ─────────────────────────────────────────────────────────────────────
 async function main() {
   console.log(`\n${'═'.repeat(60)}`);
-  console.log(`${BOLD}  NoteLoom Backend — Feature E2E Flow Test${RESET}`);
+  console.log(`${BOLD}  EduSpace Backend — Feature E2E Flow Test${RESET}`);
   console.log('  Target: ' + BASE_URL);
   console.log('  College: ' + COLLEGE_CODE);
   console.log(`${'═'.repeat(60)}`);
@@ -292,18 +292,18 @@ async function main() {
     const { uid } = await signup('faculty', { department: 'Physics', designation: 'Professor', qualification: 'Ph.D', employeeId: `FAC-E2E-${TS}` });
     state.facultyUid = uid;
   });
-  await test('Sign in faculty', async () => { state.facultyToken = await signin(`e2e_faculty_${TS}@noteloom-e2e.com`, 'faculty'); });
+  await test('Sign in faculty', async () => { state.facultyToken = await signin(`e2e_faculty_${TS}@eduspace-e2e.com`, 'faculty'); });
 
   await test('Sign up student', async () => {
     const { uid } = await signup('student', { phoneNumber: '9876543210', gender: 'Male', admissionYear: 2025, course: 'B.Tech', stream: 'Computer Science & Engineering', year: '2nd', rollNo: `E2E-${TS}`, currentSemester: 3 });
     state.studentUid = uid;
   });
-  await test('Sign in student', async () => { state.studentToken = await signin(`e2e_student_${TS}@noteloom-e2e.com`, 'student'); });
+  await test('Sign in student', async () => { state.studentToken = await signin(`e2e_student_${TS}@eduspace-e2e.com`, 'student'); });
 
   await test('Sign up college admin', async () => {
     await signup('college_admin', { adminLevel: 'College Admin', employeeId: `ADM-E2E-${TS}`, responsibilities: 'System Administration' });
   });
-  await test('Sign in college admin', async () => { state.adminToken = await signin(`e2e_college_admin_${TS}@noteloom-e2e.com`, 'college_admin'); });
+  await test('Sign in college admin', async () => { state.adminToken = await signin(`e2e_college_admin_${TS}@eduspace-e2e.com`, 'college_admin'); });
 
   if (failed > 0) {
     console.log(`\n${RED} Aborting: sign-in phase failed${RESET}`);

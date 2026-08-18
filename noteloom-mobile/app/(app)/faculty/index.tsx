@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+﻿import React, { useState, useEffect, useCallback } from 'react';
 import { View, Text, Pressable, StyleSheet } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Sun, Moon, LogOut, BookOpen, ClipboardCheck, Megaphone, Bot, Check, Loader } from 'lucide-react-native';
@@ -83,7 +83,7 @@ export default function FacultyHome() {
     { key: 'classes', label: 'My Classes', sub: `${batches.length} batches`, gradient: ['#3b82f6', '#6366f1'] as [string, string], icon: <BookOpen size={18} color="#fff" />, onPress: () => router.push('/(app)/faculty/classes') },
     { key: 'att', label: 'Attendance', sub: 'Mark now', gradient: ['#10b981', '#0d9488'] as [string, string], icon: <ClipboardCheck size={18} color="#fff" />, onPress: () => router.push('/(app)/faculty/attendance') },
     { key: 'notice', label: 'Notice', sub: 'Faculty desk', gradient: ['#f43f5e', '#e11d48'] as [string, string], icon: <Megaphone size={18} color="#fff" />, onPress: () => router.push('/(app)/faculty/notices') },
-    { key: 'ai', label: 'Noteloom Ai', sub: 'Lesson plan', gradient: ['#a855f7', '#7c3aed'] as [string, string], icon: <Bot size={18} color="#fff" />, onPress: () => router.push('/(app)/ai-chat') },
+    { key: 'ai', label: 'EduSpace Ai', sub: 'Lesson plan', gradient: ['#a855f7', '#7c3aed'] as [string, string], icon: <Bot size={18} color="#fff" />, onPress: () => router.push('/(app)/ai-chat') },
   ];
 
   return (

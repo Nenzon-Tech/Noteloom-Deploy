@@ -1,4 +1,4 @@
-const fs = require('fs');
+﻿const fs = require('fs');
 const path = require('path');
 const os = require('os');
 const axios = require('axios');
@@ -88,7 +88,7 @@ exports.chat = async (req, res) => {
       \`\`\`
     `;
   } else {
-    systemInstruction = `You are Noteloom Ai, a friendly study buddy. User: ${userName}.`;
+    systemInstruction = `You are EduSpace Ai, a friendly study buddy. User: ${userName}.`;
   }
 
   let finalReply = "";

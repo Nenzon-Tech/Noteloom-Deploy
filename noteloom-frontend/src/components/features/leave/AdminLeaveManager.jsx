@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { format } from 'date-fns';
 import { useNavigate } from 'react-router-dom';
@@ -31,7 +31,7 @@ const AdminLeaveManager = () => {
         uid: localStorage.getItem('uid') || localStorage.getItem('username') || 'ADMIN'
     });
 
-    // 2. Fetch fresh session info on mount to get the real NoteLoom ID
+    // 2. Fetch fresh session info on mount to get the real EduSpace ID
 useEffect(() => {
         const fetchSession = async () => {
             try {
@@ -40,7 +40,7 @@ useEffect(() => {
 
                 if (!token) return;
 
-                const res = await axios.get('https://noteloom-api.vercel.app/session/info', { 
+                const res = await axios.get('https://eduspace-api.vercel.app/session/info', { 
                     withCredentials: true,
                     headers: { 
                         // ATTACH THE TOKEN
@@ -83,7 +83,7 @@ useEffect(() => {
     const fetchRequests = async () => {
         const query = `?status=${filter.status}&dept=${filter.dept}&search=${filter.search}`;
         try {
-            const res = await axios.get(`https://noteloom-api.vercel.app/api/leave/admin/requests${query}`);
+            const res = await axios.get(`https://eduspace-api.vercel.app/api/leave/admin/requests${query}`);
             setRequests(res.data);
         } catch(err) { console.error("Error fetching requests"); }
     };
@@ -92,7 +92,7 @@ useEffect(() => {
         const remarks = prompt(`Enter remarks for ${status} (Optional):`, "");
         if (remarks === null) return; 
         
-        await axios.put(`https://noteloom-api.vercel.app/api/leave/admin/action/${id}`, { status, remarks });
+        await axios.put(`https://eduspace-api.vercel.app/api/leave/admin/action/${id}`, { status, remarks });
         fetchRequests(); 
     };
 

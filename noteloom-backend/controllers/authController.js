@@ -1,4 +1,4 @@
-const bcrypt = require('bcryptjs');
+﻿const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const User = require('../models/User'); 
 const StudentProfile = require('../models/StudentProfile');
@@ -181,7 +181,7 @@ exports.roleSignup = async (req, res) => {
       password: hashedPassword, 
       emailVerified: true,
       role: role,
-      noteloomId: generatedUid,
+      eduspaceId: generatedUid,
       department: department || stream || 'General',
       college: tenant.name
     });

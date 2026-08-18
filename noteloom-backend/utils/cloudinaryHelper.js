@@ -1,4 +1,4 @@
-const { cloudinary } = require('../config/cloudinary');
+﻿const { cloudinary } = require('../config/cloudinary');
 
 /**
  * Parses the Cloudinary URL to extract the public ID and deletes it.
@@ -28,9 +28,9 @@ const deleteFromCloudinary = async (url) => {
     
     // Detect resource type
     let resourceType = 'raw'; // Default for documents/PDFs
-    if (url.includes('/noteloom_images/')) {
+    if (url.includes('/eduspace_images/')) {
       resourceType = 'image';
-    } else if (url.includes('/noteloom_videos/')) {
+    } else if (url.includes('/eduspace_videos/')) {
       resourceType = 'video';
     }
     

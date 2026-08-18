@@ -1,4 +1,4 @@
-import React from 'react';
+﻿import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
@@ -15,7 +15,7 @@ export const LandingNavbar = () => {
       <View style={[styles.inner, { backgroundColor: isDarkMode ? 'rgba(15,23,42,0.7)' : 'rgba(255,255,255,0.7)' }]}>
         <TouchableOpacity style={styles.left}>
           <Text style={[styles.logo, { color: isDarkMode ? 'white' : '#111827' }]}>
-            NoteLoom
+            EduSpace
           </Text>
           <View style={styles.betaBadge}>
             <Text style={styles.betaText}>Beta</Text>

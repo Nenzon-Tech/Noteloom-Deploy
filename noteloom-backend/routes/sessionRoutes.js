@@ -1,4 +1,4 @@
-const express = require('express');
+﻿const express = require('express');
 const router = express.Router();
 const Session = require('../models/Session');
 const Membership = require('../models/Membership');
@@ -39,7 +39,7 @@ router.get('/info', async (req, res) => {
       await Session.updateOne({ _id: session._id }, { $set: { lastActivity: new Date() } });
     }
 
-    const systemDbRoles = ['it_admin', 'it_user', 'noteloom_admin', 'noteloom_manager'];
+    const systemDbRoles = ['it_admin', 'it_user', 'eduspace_admin', 'eduspace_manager'];
     const isSystemUser = systemDbRoles.includes(user.role) || session.isSystemSession;
 
     // PATH A: SYSTEM USER
@@ -104,7 +104,7 @@ router.get('/menu', async (req, res) => {
     if (!session) return res.status(401).json({ error: 'Session expired' });
 
     const user = session.userId;
-    const systemDbRoles = ['it_admin', 'it_user', 'noteloom_admin', 'noteloom_manager'];
+    const systemDbRoles = ['it_admin', 'it_user', 'eduspace_admin', 'eduspace_manager'];
     const isSystemUser = systemDbRoles.includes(user.role) || session.isSystemSession;
 
     // System users (IT Admin) don't use this menu endpoint

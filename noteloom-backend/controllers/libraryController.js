@@ -1,4 +1,4 @@
-const { LibraryCredential, DigitalResource, PhysicalBook } = require('../models/Library');
+﻿const { LibraryCredential, DigitalResource, PhysicalBook } = require('../models/Library');
 const User = require('../models/User'); 
 const Membership = require('../models/Membership');
 const StudentProfile = require('../models/StudentProfile');
@@ -220,7 +220,7 @@ exports.getCirculationUser = async (req, res) => {
         const { identifier } = req.params;
 
         let user = await User.findOne({ 
-            $or: [ { email: identifier }, { noteloomId: identifier } ] 
+            $or: [ { email: identifier }, { eduspaceId: identifier } ] 
         });
 
         if (!user) {
@@ -294,7 +294,7 @@ exports.getCirculationUser = async (req, res) => {
                 name: user.name,
                 email: user.email,
                 role: membership.role,
-                noteloomId: profileUid || user.noteloomId || 'N/A',
+                eduspaceId: profileUid || user.eduspaceId || 'N/A',
                 profilePicture: profilePic
             },
             holdings
@@ -364,7 +364,7 @@ exports.checkoutBook = async (req, res) => {
         userId: user._id, 
         name: user.name, 
         email: user.email, 
-        noteloomId: user.noteloomId || 'N/A' 
+        eduspaceId: user.eduspaceId || 'N/A' 
     };
     book.copies[copyIndex].issuedDate = new Date();
     

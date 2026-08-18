@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+﻿import React, { useState, useRef } from 'react';
 import { View, Text, TextInput, Pressable, ScrollView, KeyboardAvoidingView, Platform, ActivityIndicator, StyleSheet } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Send, Bot, X, MessageCircle, GraduationCap, Sparkles, Camera, FileText, Play } from 'lucide-react-native';
@@ -23,7 +23,7 @@ export default function AIChat() {
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
   const [messages, setMessages] = useState<ChatMessage[]>([
-    { _id: 'welcome', content: `Hi ${user?.name?.split(' ')[0] || 'there'}! I'm Noteloom Ai. Ask me about your DBMS course, summarize a lecture, or generate a mind map. 🎓`, sender: 'ai' },
+    { _id: 'welcome', content: `Hi ${user?.name?.split(' ')[0] || 'there'}! I'm EduSpace Ai. Ask me about your DBMS course, summarize a lecture, or generate a mind map. 🎓`, sender: 'ai' },
   ]);
   const scrollRef = useRef<ScrollView>(null);
 
@@ -64,7 +64,7 @@ export default function AIChat() {
               <Bot size={21} color="#fff" />
             </View>
             <View style={styles.headText}>
-              <Text style={styles.headTitle}>Noteloom Ai</Text>
+              <Text style={styles.headTitle}>EduSpace Ai</Text>
               <View style={styles.headSub}>
                 <Sparkles size={10} color="#fff" />
                 <Text style={styles.headSubText}>Your personalised assistant</Text>

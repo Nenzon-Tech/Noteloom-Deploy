@@ -1,4 +1,4 @@
-import { API_BASE } from '@/utils/config';
+﻿import { API_BASE } from '@/utils/config';
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
@@ -204,7 +204,7 @@ const CollegeSettings = () => {
           <div>
             <h1 className="text-3xl font-extrabold tracking-tight flex items-center gap-3">
               <Building className="w-8 h-8 text-indigo-500" />
-              Noteloom College Settings
+              EduSpace College Settings
             </h1>
             <p className={`mt-1 text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
               Globally update your institution's name and brand logo across all user portals.

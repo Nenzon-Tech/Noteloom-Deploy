@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+﻿const mongoose = require('mongoose');
 const { encrypt, decrypt } = require('../utils/crypto');
 
 // 1. Digital Credentials
@@ -53,7 +53,7 @@ const physicalBookSchema = new mongoose.Schema({
       userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
       name: String,
       email: String,
-      noteloomId: String
+      eduspaceId: String
     },
     issuedDate: Date,
     dueDate: Date

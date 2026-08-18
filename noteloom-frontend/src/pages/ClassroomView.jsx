@@ -1,4 +1,4 @@
-import { API_BASE } from '@/utils/config';
+﻿import { API_BASE } from '@/utils/config';
 // src/pages/ClassroomView.jsx
 import React, { useState, useEffect } from 'react';
 import { useParams, useLocation, useNavigate } from 'react-router-dom';
@@ -9,7 +9,7 @@ import {
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useTheme } from '@/context/ThemeContext.jsx'; 
-// import NoteloomAi from '@/components/features/ai/NoteloomAi';
+// import EduSpaceAi from '@/components/features/ai/EduSpaceAi';
 
  
 
@@ -711,7 +711,7 @@ const ClassroomView = () => {
       )}
 
       {/* 2. ADD THIS AT THE BOTTOM OF THE MAIN DIV */}
-      {/* <NoteloomAi 
+      {/* <EduSpaceAi 
         contextData={{
           classroomName: state?.subjectName || "this Class", // Uses route state if available
           classroomId: id,

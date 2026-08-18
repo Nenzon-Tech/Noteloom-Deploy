@@ -1,5 +1,5 @@
-/**
- * NoteLoom Backend — Email Templates
+﻿/**
+ * EduSpace Backend — Email Templates
  */
 
 const getVerificationEmailHtml = (code) => {

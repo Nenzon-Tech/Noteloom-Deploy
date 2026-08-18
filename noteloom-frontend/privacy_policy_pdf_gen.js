@@ -1,7 +1,7 @@
-/**
- * PDF Generator for NoteLoom Privacy Policy
- * Uses jsPDF (installed in noteloom-frontend) + direct content rendering
- * Run from: noteloom-frontend directory
+﻿/**
+ * PDF Generator for EduSpace Privacy Policy
+ * Uses jsPDF (installed in eduspace-frontend) + direct content rendering
+ * Run from: eduspace-frontend directory
  */
 
 const { jsPDF } = require('jspdf');
@@ -11,7 +11,7 @@ const path = require('path');
 // ─── OUTPUT PATH ───────────────────────────────────────────────────────────────
 const OUTPUT_DIR = path.join(__dirname, '..', 'output');
 if (!fs.existsSync(OUTPUT_DIR)) fs.mkdirSync(OUTPUT_DIR, { recursive: true });
-const PDF_PATH = path.join(OUTPUT_DIR, 'Privacy_Policy_NoteLoom.pdf');
+const PDF_PATH = path.join(OUTPUT_DIR, 'Privacy_Policy_EduSpace.pdf');
 
 // ─── DOCUMENT CONFIG ───────────────────────────────────────────────────────────
 const doc = new jsPDF({ orientation: 'portrait', unit: 'pt', format: 'a4' });
@@ -46,7 +46,7 @@ const addPage = () => {
   doc.line(MARGIN, 40, PAGE_W - MARGIN, 40);
   doc.setFontSize(8);
   doc.setTextColor(...TEXT_MUTED);
-  doc.text('NoteLoom — Privacy Policy | Last Updated: [DATE]', PAGE_W - MARGIN, 35, { align: 'right' });
+  doc.text('EduSpace — Privacy Policy | Last Updated: [DATE]', PAGE_W - MARGIN, 35, { align: 'right' });
 };
 
 const checkPage = (needed = 20) => {
@@ -159,7 +159,7 @@ setFont('bold', 26, BRAND_BLUE);
 doc.text('PRIVACY POLICY', PAGE_W / 2, y, { align: 'center' });
 y += 36;
 setFont('normal', 11, TEXT_MUTED);
-doc.text('NoteLoom — Multi-Tenant College SaaS Platform', PAGE_W / 2, y, { align: 'center' });
+doc.text('EduSpace — Multi-Tenant College SaaS Platform', PAGE_W / 2, y, { align: 'center' });
 y += 20;
 setFont('italic', 9.5, TEXT_MUTED);
 doc.text('Last Updated: [DATE]', PAGE_W / 2, y, { align: 'center' });
@@ -169,7 +169,7 @@ divider();
 // ─── SECTIONS ─────────────────────────────────────────────────────────────────
 
 h1('1. Introduction & Scope');
-body('This Privacy Policy ("Policy") describes how [COMPANY LEGAL NAME] ("Company," "we," "our," or "us") collects, uses, stores, and discloses information when you access or use the NoteLoom platform ("Service"), a multi-tenant Software-as-a-Service (SaaS) solution for higher-education institutions.');
+body('This Privacy Policy ("Policy") describes how [COMPANY LEGAL NAME] ("Company," "we," "our," or "us") collects, uses, stores, and discloses information when you access or use the EduSpace platform ("Service"), a multi-tenant Software-as-a-Service (SaaS) solution for higher-education institutions.');
 body('This Policy applies to all users of the Service, including students, faculty members, college administrators, and IT system administrators who are authorised by a subscribing institution ("Tenant Institution" or "Client"). By accessing or using the Service, you acknowledge that you have read and understood this Policy.');
 
 h1('2. Information We Collect');
@@ -181,7 +181,7 @@ boldBodyInline('Faculty Profile: ', 'Department, designation, qualification, yea
 boldBodyInline('College Admin Profile: ', 'Admin level, responsibilities, employee ID, approval authority, access level.');
 boldBodyInline('Leave Applications: ', 'Leave type, start/end dates, reason.');
 boldBodyInline('COE / Exam Portal: ', 'Selected subjects, fee payment reference, roll number snapshot.');
-boldBodyInline('Library System: ', 'Name, email, and NoteLoom ID for physical book loans; URL, title, and description for digital resource submissions.');
+boldBodyInline('Library System: ', 'Name, email, and EduSpace ID for physical book loans; URL, title, and description for digital resource submissions.');
 boldBodyInline('AI Study Assistant: ', 'Text messages, academic queries, and files uploaded for processing (PDF, DOCX, XLSX, PPTX, images, audio, video). Files are deleted from temporary storage immediately after processing.');
 boldBodyInline('Notice Board: ', 'Text content, file attachments, reactions, and threaded comment text.');
 
@@ -262,7 +262,7 @@ y += 12;
 
 h1('6. Cookies & Tracking Technologies');
 h2('6.1 Cookies');
-body('The NoteLoom platform does not set any HTTP cookies. No cookie consent banner is required because no cookies are used.');
+body('The EduSpace platform does not set any HTTP cookies. No cookie consent banner is required because no cookies are used.');
 h2('6.2 localStorage & sessionStorage');
 body('See Section 2.2 for the complete list of localStorage items. All items are essential or functional. No tracking or advertising items are stored. All session items are cleared on logout.');
 h2('6.3 Third-Party Tracking');
@@ -297,7 +297,7 @@ h1('10. International Data Transfers');
 body('Data is processed on infrastructure operated by Vercel (US-based, global regions), MongoDB Atlas (region variable), Google (Gemini), Cloudflare, Cloudinary, and Twilio/SendGrid. Data may be transferred outside India and the EEA. Transfers rely on sub-processor DPAs and, for EEA users, Standard Contractual Clauses.');
 
 h1('11. Children\'s Privacy');
-body('NoteLoom is a B2B SaaS for higher-education institutions serving adult users. We do not knowingly collect data from individuals under 18 outside of an institutional context. Where a Tenant Institution grants access to minors, the institution is responsible for obtaining required parental or guardian consent.');
+body('EduSpace is a B2B SaaS for higher-education institutions serving adult users. We do not knowingly collect data from individuals under 18 outside of an institutional context. Where a Tenant Institution grants access to minors, the institution is responsible for obtaining required parental or guardian consent.');
 
 h1('12. Changes to This Policy');
 body('We may update this Policy periodically. Material changes will be communicated via the platform notice board or by email. Continued use after the effective date constitutes acceptance.');
@@ -358,7 +358,7 @@ for (let i = 1; i <= totalPages; i++) {
     doc.setLineWidth(0.5);
     doc.line(MARGIN, 40, PAGE_W - MARGIN, 40);
     setFont('italic', 7.5, TEXT_MUTED);
-    doc.text('NoteLoom — Privacy Policy | Last Updated: [DATE]', PAGE_W - MARGIN, 35, { align: 'right' });
+    doc.text('EduSpace — Privacy Policy | Last Updated: [DATE]', PAGE_W - MARGIN, 35, { align: 'right' });
   }
 }
 

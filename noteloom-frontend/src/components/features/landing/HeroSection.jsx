@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+﻿import React, { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Sparkles, ArrowRight, GraduationCap, Shield, TrendingUp } from "lucide-react";
 import { useTheme } from "@/context/ThemeContext.jsx";
@@ -9,7 +9,7 @@ const HeroSection = ({ navigate }) => {
   const canvasRef = useRef(null);
 
   const slides = [
-    { prefix: "Welcome To ", highlight: "Noteloom", break: false },
+    { prefix: "Welcome To ", highlight: "EduSpace", break: false },
     { prefix: "Your Personalized ", highlight: "Learning Platform", break: false },
     { prefix: "Let's Connect, ", highlight: "Grow & Excel", break: false },
     { prefix: "Smarter Insights, ", highlight: "Better Grades", break: true },

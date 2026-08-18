@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+﻿import React, { useEffect, useRef, useState } from 'react';
 import { View, Text, Animated, Easing, StyleSheet, StatusBar, Pressable, ActivityIndicator } from 'react-native';
 import { useRouter } from 'expo-router';
 import * as LocalAuthentication from 'expo-local-authentication';
@@ -114,7 +114,7 @@ export default function Index() {
         return;
       }
       const result = await LocalAuthentication.authenticateAsync({
-        promptMessage: 'Unlock NoteLoom with Biometrics',
+        promptMessage: 'Unlock EduSpace with Biometrics',
         fallbackLabel: 'Use Passcode',
         cancelLabel: 'Cancel',
       });
@@ -138,7 +138,7 @@ export default function Index() {
           </Gradient>
           <Text style={[styles.gateTitle, { color: theme.fg }]}>Welcome back</Text>
           <Text style={[styles.gateSubtitle, { color: theme.muted }]}>
-            Unlock NoteLoom to continue to your dashboard.
+            Unlock EduSpace to continue to your dashboard.
           </Text>
 
           {biometricUnavailable ? (
@@ -191,7 +191,7 @@ export default function Index() {
           </Gradient>
         </View>
 
-        <Text style={[styles.splashTitle, { color: theme.fg }]}>NoteLoom</Text>
+        <Text style={[styles.splashTitle, { color: theme.fg }]}>EduSpace</Text>
 
         <View style={styles.dotsRow}>
           <Animated.View style={[styles.dot, { backgroundColor: theme.violet, opacity: dot1Anim }]} />
@@ -207,7 +207,7 @@ export default function Index() {
   const feats = [
     { key: 'notes', icon: <Building2 size={17} color="#10b981" />, bg: 'rgba(16,185,129,0.12)', title: 'Smart notes', desc: 'Semester-wise notes, libraries and admit cards in one place.' },
     { key: 'notices', icon: <Bell size={17} color="#3b82f6" />, bg: 'rgba(59,130,246,0.12)', title: 'Live notices', desc: 'Exam alerts, events and campus updates in real time.' },
-    { key: 'ai', icon: <Bot size={17} color="#a855f7" />, bg: 'rgba(168,85,247,0.12)', title: 'Noteloom Ai', desc: 'AI answers for your syllabus, timetables and study plans.' },
+    { key: 'ai', icon: <Bot size={17} color="#a855f7" />, bg: 'rgba(168,85,247,0.12)', title: 'EduSpace Ai', desc: 'AI answers for your syllabus, timetables and study plans.' },
   ];
 
   return (
@@ -218,7 +218,7 @@ export default function Index() {
           <Gradient colors={theme.gradientBrand} angle={135} radius={26} style={styles.logo}>
             <GraduationCap size={40} color="#fff" />
           </Gradient>
-          <Text style={[styles.brandName, { color: theme.indigo }]}>NoteLoom</Text>
+          <Text style={[styles.brandName, { color: theme.indigo }]}>EduSpace</Text>
           <Text style={[styles.tagline, { color: theme.muted }]}>
             The all-in-one campus app for notes, attendance, notices, and AI help — trusted by 1,000+ colleges.
           </Text>
@@ -241,7 +241,7 @@ export default function Index() {
             Get Started
           </GradButton>
           <Pressable onPress={() => router.push('/college-selection')}>
-            <Text style={[styles.note, { color: theme.faint }]}>By continuing you agree to NoteLoom's Terms & Privacy Policy.</Text>
+            <Text style={[styles.note, { color: theme.faint }]}>By continuing you agree to EduSpace's Terms & Privacy Policy.</Text>
           </Pressable>
         </Animated.View>
       </Screen>

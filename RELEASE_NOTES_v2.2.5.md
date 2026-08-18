@@ -1,6 +1,6 @@
-# 🎓 NoteLoom v2.2.5 — Android APK
+﻿# 🎓 EduSpace v2.2.5 — Android APK
 
-The NoteLoom mobile companion app for students, faculty, college admins, and IT admins — now fully optimized for tablets and large screens.
+The EduSpace mobile companion app for students, faculty, college admins, and IT admins — now fully optimized for tablets and large screens.
 
 ---
 
@@ -50,10 +50,10 @@ The NoteLoom mobile companion app for students, faculty, college admins, and IT 
 
 ## 📦 About this build
 
-- **File:** `NoteLoom-v2.2.5.apk`
-- **Package:** `com.nenzontech.noteloom`
+- **File:** `EduSpace-v2.2.5.apk`
+- **Package:** `com.nenzontech.eduspace`
 - **Version:** 2.2.5 (versionCode 5)
 - **Targets Android** devices; install by enabling "Install unknown apps"
-- Backend: NoteLoom hosted API
+- Backend: EduSpace hosted API
 
 > ⚠️ This is an internal/beta build signed with a debug key — safe for sideloading and testing.

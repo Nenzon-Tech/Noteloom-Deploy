@@ -1,4 +1,4 @@
-{
+﻿{
   "cli": {
     "version": ">= 10.0.0"
   },
@@ -13,7 +13,7 @@
       },
       "distribution": "internal",
       "env": {
-        "EXPO_PUBLIC_API_BASE": "https://NoteLoom-devops-noteloom-backend.hf.space"
+        "EXPO_PUBLIC_API_BASE": "https://EduSpace-devops-eduspace-backend.hf.space"
       }
     },
     "production": {
@@ -22,7 +22,7 @@
       },
       "autoIncrement": true,
       "env": {
-        "EXPO_PUBLIC_API_BASE": "https://NoteLoom-devops-noteloom-backend.hf.space"
+        "EXPO_PUBLIC_API_BASE": "https://EduSpace-devops-eduspace-backend.hf.space"
       }
     }
   },

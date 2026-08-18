@@ -1,4 +1,4 @@
-import { API_BASE } from '@/utils/config';
+﻿import { API_BASE } from '@/utils/config';
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import QRCode from 'react-qr-code';
@@ -191,7 +191,7 @@ const DigitalLibrary = () => {
           case 'student': return 'Student Dashboard';
           case 'faculty': return 'Faculty Dashboard';
           case 'college_admin': return 'Admin Dashboard';
-          case 'noteloom_admin': return 'IT Admin Dashboard';
+          case 'eduspace_admin': return 'IT Admin Dashboard';
           default: return 'Dashboard';
       }
   };
@@ -1513,10 +1513,10 @@ const DigitalLibrary = () => {
                                                     {issueUser.email}
                                                 </span>
                                                 
-                                                {/* [UPDATED] Larger NoteLoom ID Field */}
+                                                {/* [UPDATED] Larger EduSpace ID Field */}
                                                 <span className="text-sm font-mono flex items-center gap-2 text-purple-500 font-bold bg-purple-500/10 px-3 py-1.5 rounded-lg w-fit mt-1 border border-purple-500/20">
                                                     <CreditCard size={16} /> 
-                                                    {issueUser.noteloomId || 'N/A'}
+                                                    {issueUser.eduspaceId || 'N/A'}
                                                 </span>
                                             </div>
 

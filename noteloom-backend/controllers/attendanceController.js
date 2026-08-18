@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+﻿const mongoose = require('mongoose');
 const { Routine, Attendance, WeeklyReport } = require('../models/AttendanceModels');
 const StudentProfile = require('../models/StudentProfile');
 const Batch = require('../models/Batch');
@@ -113,7 +113,7 @@ exports.getAttendanceReport = async (req, res) => {
       return {
         studentId: student._id,
         name: student.name,
-        username: student.username, // Noteloom ID
+        username: student.username, // EduSpace ID
         presentCount: record ? record.presentCount : 0
       };
     });

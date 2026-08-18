@@ -1,4 +1,4 @@
-module.exports = {
+﻿module.exports = {
   student: [
     { key: 'courses', title: 'My Courses', icon: 'BookOpen', description: 'Access your enrolled courses' },
     { key: 'assignments', title: 'Assignments', icon: 'ClipboardList', description: 'View and submit assignments' },
@@ -31,7 +31,7 @@ module.exports = {
   ],
   college_admin: [
     { key: 'staff_notices', title: 'Staff Notices', icon: 'MessageSquare', description: 'Publish notices for staff' },
-    { key: 'settings', title: 'Noteloom College Settings', icon: 'Settings', description: 'Manage college configuration' },
+    { key: 'settings', title: 'EduSpace College Settings', icon: 'Settings', description: 'Manage college configuration' },
     { key: 'leave_manager', title: 'Faculty Leave Manager', icon: 'Briefcase', description: 'Approve or reject faculty leaves' },
     { key: 'library', title: 'Digital Library Resources', icon: 'Library', description: 'Access digital resources' },
     { key: 'approvals', title: 'Faculty Approval', icon: 'ShieldCheck', description: 'Approve new faculty accounts' },

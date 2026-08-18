@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+﻿import React, { useState, useEffect, useRef } from 'react';
 import {
   View, Text, TouchableOpacity, StyleSheet, Dimensions,
   Animated, Platform,
@@ -12,7 +12,7 @@ import { useTheme } from '../../contexts/ThemeContext';
 const { width, height } = Dimensions.get('window');
 
 const headlines = [
-  { pre: 'Welcome To ', highlight: 'NoteLoom' },
+  { pre: 'Welcome To ', highlight: 'EduSpace' },
   { pre: 'Your Personalized ', highlight: 'Learning Platform' },
   { pre: 'Let\'s Connect, ', highlight: 'Grow & Excel' },
   { pre: 'Smarter Insights, ', highlight: 'Better Grades' },

@@ -1,4 +1,4 @@
-const cloudinary = require('cloudinary').v2;
+﻿const cloudinary = require('cloudinary').v2;
 const { CloudinaryStorage } = require('multer-storage-cloudinary');
 const multer = require('multer');
 
@@ -14,10 +14,10 @@ const storage = new CloudinaryStorage({
   cloudinary: cloudinary,
   params: async (req, file) => {
     // Determine the folder based on file type (optional but good for organization)
-    let folderName = 'noteloom_general';
-    if (file.mimetype.includes('image')) folderName = 'noteloom_images';
-    else if (file.mimetype.includes('video')) folderName = 'noteloom_videos';
-    else if (file.mimetype === 'application/pdf') folderName = 'noteloom_pdfs';
+    let folderName = 'eduspace_general';
+    if (file.mimetype.includes('image')) folderName = 'eduspace_images';
+    else if (file.mimetype.includes('video')) folderName = 'eduspace_videos';
+    else if (file.mimetype === 'application/pdf') folderName = 'eduspace_pdfs';
 
     return {
       folder: folderName,

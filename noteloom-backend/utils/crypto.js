@@ -1,4 +1,4 @@
-const crypto = require('crypto');
+﻿const crypto = require('crypto');
 
 // Derive a 32-byte key from the environment variable or JWT_SECRET
 const getEncryptionKey = () => {
@@ -7,7 +7,7 @@ const getEncryptionKey = () => {
     if (process.env.NODE_ENV === 'production') {
       throw new Error('FATAL: ENCRYPTION_KEY or JWT_SECRET must be set for database encryption.');
     }
-    return crypto.createHash('sha256').update('developer-fallback-secret-key-noteloom').digest();
+    return crypto.createHash('sha256').update('developer-fallback-secret-key-eduspace').digest();
   }
   return crypto.createHash('sha256').update(secret).digest();
 };

@@ -1,4 +1,4 @@
-=========================================
+﻿=========================================
 NOTE LOOM - SECURITY & REMEDIATION PROGRESS
 =========================================
 
@@ -12,7 +12,7 @@ Tasks checklist:
     - Action: Create src/components/common/ITProtectedRoute.jsx (Completed)
 
 [x] Task 3: AI Mermaid Mindmap Renderer Security
-    - Action: Update src/components/features/ai/NoteloomAi.jsx to use securityLevel: 'strict' and sanitize SVG using DOMPurify. (Completed)
+    - Action: Update src/components/features/ai/EduSpaceAi.jsx to use securityLevel: 'strict' and sanitize SVG using DOMPurify. (Completed)
 
 [x] Task 4: Disable Production Source Maps
     - Action: Update vite.config.js to set build.sourcemap and build.cssSourcemap to false. (Completed)

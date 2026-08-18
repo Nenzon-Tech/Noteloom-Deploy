@@ -1,8 +1,8 @@
-========================================================================
-NoteLoom Backend - Developer Refactoring & Upgrade Summary
+﻿========================================================================
+EduSpace Backend - Developer Refactoring & Upgrade Summary
 ========================================================================
 This document lists the architectural refactorings, security patches, 
-and feature upgrades made to the NoteLoom backend codebase relative to the 
+and feature upgrades made to the EduSpace backend codebase relative to the 
 original beta repository. Use this as a reference guide for future development.
 
 ------------------------------------------------------------------------
@@ -21,12 +21,12 @@ A. Cleanup Cron Endpoint Protection
 
 B. Restricted CORS Dynamic Settings
    - What was happening: The CORS handler in server.js accepted any URL starting 
-     with "noteloom" and ending with "vercel.app", which allowed an attacker to 
-     register a malicious site like "noteloom-steal.vercel.app" and read tokens.
+     with "eduspace" and ending with "vercel.app", which allowed an attacker to 
+     register a malicious site like "eduspace-steal.vercel.app" and read tokens.
      Also, local network IPs (e.g. 192.168.x.x) or Hugging Face Space endpoints 
      were not allowed, causing CORS blocks during testing or alternative hostings.
    - What was changed: Restructured the regex validation to explicitly check for 
-     official branch preview subdomains (noteloom-frontend-*.vercel.app), added 
+     official branch preview subdomains (eduspace-frontend-*.vercel.app), added 
      regex patterns for private subnets (localhost, 127.0.0.1, 192.168.x.x, 
      10.x.x.x, 172.16.x.x-172.31.x.x) with any port, and allowed *.hf.space.
    - What is improved: Prevents unauthorized Vercel subdomains from bypassing CORS, 

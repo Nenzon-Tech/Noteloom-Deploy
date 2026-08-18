@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+﻿import React, { useState, useEffect, useCallback } from 'react';
 import { View, Pressable, StyleSheet } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Sun, Moon, LogOut, ClipboardCheck, Users, Megaphone, Bot, RefreshCw } from 'lucide-react-native';
@@ -72,7 +72,7 @@ export default function AdminHome() {
     { key: 'ap', label: 'Approvals', sub: `${pending} pending`, gradient: ['#10b981', '#0d9488'] as [string, string], icon: <ClipboardCheck size={18} color="#fff" />, onPress: () => router.push('/(app)/admin/approvals') },
     { key: 'users', label: 'Users', sub: `${totalUsers} active`, gradient: ['#3b82f6', '#6366f1'] as [string, string], icon: <Users size={18} color="#fff" />, onPress: () => router.push('/(app)/admin/users') },
     { key: 'notice', label: 'Notice', sub: 'Announce', gradient: ['#f43f5e', '#e11d48'] as [string, string], icon: <Megaphone size={18} color="#fff" />, onPress: () => router.push('/(app)/admin/notices') },
-    { key: 'ai', label: 'Noteloom Ai', sub: 'Reports', gradient: ['#a855f7', '#7c3aed'] as [string, string], icon: <Bot size={18} color="#fff" />, onPress: () => router.push('/(app)/ai-chat') },
+    { key: 'ai', label: 'EduSpace Ai', sub: 'Reports', gradient: ['#a855f7', '#7c3aed'] as [string, string], icon: <Bot size={18} color="#fff" />, onPress: () => router.push('/(app)/ai-chat') },
   ];
 
   const today = new Date().toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });

@@ -1,4 +1,4 @@
-import React, { ReactNode } from 'react';
+﻿import React, { ReactNode } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTheme } from '../../contexts/ThemeContext';
@@ -66,7 +66,7 @@ export const Wordmark = ({ dark }: { dark?: boolean }) => {
   const { theme } = useTheme();
   return (
     <View style={styles.wordmark}>
-      <Text style={[styles.wordmarkText, { color: theme.indigo }]}>NoteLoom</Text>
+      <Text style={[styles.wordmarkText, { color: theme.indigo }]}>EduSpace</Text>
       <View style={styles.beta}>
         <Text style={styles.betaText}>Beta</Text>
       </View>

@@ -1,5 +1,5 @@
-/**
- * NoteLoom Custom Cost Report Generator
+﻿/**
+ * EduSpace Custom Cost Report Generator
  * Custom Setup: Cloudinary Free, Vercel Pro, Hugging Face Spaces Base, Google Workspace SMTP.
  */
 
@@ -14,7 +14,7 @@ const path = require('path');
 const OUTPUT_DIR = path.join(__dirname, '..', 'output');
 if (!fs.existsSync(OUTPUT_DIR)) fs.mkdirSync(OUTPUT_DIR, { recursive: true });
 
-const DOCX_PATH = path.join(OUTPUT_DIR, 'NoteLoom_August_Beta_Custom_Cost_Report.docx');
+const DOCX_PATH = path.join(OUTPUT_DIR, 'EduSpace_August_Beta_Custom_Cost_Report.docx');
 
 // Colors
 const BRAND_BLUE = '1E3A5F';
@@ -135,7 +135,7 @@ const children = [
     alignment: AlignmentType.CENTER,
     spacing: { before: 0, after: 100 },
     children: [
-      new TextRun({ text: 'NoteLoom Custom Config | August 2026 Trial', size: 24, font: 'Calibri', color: TEXT_MUTED })
+      new TextRun({ text: 'EduSpace Custom Config | August 2026 Trial', size: 24, font: 'Calibri', color: TEXT_MUTED })
     ]
   }),
   new Paragraph({
@@ -149,7 +149,7 @@ const children = [
 
   // SECTION 1
   h1('1. Custom Configuration Overview'),
-  body('This cost report details the financial model for your customized deployment plan of NoteLoom for the August 2026 beta test. The setup leverages Vercel Pro for frontend hosting, a free Hugging Face Spaces container for the Express backend, Google Workspace for transaction mail, a free Cloudinary CDN tier, and MongoDB Atlas for database operations.'),
+  body('This cost report details the financial model for your customized deployment plan of EduSpace for the August 2026 beta test. The setup leverages Vercel Pro for frontend hosting, a free Hugging Face Spaces container for the Express backend, Google Workspace for transaction mail, a free Cloudinary CDN tier, and MongoDB Atlas for database operations.'),
   boldBody('Scope: ', '567 active users (350 students, 200 faculty, 10 college admins, 7 system IT admins).'),
   boldBody('Duration: ', 'August 2026 (22 active college days).'),
 
@@ -162,7 +162,7 @@ const children = [
   new Table({
     width: { size: 100, type: WidthType.PERCENTAGE },
     rows: [
-      createRow([{ text: 'Item' }, { text: 'Provider & Plan' }, { text: 'Role in NoteLoom' }, { text: 'Monthly Cost' }], true),
+      createRow([{ text: 'Item' }, { text: 'Provider & Plan' }, { text: 'Role in EduSpace' }, { text: 'Monthly Cost' }], true),
       createRow([{ text: 'Custom Domain' }, { text: 'Namecheap / Porkbun (.com)' }, { text: 'SSL-secured domain mapping' }, { text: '$12.00 (Flat)' }], false, false),
       createRow([{ text: 'Frontend Hosting' }, { text: 'Vercel Pro (1 seat)' }, { text: 'Serves React Vite SPA with SSL' }, { text: '$20.00/mo' }], false, true),
       createRow([{ text: 'Backend Host' }, { text: 'Hugging Face Spaces (Base CPU)' }, { text: 'Hosts the Express API in a Docker container' }, { text: '$0.00 (Free)' }], false, false),
@@ -191,7 +191,7 @@ const children = [
 
   h2('3.3 Cloudinary Free Tier (Asset CDN) — Sufficient with Workaround'),
   bullet('Limit: The free tier provides 25GB of monthly storage and bandwidth. If 200 faculty members upload raw 100MB lecture videos directly, the limit will be reached within days.'),
-  bullet('Workaround: Instruct faculty to upload lecture videos to YouTube (as unlisted videos) and paste the links into the NoteLoom LMS. NoteLoom\'s built-in transcription parser will transcribe the YouTube video text for free, avoiding Cloudinary storage bandwidth consumption completely.'),
+  bullet('Workaround: Instruct faculty to upload lecture videos to YouTube (as unlisted videos) and paste the links into the EduSpace LMS. EduSpace\'s built-in transcription parser will transcribe the YouTube video text for free, avoiding Cloudinary storage bandwidth consumption completely.'),
 
   h2('3.4 Google Workspace SMTP (Email) — Highly Sufficient'),
   bullet('Google Workspace limits SMTP relay accounts to 2,000 emails per day. For 567 users, daily transactional traffic (registration OTPs and overdue book notifications) will average 150–200 emails, which easily fits within the limit and ensures 100% inbox delivery (no spam folder issues).'),
@@ -229,8 +229,8 @@ const children = [
 ];
 
 const doc = new Document({
-  creator: 'NoteLoom Solutions Architect',
-  description: 'NoteLoom August Beta Custom Config Cost Report',
+  creator: 'EduSpace Solutions Architect',
+  description: 'EduSpace August Beta Custom Config Cost Report',
   title: 'Custom Config Cost Report',
   styles: {
     default: {
@@ -254,7 +254,7 @@ const doc = new Document({
               border: { bottom: { color: 'D1D5DB', space: 1, value: BorderStyle.SINGLE, size: 4 } },
               spacing: { after: 100 },
               children: [
-                new TextRun({ text: 'NoteLoom — Custom Config Cost Report | August 2026', size: 17, font: 'Calibri', color: TEXT_MUTED, italics: true })
+                new TextRun({ text: 'EduSpace — Custom Config Cost Report | August 2026', size: 17, font: 'Calibri', color: TEXT_MUTED, italics: true })
               ]
             })
           ]

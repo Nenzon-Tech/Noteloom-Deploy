@@ -1,7 +1,7 @@
-/**
- * NoteLoom Privacy Policy Document Generator
- * Uses the 'docx' library (already a dependency in noteloom-backend)
- * Run from the noteloom-backend directory: node ../privacy_policy_gen.js
+﻿/**
+ * EduSpace Privacy Policy Document Generator
+ * Uses the 'docx' library (already a dependency in eduspace-backend)
+ * Run from the eduspace-backend directory: node ../privacy_policy_gen.js
  */
 
 const {
@@ -17,7 +17,7 @@ const path = require('path');
 const OUTPUT_DIR = path.join(__dirname, '..', 'output');
 if (!fs.existsSync(OUTPUT_DIR)) fs.mkdirSync(OUTPUT_DIR, { recursive: true });
 
-const DOCX_PATH = path.join(OUTPUT_DIR, 'Privacy_Policy_NoteLoom.docx');
+const DOCX_PATH = path.join(OUTPUT_DIR, 'Privacy_Policy_EduSpace.docx');
 
 // ─── COLOR PALETTE ─────────────────────────────────────────────────────────────
 const BRAND_BLUE = '1E3A5F';
@@ -147,7 +147,7 @@ const children = [
   new Paragraph({
     alignment: AlignmentType.CENTER,
     spacing: { before: 0, after: 120 },
-    children: [new TextRun({ text: 'NoteLoom — Multi-Tenant College SaaS Platform', size: 28, font: 'Calibri', color: TEXT_MUTED })]
+    children: [new TextRun({ text: 'EduSpace — Multi-Tenant College SaaS Platform', size: 28, font: 'Calibri', color: TEXT_MUTED })]
   }),
   new Paragraph({
     alignment: AlignmentType.CENTER,
@@ -158,7 +158,7 @@ const children = [
 
   // ── SECTION 1 ───────────────────────────────────────────────────────────────
   h1('1. Introduction & Scope'),
-  body('This Privacy Policy ("Policy") describes how [COMPANY LEGAL NAME] ("Company," "we," "our," or "us") collects, uses, stores, and discloses information when you access or use the NoteLoom platform ("Service"), a multi-tenant Software-as-a-Service (SaaS) solution for higher-education institutions.'),
+  body('This Privacy Policy ("Policy") describes how [COMPANY LEGAL NAME] ("Company," "we," "our," or "us") collects, uses, stores, and discloses information when you access or use the EduSpace platform ("Service"), a multi-tenant Software-as-a-Service (SaaS) solution for higher-education institutions.'),
   body('This Policy applies to all users of the Service, including students, faculty members, college administrators, and IT system administrators who are authorised by a subscribing institution ("Tenant Institution" or "Client"). Individual users of the platform are typically provided access by and under the authority of their institution.'),
   body('By accessing or using the Service, you acknowledge that you have read and understood this Policy. If you are using the Service on behalf of an institution, you represent that the institution has authorised you to accept this Policy on its behalf.'),
 
@@ -174,7 +174,7 @@ const children = [
   boldBody('College Administrator Profile: ', 'Admin level, responsibilities, employee ID, approval authority, access level.'),
   boldBody('Leave Applications: ', 'Leave type (casual, sick, duty, maternity, paternity, or loss-of-pay), start and end dates, reason for leave.'),
   boldBody('Exam / COE Portal: ', 'Selected examination subjects (regular and backlog), fee payment confirmation reference, roll number snapshot at time of submission.'),
-  boldBody('Library System: ', 'Physical book borrowing: name, email, and NoteLoom ID stored against book copies. Digital resource submissions: title, author, URL, department, description.'),
+  boldBody('Library System: ', 'Physical book borrowing: name, email, and EduSpace ID stored against book copies. Digital resource submissions: title, author, URL, department, description.'),
   boldBody('AI Study Assistant: ', 'Text messages, academic queries, and files uploaded for summarisation or problem-solving (PDF, DOCX, XLSX, PPTX, images, audio, and video files). Files are processed transiently and are deleted from temporary server storage immediately after processing; they are not persistently stored by us.'),
   boldBody('Notice Board: ', 'Text content, file attachments (uploaded to Cloudinary), reactions, and threaded comment text when posting or interacting with notices.'),
 
@@ -264,7 +264,7 @@ const children = [
   // ── SECTION 6 ───────────────────────────────────────────────────────────────
   h1('6. Cookies & Tracking Technologies'),
   h2('6.1 Cookies'),
-  body('The NoteLoom platform does not set HTTP cookies of any kind — neither session cookies nor persistent cookies. No cookie consent banner is currently implemented because no cookies are used.'),
+  body('The EduSpace platform does not set HTTP cookies of any kind — neither session cookies nor persistent cookies. No cookie consent banner is currently implemented because no cookies are used.'),
 
   h2('6.2 localStorage (Browser Storage)'),
   body('The platform stores the following items in the browser\'s localStorage, which persists across browser sessions until cleared:'),
@@ -305,7 +305,7 @@ const children = [
   bullet('Library Credential Encryption: Database credentials stored in the Digital Library module (login IDs and passwords for third-party academic portals) are encrypted at rest using AES-256-GCM symmetric encryption via Node.js\'s built-in crypto module. The encryption key is derived from a dedicated ENCRYPTION_KEY environment variable (or falls back to JWT_SECRET).'),
   bullet('Transport Encryption: All data in transit is encrypted via HTTPS/TLS, enforced by the Vercel hosting platform.'),
   bullet('Multi-Tenant Data Isolation: All MongoDB queries include a tenantId filter, logically isolating each institution\'s data at the query layer.'),
-  bullet('Dynamic CORS Policy: The backend enforces a strict dynamic CORS allowlist restricted to known production domains (noteloomtest.vercel.app), localhost, private LAN ranges, and Hugging Face Spaces domains.'),
+  bullet('Dynamic CORS Policy: The backend enforces a strict dynamic CORS allowlist restricted to known production domains (eduspacetest.vercel.app), localhost, private LAN ranges, and Hugging Face Spaces domains.'),
   bullet('Proxy Token Forwarding: The Vercel frontend proxy forwards authentication tokens via a secure x-user-token header rather than passing tokens in query strings.'),
   bullet('Cron Job Authentication: The daily cron endpoint (/api/cron/cleanup) requires a shared secret (CRON_SECRET) to prevent unauthorised execution.'),
   body('Despite these measures, no method of transmission or storage is completely secure. We cannot guarantee absolute security and disclaim liability for breaches outside our reasonable control. We will notify affected Tenant Institutions of any confirmed data breach affecting their users\' data in accordance with applicable law.'),
@@ -322,7 +322,7 @@ const children = [
   boldBody('Right to Withdraw Consent: ', 'Where processing is based on consent, you may withdraw consent at any time by contacting us. Withdrawal does not affect the lawfulness of processing before withdrawal.'),
 
   body('To exercise any of the above rights, contact us at [EMAIL] or contact your institution\'s college administrator. We will respond within [PLACEHOLDER] calendar days as required by applicable law.'),
-  body('Note: Because NoteLoom is a B2B SaaS product, personal data is provided to us by and on behalf of the Tenant Institution (the college). For certain requests, we will need to co-ordinate with the relevant institution. Individual users are encouraged to raise data requests with their institution\'s designated contact first.'),
+  body('Note: Because EduSpace is a B2B SaaS product, personal data is provided to us by and on behalf of the Tenant Institution (the college). For certain requests, we will need to co-ordinate with the relevant institution. Individual users are encouraged to raise data requests with their institution\'s designated contact first.'),
 
   // ── SECTION 10 ──────────────────────────────────────────────────────────────
   h1('10. International Data Transfers'),
@@ -399,8 +399,8 @@ const children = [
 // ─── BUILD DOCUMENT ────────────────────────────────────────────────────────────
 
 const doc = new Document({
-  creator: 'NoteLoom',
-  description: 'Privacy Policy — NoteLoom Multi-Tenant College SaaS',
+  creator: 'EduSpace',
+  description: 'Privacy Policy — EduSpace Multi-Tenant College SaaS',
   title: 'Privacy Policy',
   styles: {
     default: {
@@ -442,7 +442,7 @@ const doc = new Document({
               border: { bottom: { color: 'D1D5DB', space: 1, value: BorderStyle.SINGLE, size: 4 } },
               spacing: { after: 100 },
               children: [
-                new TextRun({ text: 'NoteLoom — Privacy Policy | Last Updated: [DATE]', size: 17, font: 'Calibri', color: TEXT_MUTED, italics: true })
+                new TextRun({ text: 'EduSpace — Privacy Policy | Last Updated: [DATE]', size: 17, font: 'Calibri', color: TEXT_MUTED, italics: true })
               ]
             })
           ]

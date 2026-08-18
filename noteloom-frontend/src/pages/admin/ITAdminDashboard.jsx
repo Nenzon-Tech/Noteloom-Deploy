@@ -1,4 +1,4 @@
-import { API_BASE } from '@/utils/config';
+﻿import { API_BASE } from '@/utils/config';
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from "react-router-dom";
 import { Shield, School, Plus, CheckCircle, AlertCircle, Wifi, Users, Settings, Trash2 } from "lucide-react";
@@ -90,7 +90,7 @@ const ITAdminDashboard = () => {
   };
 
   const fetchITUsers = async () => {
-    if (itUser?.role !== 'noteloom_admin') return;
+    if (itUser?.role !== 'eduspace_admin') return;
     try {
       const response = await fetch(`${API_BASE}/it-admin/users`, {
         headers: { 'Authorization': `Bearer ${localStorage.getItem('itSessionToken')}` },
@@ -150,7 +150,7 @@ const ITAdminDashboard = () => {
   };
 
   const handleDeleteCollege = async (id, name) => {
-    if (itUser.role !== 'noteloom_admin') return alert("Only Admin can delete.");
+    if (itUser.role !== 'eduspace_admin') return alert("Only Admin can delete.");
     if (name === 'EduSpace System' || name === 'Note Loom System') return alert("Cannot delete System Tenant");
     if (!confirm(`WARNING: This will suspend the college and schedule permanent deletion in 3 MONTHS.\n\nAre you sure?`)) return;
 
@@ -234,8 +234,8 @@ const ITAdminDashboard = () => {
 };
 
   const getDashboardTitle = () => {
-    if (itUser?.role === 'noteloom_admin') return 'EduSpace Admin';
-    if (itUser?.role === 'noteloom_manager') return 'EduSpace Manager';
+    if (itUser?.role === 'eduspace_admin') return 'EduSpace Admin';
+    if (itUser?.role === 'eduspace_manager') return 'EduSpace Manager';
     return 'IT Portal';
   };
 
@@ -254,7 +254,7 @@ const ITAdminDashboard = () => {
               <div>
                 <div className="flex items-center space-x-2 mb-1">
                   {/* ROLE BADGE: RED for Admin, ORANGE for Manager */}
-                  <span className={`inline-flex items-center px-4 py-1.5 rounded-full text-sm font-medium text-white ${itUser?.role === 'noteloom_admin' ? 'bg-red-600' : 'bg-orange-600'}`}>
+                  <span className={`inline-flex items-center px-4 py-1.5 rounded-full text-sm font-medium text-white ${itUser?.role === 'eduspace_admin' ? 'bg-red-600' : 'bg-orange-600'}`}>
                     <Shield className="w-4 h-4 mr-2" />
                     {getDashboardTitle()}
                   </span>
@@ -307,7 +307,7 @@ const ITAdminDashboard = () => {
               </button>
             ))}
             
-            {itUser?.role === 'noteloom_admin' && (
+            {itUser?.role === 'eduspace_admin' && (
               <>
                 <button
                   onClick={() => setActiveTab('manager-requests')}
@@ -380,7 +380,7 @@ const ITAdminDashboard = () => {
                 <h3 className="text-xl font-semibold">Registered Colleges</h3>
                 <p className={`text-sm mt-1 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>Manage access and add new institutions</p>
               </div>
-              {itUser.role === 'noteloom_admin' && (
+              {itUser.role === 'eduspace_admin' && (
                 <button 
                   onClick={() => setShowCreateForm(!showCreateForm)}
                   className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium flex items-center"
@@ -477,7 +477,7 @@ const ITAdminDashboard = () => {
                         {college.status === 'active' ? 'Suspend' : 'Activate'}
                       </button>
                       
-                      {itUser.role === 'noteloom_admin' && (
+                      {itUser.role === 'eduspace_admin' && (
                         <button 
                           onClick={() => handleDeleteCollege(college._id, college.name)}
                           className="px-4 py-2 rounded-lg text-sm font-medium bg-red-600/20 text-red-500"
@@ -521,7 +521,7 @@ const ITAdminDashboard = () => {
         )}
 
         {/* --- MANAGER REQUESTS TAB --- */}
-        {itUser?.role === 'noteloom_admin' && activeTab === 'manager-requests' && (
+        {itUser?.role === 'eduspace_admin' && activeTab === 'manager-requests' && (
           <div className={`rounded-lg p-6 backdrop-blur-md border ${isDarkMode ? 'bg-gray-800/70 border-gray-700/50' : 'bg-white/70 border-gray-200/50'}`}>
             <h3 className="text-xl font-semibold mb-4">Manager Requests</h3>
             <div className="space-y-4">
@@ -548,7 +548,7 @@ const ITAdminDashboard = () => {
         )}
 
         {/* --- USER MANAGEMENT TAB --- */}
-        {itUser?.role === 'noteloom_admin' && activeTab === 'user-management' && (
+        {itUser?.role === 'eduspace_admin' && activeTab === 'user-management' && (
           <div className={`rounded-lg p-6 backdrop-blur-md border ${isDarkMode ? 'bg-gray-800/70 border-gray-700/50' : 'bg-white/70 border-gray-200/50'}`}>
             <h3 className="text-xl font-semibold mb-4">IT User Management</h3>
             <div className="overflow-x-auto">
@@ -569,8 +569,8 @@ const ITAdminDashboard = () => {
                       <td className="px-6 py-4 font-medium">{user.name}</td>
                       <td className="px-6 py-4">{user.email}</td>
                       <td className="px-6 py-4">
-                        <span className={`px-2 py-1 rounded text-xs ${user.role === 'noteloom_admin' ? 'bg-red-100 text-red-800' : 'bg-orange-100 text-orange-800'}`}>
-                          {user.role === 'noteloom_admin' ? 'ADMIN' : 'MANAGER'}
+                        <span className={`px-2 py-1 rounded text-xs ${user.role === 'eduspace_admin' ? 'bg-red-100 text-red-800' : 'bg-orange-100 text-orange-800'}`}>
+                          {user.role === 'eduspace_admin' ? 'ADMIN' : 'MANAGER'}
                         </span>
                       </td>
                       <td className="px-6 py-4">Active</td>

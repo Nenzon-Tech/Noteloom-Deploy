@@ -1,4 +1,4 @@
-# 🖥️ Note Loom — Backend Server API
+﻿# 🖥️ Note Loom — Backend Server API
 
 The backend for the **Note Loom** multi-tenant college management platform. It provides a RESTful API built on **Node.js, Express, and MongoDB (Mongoose)**, powered by Google Gemini and Cloudflare AI services.
 
@@ -32,7 +32,7 @@ graph TD
 ## 📁 Directory Structure
 
 ```
-noteloom-backend/
+eduspace-backend/
 ├── server.js               # Entry point (bootstraps database & HTTP server)
 ├── vercel.json             # Serverless Vercel config
 ├── Dockerfile              # Hugging Face Spaces production container config
@@ -169,7 +169,7 @@ All **40** test cases (verifying auth, session validation, route guards, cron al
 
 While the backend is fully refactored, secure, and complete, the following technical debt remains on the frontend:
 
-1.  **Monolith Deconstruction:** Split the 8,200+ line monolith [src/App.jsx](file:///d:/NoteLoom/Code-files/noteloom-frontend/src/App.jsx) in the frontend project into modular pages (e.g. Auth, dashboards, timetables) and layouts.
-2.  **Frontend Database Dependencies:** Remove `mongodb` from the frontend [package.json](file:///d:/NoteLoom/Code-files/noteloom-frontend/package.json) to stop backend drivers from bloating the browser build size.
-3.  **Environment Variable API Base URL:** Transition hardcoded backend fetch base URLs in the frontend to use `import.meta.env.VITE_API_BASE_URL` instead of the hardcoded `https://noteloom-api.vercel.app` strings.
+1.  **Monolith Deconstruction:** Split the 8,200+ line monolith [src/App.jsx](file:///d:/EduSpace/Code-files/eduspace-frontend/src/App.jsx) in the frontend project into modular pages (e.g. Auth, dashboards, timetables) and layouts.
+2.  **Frontend Database Dependencies:** Remove `mongodb` from the frontend [package.json](file:///d:/EduSpace/Code-files/eduspace-frontend/package.json) to stop backend drivers from bloating the browser build size.
+3.  **Environment Variable API Base URL:** Transition hardcoded backend fetch base URLs in the frontend to use `import.meta.env.VITE_API_BASE_URL` instead of the hardcoded `https://eduspace-api.vercel.app` strings.
 4.  **Payment Gateway Integration:** Evolve the examination checkout form payment status from a direct mocked `'Paid'` status updates into a sandbox integration stub (e.g. Stripe checkout page).

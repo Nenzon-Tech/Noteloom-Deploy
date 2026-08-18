@@ -1,5 +1,5 @@
-/**
- * NoteLoom Backend — Full Feature Test Suite
+﻿/**
+ * EduSpace Backend — Full Feature Test Suite
  * 
  * Run with:  node tests/runTests.js
  * 
@@ -41,7 +41,7 @@ let state = {
   tenantId:        null,
   collegeCode:     null,
   userId:          null,
-  testEmail:       `test_${Date.now()}@noteloom-test.com`,
+  testEmail:       `test_${Date.now()}@eduspace-test.com`,
   testPassword:    'TestPass@123',
   testCollegeCode: null,   // fetched from public/colleges
 };
@@ -191,7 +191,7 @@ async function testITAdminAuth() {
 
   await test('POST /it-admin/login → 401 with wrong creds', async () => {
     const r = await request('POST', '/it-admin/login', {
-      email: 'fake@noteloom.com',
+      email: 'fake@eduspace.com',
       password: 'wrongpassword'
     });
     assert(r.status === 401, `Expected 401, got ${r.status}`);
@@ -367,7 +367,7 @@ async function testRequestValidation() {
 
   await test('POST /api/auth/signin → 400 validation error (missing password)', async () => {
     const r = await request('POST', '/api/auth/signin', {
-      email: 'test@noteloom.com'
+      email: 'test@eduspace.com'
     });
     assert(r.status === 400, `Expected 400, got ${r.status}`);
     assert(r.body.error === "Validation failed", `Expected "Validation failed", got "${r.body.error}"`);
@@ -387,7 +387,7 @@ async function testRequestValidation() {
 // ─── MAIN ─────────────────────────────────────────────────────────────────────
 async function main() {
   console.log(`\n${'═'.repeat(60)}`);
-  console.log(`${BOLD}  NoteLoom Backend — Full Test Suite${RESET}`);
+  console.log(`${BOLD}  EduSpace Backend — Full Test Suite${RESET}`);
   console.log('  Target: ' + BASE_URL);
   console.log(`${'═'.repeat(60)}`);
 

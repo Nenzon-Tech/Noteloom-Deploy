@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+﻿const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 const path = require('path');
 require('dotenv').config({ path: path.join(__dirname, '.env') });
@@ -157,8 +157,8 @@ async function seedData() {
     console.log('🔢 Verifying ID Counters...');
     const counters = [
       { _id: 'college_registry', seq: 1001 },
-      { _id: 'noteloom_emp_90', seq: 1 },
-      { _id: 'noteloom_emp_91', seq: 1 },
+      { _id: 'eduspace_emp_90', seq: 1 },
+      { _id: 'eduspace_emp_91', seq: 1 },
       { _id: 'uid_1001_2025_001', seq: 1 },
       { _id: 'uid_1001_101_001', seq: 1 },
       { _id: 'uid_1001_102_007', seq: 1 }
@@ -212,8 +212,8 @@ async function seedData() {
     const adminUser = await upsertUser('admin@email.in', 'College Admin', hashedPassword);
     
     // IT Users
-    const noteloomAdmin = await upsertUser('admin@noteloom.in', 'Note Loom Admin', itHashedPassword);
-    const noteloomManager = await upsertUser('manager@noteloom.in', 'Note Loom Manager', itHashedPassword);
+    const eduspaceAdmin = await upsertUser('admin@eduspace.in', 'Note Loom Admin', itHashedPassword);
+    const eduspaceManager = await upsertUser('manager@eduspace.in', 'Note Loom Manager', itHashedPassword);
 
     // --- 5. MANAGE MEMBERSHIPS (Upsert) ---
     console.log('🎟️ Verifying Memberships...');
@@ -229,8 +229,8 @@ async function seedData() {
     await upsertMembership(studentUser, iemTenant, 'student');
     await upsertMembership(facultyUser, iemTenant, 'faculty');
     await upsertMembership(adminUser, iemTenant, 'college_admin');
-    await upsertMembership(noteloomAdmin, sysTenant, 'it_admin');
-    await upsertMembership(noteloomManager, sysTenant, 'it_user');
+    await upsertMembership(eduspaceAdmin, sysTenant, 'it_admin');
+    await upsertMembership(eduspaceManager, sysTenant, 'it_user');
 
     // --- 6. MANAGE PROFILES (Upsert) ---
     console.log('🆔 Verifying Profiles...');
@@ -282,7 +282,7 @@ async function seedData() {
     );
 
     await ITAdminProfile.findOneAndUpdate(
-      { userId: noteloomAdmin._id },
+      { userId: eduspaceAdmin._id },
       {
         uid: 'IT-ADMIN-01',
         employeeId: '9000001',
@@ -292,7 +292,7 @@ async function seedData() {
     );
 
     await ITUserProfile.findOneAndUpdate(
-      { userId: noteloomManager._id },
+      { userId: eduspaceManager._id },
       {
         uid: 'IT-USER-01',
         employeeId: '9100001',

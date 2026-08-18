@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+﻿import React, { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
@@ -90,7 +90,7 @@ const ManageUsers = () => {
   const [actionMessage, setActionMessage] = useState({ type: '', text: '' });
 
   const storedCollegeCode = localStorage.getItem('selectedCollegeCode') || '';
-  const storedCollegeName = localStorage.getItem('selectedCollege') || sessionProfile?.college || 'NoteLoom Institution';
+  const storedCollegeName = localStorage.getItem('selectedCollege') || sessionProfile?.college || 'EduSpace Institution';
 
   // Fetch Users without blanking out UI
   const fetchUsers = async (tabToFetch = activeTab) => {
@@ -205,7 +205,7 @@ const ManageUsers = () => {
         u.name?.toLowerCase().includes(searchStr) ||
         u.email?.toLowerCase().includes(searchStr) ||
         u.uid?.toLowerCase().includes(searchStr) ||
-        u.noteloomId?.toLowerCase().includes(searchStr) ||
+        u.eduspaceId?.toLowerCase().includes(searchStr) ||
         prof.rollNo?.toLowerCase().includes(searchStr) ||
         prof.employeeId?.toLowerCase().includes(searchStr) ||
         prof.department?.toLowerCase().includes(searchStr) ||
@@ -687,10 +687,10 @@ const ManageUsers = () => {
                     }`}>
                       <div className="flex items-center gap-1.5 text-xs font-mono font-bold">
                         <span className="text-[10px] uppercase font-sans font-bold opacity-70">UID:</span>
-                        <span className="tracking-wide">{u.noteloomId || u.uid}</span>
+                        <span className="tracking-wide">{u.eduspaceId || u.uid}</span>
                       </div>
                       <button
-                        onClick={() => handleCopyUid(u.noteloomId || u.uid)}
+                        onClick={() => handleCopyUid(u.eduspaceId || u.uid)}
                         className={`p-1 rounded transition ${
                           isDarkMode
                             ? 'hover:bg-white/10 text-gray-400 hover:text-white'
@@ -698,7 +698,7 @@ const ManageUsers = () => {
                         }`}
                         title="Copy UID"
                       >
-                        {copiedUid === (u.noteloomId || u.uid) ? (
+                        {copiedUid === (u.eduspaceId || u.uid) ? (
                           <Check className="w-3.5 h-3.5 text-emerald-600 dark:text-green-400" />
                         ) : (
                           <Copy className="w-3.5 h-3.5" />
@@ -855,13 +855,13 @@ const ManageUsers = () => {
 
                         <td className="p-4 font-mono font-bold text-blue-700 dark:text-blue-400">
                           <div className="flex items-center gap-1.5">
-                            <span>{u.noteloomId || u.uid}</span>
+                            <span>{u.eduspaceId || u.uid}</span>
                             <button
-                              onClick={() => handleCopyUid(u.noteloomId || u.uid)}
+                              onClick={() => handleCopyUid(u.eduspaceId || u.uid)}
                               className="p-1 hover:bg-slate-200 dark:hover:bg-white/10 rounded text-slate-500 dark:text-gray-400 transition"
                               title="Copy UID"
                             >
-                              {copiedUid === (u.noteloomId || u.uid) ? (
+                              {copiedUid === (u.eduspaceId || u.uid) ? (
                                 <Check className="w-3 h-3 text-emerald-600 dark:text-green-400" />
                               ) : (
                                 <Copy className="w-3 h-3" />
@@ -997,26 +997,26 @@ const ManageUsers = () => {
                 </div>
               </div>
 
-              {/* NoteLoom UID Card */}
+              {/* EduSpace UID Card */}
               <div className={`p-4 mb-6 rounded-2xl border flex items-center justify-between ${
                 isDarkMode ? 'bg-black/30 border-blue-500/20' : 'bg-blue-50/80 border-blue-200'
               }`}>
                 <div>
                   <span className="text-[10px] font-bold uppercase tracking-wider text-blue-700 dark:text-blue-400">Institutional System UID</span>
                   <div className="text-lg font-mono font-black text-blue-800 dark:text-blue-300 mt-0.5">
-                    {selectedUserModal.noteloomId || selectedUserModal.uid}
+                    {selectedUserModal.eduspaceId || selectedUserModal.uid}
                   </div>
                 </div>
                 <button
-                  onClick={() => handleCopyUid(selectedUserModal.noteloomId || selectedUserModal.uid)}
+                  onClick={() => handleCopyUid(selectedUserModal.eduspaceId || selectedUserModal.uid)}
                   className={`px-3 py-1.5 rounded-xl text-xs font-bold transition flex items-center gap-1.5 ${
                     isDarkMode
                       ? 'bg-blue-500/20 hover:bg-blue-500/30 text-blue-300'
                       : 'bg-blue-600 hover:bg-blue-700 text-white shadow-sm'
                   }`}
                 >
-                  {copiedUid === (selectedUserModal.noteloomId || selectedUserModal.uid) ? <Check className="w-3.5 h-3.5 text-white" /> : <Copy className="w-3.5 h-3.5" />}
-                  {copiedUid === (selectedUserModal.noteloomId || selectedUserModal.uid) ? 'Copied!' : 'Copy UID'}
+                  {copiedUid === (selectedUserModal.eduspaceId || selectedUserModal.uid) ? <Check className="w-3.5 h-3.5 text-white" /> : <Copy className="w-3.5 h-3.5" />}
+                  {copiedUid === (selectedUserModal.eduspaceId || selectedUserModal.uid) ? 'Copied!' : 'Copy UID'}
                 </button>
               </div>
 

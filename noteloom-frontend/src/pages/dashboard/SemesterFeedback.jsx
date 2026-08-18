@@ -1,4 +1,4 @@
-import { API_BASE } from '@/utils/config';
+﻿import { API_BASE } from '@/utils/config';
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
@@ -55,7 +55,7 @@ const ProfileIdentityCard = ({ profile, isDarkMode }) => (
       
       <div className="flex flex-col gap-2 mt-5 w-full">
           <div className={`flex justify-between items-center px-4 py-2 rounded-xl text-[11px] font-mono border ${isDarkMode ? 'bg-gray-900 text-gray-300 border-gray-700' : 'bg-gray-50 text-gray-600 border-gray-200'}`}>
-            <span className="opacity-60 font-sans uppercase font-bold">NoteLoom ID</span>
+            <span className="opacity-60 font-sans uppercase font-bold">EduSpace ID</span>
             <span className="font-bold">{profile?.uid || 'N/A'}</span>
           </div>
           <div className={`flex justify-between items-center px-4 py-2 rounded-xl text-[11px] font-mono border ${isDarkMode ? 'bg-teal-500/10 text-teal-300 border-teal-500/20' : 'bg-teal-50 text-teal-700 border-teal-200'}`}>

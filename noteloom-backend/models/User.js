@@ -1,8 +1,8 @@
-const mongoose = require('mongoose');
+﻿const mongoose = require('mongoose');
 
 const userSchema = new mongoose.Schema({
-  // --- 0.Noteloom ID ---
-   noteloomId: {
+  // --- 0.EduSpace ID ---
+   eduspaceId: {
     type: String,
     unique: true,
     sparse: true,   // allows existing users without it
@@ -23,7 +23,7 @@ const userSchema = new mongoose.Schema({
   // without needing to query the 'Membership' collection every time.
   role: { 
     type: String, 
-    enum: ['student', 'faculty', 'college_admin', 'individual_student', 'it_user', 'it_admin', 'noteloom_manager', 'noteloom_admin'], 
+    enum: ['student', 'faculty', 'college_admin', 'individual_student', 'it_user', 'it_admin', 'eduspace_manager', 'eduspace_admin'], 
     default: 'student' 
   },
 

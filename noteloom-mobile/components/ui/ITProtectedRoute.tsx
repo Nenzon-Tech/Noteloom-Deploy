@@ -1,4 +1,4 @@
-import React, { ReactNode } from 'react';
+﻿import React, { ReactNode } from 'react';
 import { View, Text } from 'react-native';
 import { Redirect } from 'expo-router';
 import { useSession } from '../../hooks/useSession';
@@ -20,7 +20,7 @@ export const ITProtectedRoute = ({ allowedRoles, children }: ITProtectedRoutePro
     return <Redirect href="/" />;
   }
 
-  const validRoles = allowedRoles || ['noteloom_admin', 'noteloom_manager'];
+  const validRoles = allowedRoles || ['eduspace_admin', 'eduspace_manager'];
   if (!validRoles.includes(profile?.role || '')) {
     return <Redirect href="/" />;
   }

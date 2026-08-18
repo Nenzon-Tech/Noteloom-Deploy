@@ -1,4 +1,4 @@
-// Database Roles (Internal Storage)
+﻿// Database Roles (Internal Storage)
 const DB_ROLES = {
   SUPER_ADMIN: 'it_admin',
   MANAGER: 'it_user',
@@ -8,10 +8,10 @@ const DB_ROLES = {
 
 // Frontend Roles (What the UI expects for badges/permissions)
 const FRONTEND_ROLES = {
-  SUPER_ADMIN: 'noteloom_admin',
-  MANAGER: 'noteloom_manager',
+  SUPER_ADMIN: 'eduspace_admin',
+  MANAGER: 'eduspace_manager',
   // Future roles:
-  // MODERATOR: 'noteloom_moderator',
+  // MODERATOR: 'eduspace_moderator',
 };
 
 // Mapping: DB Role -> Frontend Role

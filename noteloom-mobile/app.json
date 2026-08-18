@@ -1,19 +1,19 @@
-{
+﻿{
   "expo": {
-    "name": "NoteLoom",
-    "slug": "noteloom",
+    "name": "EduSpace",
+    "slug": "eduspace",
     "owner": "nenzon-technology",
     "version": "2.2.5",
-    "scheme": "noteloom",
+    "scheme": "eduspace",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "automatic",
     "ios": {
       "supportsTablet": false,
-      "bundleIdentifier": "com.nenzontech.noteloom"
+      "bundleIdentifier": "com.nenzontech.eduspace"
     },
     "android": {
-      "package": "com.nenzontech.noteloom",
+      "package": "com.nenzontech.eduspace",
       "versionCode": 5,
       "adaptiveIcon": {
         "backgroundColor": "#1f2937",
@@ -35,7 +35,7 @@
       [
         "expo-local-authentication",
         {
-          "faceIDPermission": "Use Face ID to unlock NoteLoom"
+          "faceIDPermission": "Use Face ID to unlock EduSpace"
         }
       ],
       [
@@ -48,7 +48,7 @@
       [
         "expo-image-picker",
         {
-          "photosPermission": "NoteLoom accesses your photos to let you share them with your friends."
+          "photosPermission": "EduSpace accesses your photos to let you share them with your friends."
         }
       ],
       "expo-document-picker",

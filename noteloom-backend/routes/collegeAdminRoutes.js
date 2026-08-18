@@ -1,4 +1,4 @@
-const express = require('express');
+﻿const express = require('express');
 const router = express.Router();
 
 // Import Models
@@ -254,7 +254,7 @@ router.get('/users/:role', async (req, res) => {
         const profileObj = prof ? prof.toObject() : {};
         
         // DETERMINE THE CORRECT ID TO SHOW
-        let displayUid = u.noteloomId || profileObj.uid || profileObj.rollNo || profileObj.employeeId || profileObj.enrollmentId || 'N/A';
+        let displayUid = u.eduspaceId || profileObj.uid || profileObj.rollNo || profileObj.employeeId || profileObj.enrollmentId || 'N/A';
 
         return {
           _id: u._id,
@@ -262,7 +262,7 @@ router.get('/users/:role', async (req, res) => {
           email: u.email,
           role: role,
           uid: displayUid,
-          noteloomId: u.noteloomId || displayUid,
+          eduspaceId: u.eduspaceId || displayUid,
           status: m.status || 'active',
           createdAt: u.createdAt,
           deletionScheduledAt: u.deletionScheduledAt,

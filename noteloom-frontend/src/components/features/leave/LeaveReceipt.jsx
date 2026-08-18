@@ -1,4 +1,4 @@
-import React from 'react';
+﻿import React from 'react';
 import Barcode from 'react-barcode';
 import { format } from 'date-fns';
 
@@ -11,7 +11,7 @@ export const LeaveReceipt = React.forwardRef(({ data, user }, ref) => {
       <div className="flex justify-between items-center border-b-2 border-black pb-4 mb-6">
         <div>
           <h1 className="text-2xl font-bold uppercase">Faculty Leave Application</h1>
-          <p className="text-sm">Official Receipt • Noteloom System</p>
+          <p className="text-sm">Official Receipt • EduSpace System</p>
         </div>
         <div className="text-right">
              {/* Barcode for Scanning */}

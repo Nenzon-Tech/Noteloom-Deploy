@@ -1,4 +1,4 @@
-import { API_BASE } from '@/utils/config';
+﻿import { API_BASE } from '@/utils/config';
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
@@ -164,10 +164,10 @@ const AddEditContentPage = () => {
               <div>
                 <div className="flex items-center space-x-2 mb-1">
                   <span className={`inline-flex items-center px-4 py-1.5 rounded-full text-sm font-medium text-white ${
-                    itUser?.role === 'noteloom_admin' ? 'bg-red-600' : 'bg-orange-600'
+                    itUser?.role === 'eduspace_admin' ? 'bg-red-600' : 'bg-orange-600'
                   }`}>
                     <Shield className="w-4 h-4 mr-2" />
-                    {itUser?.role === 'noteloom_admin' ? 'Note Loom Admin' : 'Note Loom Manager'}
+                    {itUser?.role === 'eduspace_admin' ? 'Note Loom Admin' : 'Note Loom Manager'}
                   </span>
                 </div>
                 

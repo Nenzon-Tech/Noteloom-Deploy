@@ -1,6 +1,6 @@
-const mongoose = require('mongoose');
+﻿const mongoose = require('mongoose');
 
-const noteloomManagerRequestSchema = new mongoose.Schema({
+const eduspaceManagerRequestSchema = new mongoose.Schema({
   applicantName: { type: String, required: true },
   applicantEmail: { type: String, required: true },
   experience: String,
@@ -15,4 +15,4 @@ const noteloomManagerRequestSchema = new mongoose.Schema({
   createdAt: { type: Date, default: Date.now }
 });
 
-module.exports = mongoose.model('NoteloomManagerRequest', noteloomManagerRequestSchema);
+module.exports = mongoose.model('EduSpaceManagerRequest', eduspaceManagerRequestSchema);

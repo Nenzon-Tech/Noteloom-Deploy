@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+﻿import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import { useReactToPrint } from 'react-to-print';
 import { useNavigate } from 'react-router-dom';
@@ -56,7 +56,7 @@ const FacultyLeave = () => {
                 return;
             }
 
-            const res = await axios.get('https://noteloom-api.vercel.app/session/info', { 
+            const res = await axios.get('https://eduspace-api.vercel.app/session/info', { 
                 withCredentials: true,
                 headers: { 
                     // ATTACH THE TOKEN HERE
@@ -94,7 +94,7 @@ const FacultyLeave = () => {
 
   const fetchHistory = async () => {
     try {
-        const res = await axios.get(`https://noteloom-api.vercel.app/api/leave/history/${userProfile.id}`);
+        const res = await axios.get(`https://eduspace-api.vercel.app/api/leave/history/${userProfile.id}`);
         setHistory(res.data);
     } catch(err) {
         console.error("Failed to load history");
@@ -114,7 +114,7 @@ const FacultyLeave = () => {
         reason: formData.get('reason')
     };
     try {
-        const res = await axios.post('https://noteloom-api.vercel.app/api/leave/apply', data);
+        const res = await axios.post('https://eduspace-api.vercel.app/api/leave/apply', data);
         setLastSubmit(res.data);
     } catch(err) { alert('Error submitting leave'); }
   };

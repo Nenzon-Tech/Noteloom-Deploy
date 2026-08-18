@@ -1,4 +1,4 @@
-import React from 'react';
+﻿import React from 'react';
 import { View, Text, TouchableOpacity, Linking, StyleSheet } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Globe, Camera, Send, Heart } from 'lucide-react-native';
@@ -22,7 +22,7 @@ export const Footer = () => {
             <Text style={[styles.brandName, { color: isDarkMode ? 'white' : '#111827' }]}>Note Loom</Text>
             <Text style={[styles.description, { color: isDarkMode ? '#d1d5db' : '#4b5563' }]}>
               Empowering educational institutions with comprehensive learning management solutions.
-              {'\n'}Email: support@noteloom.in
+              {'\n'}Email: support@eduspace.in
             </Text>
             <View style={styles.socialRow}>
               {socialLinks.map((social) => {

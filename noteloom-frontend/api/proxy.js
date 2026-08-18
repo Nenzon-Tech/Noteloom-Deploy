@@ -1,6 +1,6 @@
-export default async function handler(req, res) {
+﻿export default async function handler(req, res) {
   const hfToken = process.env.HF_TOKEN;
-  const hfSpaceUrl = process.env.HF_SPACE_URL || 'https://noteloom-devops-noteloom-backend.hf.space';
+  const hfSpaceUrl = process.env.HF_SPACE_URL || 'https://eduspace-devops-eduspace-backend.hf.space';
 
   if (!hfToken) {
     return res.status(500).json({ error: "HF_TOKEN environment variable is missing on Vercel." });

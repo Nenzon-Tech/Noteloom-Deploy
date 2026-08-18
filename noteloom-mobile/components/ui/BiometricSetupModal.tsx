@@ -1,4 +1,4 @@
-import React from 'react';
+﻿import React from 'react';
 import { View, Text, Modal, StyleSheet, Pressable, ScrollView } from 'react-native';
 import { Fingerprint, ShieldCheck, Lock, X } from 'lucide-react-native';
 import { useTheme } from '../../contexts/ThemeContext';
@@ -35,7 +35,7 @@ export const BiometricSetupModal = ({ visible, onAccept, onDecline }: BiometricS
 
           <Text style={[styles.title, { color: theme.fg }]}>Enable Fingerprint Login</Text>
           <Text style={[styles.subtitle, { color: theme.muted }]}>
-            Log into NoteLoom instantly using your device's biometric sensor on every launch.
+            Log into EduSpace instantly using your device's biometric sensor on every launch.
           </Text>
 
           <View style={[styles.termsBox, { backgroundColor: theme.surface2, borderColor: theme.border }]}>
@@ -46,7 +46,7 @@ export const BiometricSetupModal = ({ visible, onAccept, onDecline }: BiometricS
             <ScrollView style={styles.termsScroll} showsVerticalScrollIndicator={false}>
               <Text style={[styles.termsText, { color: theme.muted }]}>
                 • Your fingerprint data is stored and processed securely by your phone's Android KeyStore system.
-                {'\n'}• NoteLoom never accesses, transmits, or stores raw biometric measurements on external servers.
+                {'\n'}• EduSpace never accesses, transmits, or stores raw biometric measurements on external servers.
                 {'\n'}• Authentication is validated locally on your device.
               </Text>
             </ScrollView>

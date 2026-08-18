@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+﻿const mongoose = require('mongoose');
 
 // Models
 const Batch = require('../models/Batch');
@@ -103,8 +103,8 @@ exports.getBatches = async (req, res) => {
 
 exports.enrollStudent = async (req, res) => {
   try {
-    const { noteloomId } = req.body;
-    const profile = await StudentProfile.findOne({ uid: String(noteloomId).trim(), tenantId: req.tenant.id }).populate('userId');
+    const { eduspaceId } = req.body;
+    const profile = await StudentProfile.findOne({ uid: String(eduspaceId).trim(), tenantId: req.tenant.id }).populate('userId');
     if (!profile) return res.status(404).json({ error: "Student not found" });
     if (profile.batchId && profile.batchId.toString() === req.params.batchId) return res.status(400).json({ error: "Already enrolled" });
 

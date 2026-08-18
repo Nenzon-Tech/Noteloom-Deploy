@@ -1,4 +1,4 @@
-import React from "react";
+﻿import React from "react";
 import { Navigate } from "react-router-dom";
 import { useITSessionManager } from "@/hooks/useITSessionManager";
 import LoadingSpinner from "@/components/common/LoadingSpinner";
@@ -19,7 +19,7 @@ const ITProtectedRoute = ({ allowedRoles, children }) => {
     return <Navigate to="/it-login" replace />;
   }
 
-  const validRoles = allowedRoles || ['it_admin', 'it_user', 'noteloom_admin', 'noteloom_manager'];
+  const validRoles = allowedRoles || ['it_admin', 'it_user', 'eduspace_admin', 'eduspace_manager'];
   if (!validRoles.includes(itUser?.role)) {
     // If authenticated but role not allowed, redirect to IT login
     return <Navigate to="/it-login" replace />;

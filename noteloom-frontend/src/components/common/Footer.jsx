@@ -1,4 +1,4 @@
-import React from 'react';
+﻿import React from 'react';
 import { Link } from "react-router-dom";
 import { useTheme } from '@/context/ThemeContext.jsx';
 import { Youtube, Facebook, Instagram, Twitter, Linkedin } from "lucide-react";
@@ -37,7 +37,7 @@ const Footer = () => {
                 <br />
                 Empowering educational institutions with comprehensive learning management solutions.
                 <br /><br />
-                <strong>Email:</strong> support@noteloom.in
+                <strong>Email:</strong> support@eduspace.in
               </p>
             </div>
             

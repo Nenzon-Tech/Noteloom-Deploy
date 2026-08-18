@@ -1,4 +1,4 @@
-import { API_BASE } from '@/utils/config';
+﻿import { API_BASE } from '@/utils/config';
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from "react-router-dom";
 import { 
@@ -107,7 +107,7 @@ const ManageDepartments = () => {
           'Authorization': `Bearer ${localStorage.getItem('sessionToken')}`,
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ noteloomId: newStudentId })
+        body: JSON.stringify({ eduspaceId: newStudentId })
       });
       
       const data = await res.json();
@@ -1344,7 +1344,7 @@ const ManageDepartments = () => {
                             <div className="relative flex-1">
                                 <Search className="absolute left-3 top-3 w-4 h-4 opacity-40"/>
                                 <input 
-                                    placeholder="Enter Noteloom ID (Username)"
+                                    placeholder="Enter EduSpace ID (Username)"
                                     value={newStudentId}
                                     onChange={e => setNewStudentId(e.target.value)}
                                     className={`w-full pl-10 p-2.5 rounded-xl border outline-none ${isDarkMode ? 'bg-gray-900 border-gray-700' : 'bg-white border-gray-300'}`}

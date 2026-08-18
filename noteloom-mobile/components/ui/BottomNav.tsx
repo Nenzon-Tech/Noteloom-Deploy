@@ -1,4 +1,4 @@
-import React from 'react';
+﻿import React from 'react';
 import { View, Text, Pressable, StyleSheet } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { usePathname, useRouter } from 'expo-router';
@@ -19,7 +19,7 @@ export const ROLE_TABS: Record<string, TabRoute[]> = {
     { key: 'home', label: 'Home', route: '/(app)/dashboard', icon: Home },
     { key: 'courses', label: 'Courses', route: '/(app)/my-classes', icon: BookOpen },
     { key: 'notice', label: 'Notices', route: '/(app)/notice-board', icon: Bell },
-    { key: 'ai', label: 'Noteloom Ai', route: '/(app)/ai-chat', icon: Bot },
+    { key: 'ai', label: 'EduSpace Ai', route: '/(app)/ai-chat', icon: Bot },
     { key: 'profile', label: 'Profile', route: '/(app)/profile', icon: User },
   ],
   faculty: [
@@ -27,14 +27,14 @@ export const ROLE_TABS: Record<string, TabRoute[]> = {
     { key: 'classes', label: 'Classes', route: '/(app)/faculty/classes', icon: BookOpen },
     { key: 'attendance', label: 'Attendance', route: '/(app)/faculty/attendance', icon: ClipboardCheck },
     { key: 'notice', label: 'Notices', route: '/(app)/faculty/notices', icon: Bell },
-    { key: 'ai', label: 'Noteloom Ai', route: '/(app)/ai-chat', icon: Bot },
+    { key: 'ai', label: 'EduSpace Ai', route: '/(app)/ai-chat', icon: Bot },
   ],
   college_admin: [
     { key: 'home', label: 'Home', route: '/(app)/admin', icon: Home },
     { key: 'approvals', label: 'Approvals', route: '/(app)/admin/approvals', icon: ClipboardCheck },
     { key: 'users', label: 'Users', route: '/(app)/admin/users', icon: Users },
     { key: 'notice', label: 'Notices', route: '/(app)/admin/notices', icon: Bell },
-    { key: 'ai', label: 'Noteloom Ai', route: '/(app)/ai-chat', icon: Bot },
+    { key: 'ai', label: 'EduSpace Ai', route: '/(app)/ai-chat', icon: Bot },
   ],
   it: [
     { key: 'home', label: 'Home', route: '/(app)/it-admin', icon: Home },

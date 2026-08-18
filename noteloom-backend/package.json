@@ -1,5 +1,5 @@
-{
-  "name": "noteloom-platform-backend",
+﻿{
+  "name": "eduspace-platform-backend",
   "version": "1.0.0",
   "description": "Backend for Note Loom college platform",
   "main": "server.js",

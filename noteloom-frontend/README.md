@@ -1,4 +1,4 @@
-# 🎓 Note Loom — College Management Platform
+﻿# 🎓 Note Loom — College Management Platform
 
 **Note Loom** is a full-stack, multi-tenant college management platform that covers academics, examinations, attendance, library management, AI-powered study tools, and a complete internal IT administration panel — all under a single unified system.
 
@@ -34,7 +34,7 @@ Note Loom is designed to serve **multiple colleges simultaneously** using a mult
 
 The platform has **three user-facing portals**:
 - **College Portal** — for Students, Faculty, and College Admins
-- **IT Portal** — for Note Loom system administrators (Noteloom Admins & Managers)
+- **IT Portal** — for Note Loom system administrators (EduSpace Admins & Managers)
 - **AI Assistant** — embedded within the college portal, powered by Google Gemini + Cloudflare AI
 
 ---
@@ -115,7 +115,7 @@ Express REST API (Node.js) ── port 4000
 The frontend utilizes a modular, feature-based layout leveraging Vite path aliases (`@/`) for clean, absolute-style imports.
 
 ```
-noteloom-frontend/
+eduspace-frontend/
 ├── vite.config.js              # Vite bundler config with path alias resolver
 ├── jsconfig.json               # IDE autocomplete helper mapping @/* -> src/*
 ├── .gitignore                  # Git exclusions (dist, node_modules, .env local logs)
@@ -208,7 +208,7 @@ The `setTenantContext` middleware:
 - Calls `next()` — or returns 401/403 on failure
 
 ### IT Portal Authentication
-Uses a separate `setITContext` middleware that checks if the membership role is `it_admin` or `it_user`. The frontend role labels (`noteloom_admin`, `noteloom_manager`) are mapped server-side for compatibility.
+Uses a separate `setITContext` middleware that checks if the membership role is `it_admin` or `it_user`. The frontend role labels (`eduspace_admin`, `eduspace_manager`) are mapped server-side for compatibility.
 
 ### Automated Cleanup (Scheduled Tasks)
 The server runs two `setInterval` jobs every hour:
@@ -224,8 +224,8 @@ The server runs two `setInterval` jobs every hour:
 | `student` | Student | College portal — student features |
 | `faculty` | Faculty | College portal — faculty features |
 | `college_admin` | College Admin | Full college management |
-| `it_user` | Noteloom Manager | IT portal — limited access |
-| `it_admin` | Noteloom Admin | IT portal — full system control |
+| `it_user` | EduSpace Manager | IT portal — limited access |
+| `it_admin` | EduSpace Admin | IT portal — full system control |
 
 Features visible to each role are controlled by `masterFeatures.js` (backend config) and stored per-tenant in `SystemConfig`. The IT Admin can toggle any feature ON/OFF for any college and role via the Feature Manager panel.
 
@@ -366,7 +366,7 @@ Three modes:
 
 | Mode | Behavior |
 |---|---|
-| `default` | Friendly assistant ("Noteloom AI") |
+| `default` | Friendly assistant ("EduSpace AI") |
 | `tutor` | Socratic tutor — asks guiding questions instead of giving answers directly |
 | `mindmap` | Generates a Mermaid.js flowchart for any topic |
 
@@ -473,7 +473,7 @@ The frontend is an optimized **React SPA** served by Vite.
 | `Library (3 models)` | `LibraryCredential`, `DigitalResource`, `PhysicalBook` |
 | `SystemConfig` | Per-tenant feature flag configuration |
 | `CollegeAdminRequest` | Requests to create college admin accounts |
-| `NoteloomManagerRequest` | Requests to create IT manager accounts |
+| `EduSpaceManagerRequest` | Requests to create IT manager accounts |
 | `Counter` | Auto-increment counter utility |
 
 ---

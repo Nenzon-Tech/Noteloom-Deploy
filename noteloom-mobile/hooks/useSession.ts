@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+﻿import { useState, useEffect, useCallback } from 'react';
 import * as LocalAuthentication from 'expo-local-authentication';
 import api, { authHeaders } from '../lib/api';
 import { saveSessionToken, getSessionToken, clearSessionToken, removeSecure } from '../lib/storage';
@@ -99,7 +99,7 @@ export function useSession() {
       const isEnrolled = await LocalAuthentication.isEnrolledAsync();
       if (!hasHardware || !isEnrolled) return false;
       const result = await LocalAuthentication.authenticateAsync({
-        promptMessage: 'Unlock NoteLoom with Biometrics',
+        promptMessage: 'Unlock EduSpace with Biometrics',
         fallbackLabel: 'Use Passcode',
         cancelLabel: 'Cancel',
       });

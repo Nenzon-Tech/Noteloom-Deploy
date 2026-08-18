@@ -1,5 +1,5 @@
-/**
- * NoteLoom Comprehensive Cost Report Document Generator
+﻿/**
+ * EduSpace Comprehensive Cost Report Document Generator
  * Generates an investor-ready cost breakdown covering APIs, Hosting, Database, Domain, and Emails.
  */
 
@@ -14,7 +14,7 @@ const path = require('path');
 const OUTPUT_DIR = path.join(__dirname, '..', 'output');
 if (!fs.existsSync(OUTPUT_DIR)) fs.mkdirSync(OUTPUT_DIR, { recursive: true });
 
-const DOCX_PATH = path.join(OUTPUT_DIR, 'NoteLoom_August_Beta_Comprehensive_Cost_Report.docx');
+const DOCX_PATH = path.join(OUTPUT_DIR, 'EduSpace_August_Beta_Comprehensive_Cost_Report.docx');
 
 // Styling colors
 const BRAND_BLUE = '1E3A5F';
@@ -106,7 +106,7 @@ const children = [
     alignment: AlignmentType.CENTER,
     spacing: { before: 0, after: 100 },
     children: [
-      new TextRun({ text: 'NoteLoom Academic SaaS Platform | August 2026 Trial', size: 24, font: 'Calibri', color: TEXT_MUTED })
+      new TextRun({ text: 'EduSpace Academic SaaS Platform | August 2026 Trial', size: 24, font: 'Calibri', color: TEXT_MUTED })
     ]
   }),
   new Paragraph({
@@ -120,7 +120,7 @@ const children = [
 
   // SECTION 1
   h1('1. Overview & Setup Parameters'),
-  body('This cost report provides a full production-level financial model for the upcoming August 2026 beta test of the NoteLoom platform. Unlike previous API-only projections, this model accounts for all hosting infrastructure, database clustering, domain registration, transaction mailing limits, and CDN storage required to run a real college trial safely under load.'),
+  body('This cost report provides a full production-level financial model for the upcoming August 2026 beta test of the EduSpace platform. Unlike previous API-only projections, this model accounts for all hosting infrastructure, database clustering, domain registration, transaction mailing limits, and CDN storage required to run a real college trial safely under load.'),
   boldBody('Trial Scope: ', '567 registered accounts (350 students, 200 faculty, 10 college admins, 7 system IT admins).'),
   boldBody('Duration: ', '1 Month (August 2026 — 22 active academic days).'),
   boldBody('Goal: ', 'Ensure 100% uptime, zero rate limits during simultaneous peak periods (e.g., daily routine changes and exam form submissions), and secure data logging.'),
@@ -134,7 +134,7 @@ const children = [
   new Table({
     width: { size: 100, type: WidthType.PERCENTAGE },
     rows: [
-      createRow([{ text: 'Item' }, { text: 'Provider & Plan' }, { text: 'Purpose in NoteLoom' }, { text: 'Monthly Cost' }], true),
+      createRow([{ text: 'Item' }, { text: 'Provider & Plan' }, { text: 'Purpose in EduSpace' }, { text: 'Monthly Cost' }], true),
       createRow([{ text: 'Domain Registration' }, { text: 'Namecheap / Porkbun (.com)' }, { text: 'Custom SSL domain for the platform' }, { text: '$12.00 (Flat)' }], false, false),
       createRow([{ text: 'Frontend & API Hosting' }, { text: 'Vercel Pro (1 Team Seat)' }, { text: 'Deploys Vite SPA and serverless Express routes' }, { text: '$20.00/mo' }], false, true),
       createRow([{ text: 'Production Database' }, { text: 'MongoDB Atlas M10 (Dedicated)' }, { text: 'High concurrent connections (500+) and 10GB storage' }, { text: '$57.00/mo' }], false, false),
@@ -192,13 +192,13 @@ const children = [
   h1('5. Essential Recommendations & Hidden Gaps'),
   bullet('Prepaid Balances: Load at least $45.00 across DeepSeek and Google Gemini consoles. Buy the custom domain and subscribe to Vercel Pro and SendGrid Essentials at the end of July.'),
   bullet('Database Throttling Risk: Do not attempt to run this trial on the free MongoDB M0 tier. With 550+ users logging in and marking daily attendance simultaneously, the 100-connection limit will crash the server. The dedicated M10 tier is mandatory for testing.'),
-  bullet('Custom Domain Routing: Map the custom domain (e.g., app.noteloom.com) to Vercel. Set the frontend VITE_API_BASE variables to point to the serverless Vercel function routes correctly.'),
+  bullet('Custom Domain Routing: Map the custom domain (e.g., app.eduspace.com) to Vercel. Set the frontend VITE_API_BASE variables to point to the serverless Vercel function routes correctly.'),
   bullet('Rate Limits & Protection: Establish an in-app middleware limit of maximum 20 AI queries per user per day to protect against runaway API consumption.')
 ];
 
 const doc = new Document({
-  creator: 'NoteLoom Solutions Architect',
-  description: 'NoteLoom August Beta Test Full Financial and Infra Model',
+  creator: 'EduSpace Solutions Architect',
+  description: 'EduSpace August Beta Test Full Financial and Infra Model',
   title: 'Comprehensive Cost Report',
   styles: {
     default: {
@@ -222,7 +222,7 @@ const doc = new Document({
               border: { bottom: { color: 'D1D5DB', space: 1, value: BorderStyle.SINGLE, size: 4 } },
               spacing: { after: 100 },
               children: [
-                new TextRun({ text: 'NoteLoom — Comprehensive Cost Report | August 2026', size: 17, font: 'Calibri', color: TEXT_MUTED, italics: true })
+                new TextRun({ text: 'EduSpace — Comprehensive Cost Report | August 2026', size: 17, font: 'Calibri', color: TEXT_MUTED, italics: true })
               ]
             })
           ]

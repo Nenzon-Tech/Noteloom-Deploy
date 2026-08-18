@@ -1,4 +1,4 @@
-import { API_BASE } from '@/utils/config';
+﻿import { API_BASE } from '@/utils/config';
 import { useState, useEffect } from 'react';
 import { useNavigate } from "react-router-dom";
 import axios from 'axios';
@@ -28,7 +28,7 @@ export const useITSessionManager = () => {
         headers: { 'Authorization': `Bearer ${token}` }
       });
 
-      const validRoles = ['it_admin', 'it_user', 'noteloom_admin', 'noteloom_manager'];
+      const validRoles = ['it_admin', 'it_user', 'eduspace_admin', 'eduspace_manager'];
       
       if (res.data.user && validRoles.includes(res.data.role)) {
         setITUser(res.data.user);

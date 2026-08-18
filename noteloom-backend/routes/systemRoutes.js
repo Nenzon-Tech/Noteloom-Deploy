@@ -1,4 +1,4 @@
-const express = require('express');
+﻿const express = require('express');
 const router = express.Router();
 const SystemConfig = require('../models/SystemConfig');
 const TenantMenu = require('../models/TenantMenu');
@@ -16,7 +16,7 @@ router.get('/features', async (req, res) => {
 
 // Update Features (IT Admin)
 router.post('/features', setITContext, async (req, res) => {
-  if (req.itUser.role !== 'noteloom_admin') return res.status(403).json({ error: 'Access Denied' });
+  if (req.itUser.role !== 'eduspace_admin') return res.status(403).json({ error: 'Access Denied' });
   const config = await SystemConfig.findOneAndUpdate({ configType: 'feature_flags' }, { dashboardSettings: req.body.dashboardSettings }, { new: true, upsert: true });
   res.json(config);
 });

@@ -1,4 +1,4 @@
-import { API_BASE } from '@/utils/config';
+﻿import { API_BASE } from '@/utils/config';
 // COMPLETE WORKING App.jsx - Individual Students + Remove Book Icon
 
 import React, { useEffect, useState, useRef, lazy, Suspense } from "react";
@@ -84,7 +84,7 @@ import {
 import { Routes, Route, useNavigate, useLocation, Link, useParams } from "react-router-dom";
 import { ThemeProvider, useTheme } from '@/context/ThemeContext.jsx';
 import CustomVideoPlayer from '@/components/common/CustomVideoPlayer';
-import NoteloomAi from '@/components/features/ai/NoteloomAi';
+import EduSpaceAi from '@/components/features/ai/EduSpaceAi';
 import axios from 'axios';
 import { ErrorPopupProvider } from '@/context/ErrorPopupContext.jsx';
 import SessionExpiredPage from '@/components/common/SessionExpiredPage.jsx';
@@ -1243,7 +1243,7 @@ const IndividualStudentDashboard = () => {
                     ? 'border-gray-700/50 text-gray-500' 
                     : 'border-gray-200/50 text-gray-500'
                 }`}>
-                  Created by {item.createdBy?.name} ({item.createdBy?.role?.replace('noteloom_', 'Note Loom ')})
+                  Created by {item.createdBy?.name} ({item.createdBy?.role?.replace('eduspace_', 'Note Loom ')})
                 </div>
               </motion.div>
             ))}
@@ -1890,7 +1890,7 @@ const App = () => {
             <Route 
               path="/it-admin/features" 
               element={
-                <ITProtectedRoute allowedRoles={["noteloom_admin", "noteloom_manager"]}>
+                <ITProtectedRoute allowedRoles={["eduspace_admin", "eduspace_manager"]}>
                   <FeatureManager />
                 </ITProtectedRoute>
               } 
@@ -2193,7 +2193,7 @@ const App = () => {
             <Route 
               path="/it-admin" 
               element={
-                <ITProtectedRoute allowedRoles={["noteloom_admin", "noteloom_manager"]}>
+                <ITProtectedRoute allowedRoles={["eduspace_admin", "eduspace_manager"]}>
                   <ITAdminDashboard />
                 </ITProtectedRoute>
               } 
@@ -2201,7 +2201,7 @@ const App = () => {
             <Route 
               path="/it-admin/content/add" 
               element={
-                <ITProtectedRoute allowedRoles={["noteloom_admin", "noteloom_manager"]}>
+                <ITProtectedRoute allowedRoles={["eduspace_admin", "eduspace_manager"]}>
                   <AddEditContentPage />
                 </ITProtectedRoute>
               } 
@@ -2209,7 +2209,7 @@ const App = () => {
             <Route 
               path="/it-admin/content/edit" 
               element={
-                <ITProtectedRoute allowedRoles={["noteloom_admin", "noteloom_manager"]}>
+                <ITProtectedRoute allowedRoles={["eduspace_admin", "eduspace_manager"]}>
                   <AddEditContentPage />
                 </ITProtectedRoute>
               } 
@@ -2217,14 +2217,14 @@ const App = () => {
             <Route
               path="/it-admin/feature-manager"
               element={
-                <ITProtectedRoute allowedRoles={["noteloom_admin", "noteloom_manager"]}>
+                <ITProtectedRoute allowedRoles={["eduspace_admin", "eduspace_manager"]}>
                   <FeatureManager />
                 </ITProtectedRoute>
               }
             />
           </Routes>
         </Suspense>
-        <NoteloomAi />
+        <EduSpaceAi />
         <CookieConsent />
       </ErrorPopupProvider>
     </ThemeProvider>

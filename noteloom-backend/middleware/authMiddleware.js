@@ -1,4 +1,4 @@
-const Session = require('../models/Session'); 
+﻿const Session = require('../models/Session'); 
 const Membership = require('../models/Membership'); 
 const AdminProfile = require('../models/AdminProfile');
 
@@ -110,17 +110,17 @@ const setITContext = async (req, res, next) => {
     }
 
     // 🔄 Role Normalization for Frontend Compatibility
-    // Database 'it_admin' -> Frontend 'noteloom_admin'
-    // Database 'it_user'  -> Frontend 'noteloom_manager'
+    // Database 'it_admin' -> Frontend 'eduspace_admin'
+    // Database 'it_user'  -> Frontend 'eduspace_manager'
     const frontendRole = membership.role === 'it_admin' 
-      ? 'noteloom_admin' 
-      : 'noteloom_manager';
+      ? 'eduspace_admin' 
+      : 'eduspace_manager';
 
     req.itUser = {
       id: session.userId._id,
       name: session.userId.name,
       email: session.userId.email,
-      role: frontendRole,       // Used for permission checks (e.g. req.itUser.role === 'noteloom_admin')
+      role: frontendRole,       // Used for permission checks (e.g. req.itUser.role === 'eduspace_admin')
       originalRole: membership.role // Kept for DB operations/reference
     };
 

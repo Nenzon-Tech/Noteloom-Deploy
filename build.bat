@@ -1,8 +1,8 @@
-@echo off
+﻿@echo off
 setlocal
-title NoteLoom APK Builder
+title EduSpace APK Builder
 
-cd /d "%~dp0noteloom-mobile"
+cd /d "%~dp0eduspace-mobile"
 
 if "%ANDROID_HOME%"=="" (
   echo [ERROR] ANDROID_HOME is not set.
@@ -49,7 +49,7 @@ echo [4/4] Done!
 if exist "%APK%" (
   echo.
   echo APK ready at:
-  echo   D:\NoteLoom\Code-files\noteloom-mobile\%APK%
+  echo   D:\EduSpace\Code-files\eduspace-mobile\%APK%
   echo.
   echo Copy it to your phone, then allow "Install unknown apps" to install it.
 ) else (

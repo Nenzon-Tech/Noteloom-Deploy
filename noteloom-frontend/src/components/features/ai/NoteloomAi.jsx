@@ -1,4 +1,4 @@
-import { API_BASE } from '@/utils/config';
+﻿import { API_BASE } from '@/utils/config';
 import React, { useState, useRef, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import DOMPurify from 'dompurify';
@@ -179,7 +179,7 @@ const MermaidDiagram = ({ code }) => {
 };
 
 
-const NoteloomAi = () => {
+const EduSpaceAi = () => {
   const { isDarkMode } = useTheme();
   const location = useLocation();
   const [isOpen, setIsOpen] = useState(false);
@@ -263,7 +263,7 @@ const isAllowedPage = allowedPaths.some(path => location.pathname.includes(path)
       setMessages([{ 
         id: 'init', 
         type: 'bot', 
-        text: `Hi ${firstName}! I am Noteloom Ai. How can I help?` 
+        text: `Hi ${firstName}! I am EduSpace Ai. How can I help?` 
       }]);
     }
   }, [userName, contextName]); 
@@ -473,7 +473,7 @@ const handleFileUpload = async (e, taskType = 'summarize') => {
                 <Bot className="w-5 h-5" />
               </div>
               <div>
-                <h3 className="font-bold text-sm leading-tight">Noteloom Ai</h3>
+                <h3 className="font-bold text-sm leading-tight">EduSpace Ai</h3>
                 {/* UPDATED SUBTITLE */}
                 <p className="text-[10px] opacity-80 flex items-center">
                   <Sparkles className="w-3 h-3 mr-1" /> Your personalised assistant
@@ -668,4 +668,4 @@ const handleFileUpload = async (e, taskType = 'summarize') => {
   );
 };
 
-export default NoteloomAi;
+export default EduSpaceAi;

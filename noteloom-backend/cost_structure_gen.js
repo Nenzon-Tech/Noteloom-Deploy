@@ -1,6 +1,6 @@
-/**
- * NoteLoom August Beta Cost Structure Document Generator
- * Uses the 'docx' library in noteloom-backend
+﻿/**
+ * EduSpace August Beta Cost Structure Document Generator
+ * Uses the 'docx' library in eduspace-backend
  */
 
 const {
@@ -15,7 +15,7 @@ const path = require('path');
 const OUTPUT_DIR = path.join(__dirname, '..', 'output');
 if (!fs.existsSync(OUTPUT_DIR)) fs.mkdirSync(OUTPUT_DIR, { recursive: true });
 
-const DOCX_PATH = path.join(OUTPUT_DIR, 'NoteLoom_August_Beta_Cost_Structure.docx');
+const DOCX_PATH = path.join(OUTPUT_DIR, 'EduSpace_August_Beta_Cost_Structure.docx');
 
 // Colors
 const BRAND_BLUE = '1E3A5F';
@@ -107,7 +107,7 @@ const children = [
     alignment: AlignmentType.CENTER,
     spacing: { before: 0, after: 100 },
     children: [
-      new TextRun({ text: 'NoteLoom Academic Platform | August 2026', size: 24, font: 'Calibri', color: TEXT_MUTED })
+      new TextRun({ text: 'EduSpace Academic Platform | August 2026', size: 24, font: 'Calibri', color: TEXT_MUTED })
     ]
   }),
   new Paragraph({
@@ -121,7 +121,7 @@ const children = [
 
   // SECTION 1
   h1('1. Overview & Parameters'),
-  body('This document details the feature-by-feature cost structure for the 1-month college beta testing of the NoteLoom platform scheduled for August 2026. The structure has been configured specifically for a college environment, incorporating larger document sizes, coding/math worksheets, and lecture videos.'),
+  body('This document details the feature-by-feature cost structure for the 1-month college beta testing of the EduSpace platform scheduled for August 2026. The structure has been configured specifically for a college environment, incorporating larger document sizes, coding/math worksheets, and lecture videos.'),
   boldBody('Trial Scope: ', '350 student accounts and 200 faculty accounts across participating college streams (550 users total).'),
   boldBody('Active Period: ', 'August 2026 (22 active academic/instructional days).'),
   boldBody('Hybrid AI Engine Configuration: '),
@@ -204,8 +204,8 @@ const children = [
 ];
 
 const doc = new Document({
-  creator: 'NoteLoom Team',
-  description: 'NoteLoom August Beta Test Cost Projections',
+  creator: 'EduSpace Team',
+  description: 'EduSpace August Beta Test Cost Projections',
   title: 'Cost Projections',
   styles: {
     default: {
@@ -229,7 +229,7 @@ const doc = new Document({
               border: { bottom: { color: 'D1D5DB', space: 1, value: BorderStyle.SINGLE, size: 4 } },
               spacing: { after: 100 },
               children: [
-                new TextRun({ text: 'NoteLoom — Cost Projections | August 2026 Trial', size: 17, font: 'Calibri', color: TEXT_MUTED, italics: true })
+                new TextRun({ text: 'EduSpace — Cost Projections | August 2026 Trial', size: 17, font: 'Calibri', color: TEXT_MUTED, italics: true })
               ]
             })
           ]

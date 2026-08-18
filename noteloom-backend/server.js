@@ -1,4 +1,4 @@
-const express = require('express');
+﻿const express = require('express');
 const cors = require('cors');
 const path = require('path');
 require('dotenv').config();
@@ -50,8 +50,8 @@ app.use((req, res, next) => {
 const allowedOrigins = [
   'http://localhost:3000', 
   'http://localhost:5173', 
-  'https://noteloomtest.vercel.app', // Production URL
-  'https://noteloom-msofe8sfa-shuvankar2s-projects.vercel.app' // Frontend Alpha Branch URL
+  'https://eduspacetest.vercel.app', // Production URL
+  'https://eduspace-msofe8sfa-shuvankar2s-projects.vercel.app' // Frontend Alpha Branch URL
 ];
 
 app.use(cors({
@@ -64,8 +64,8 @@ app.use(cors({
       return callback(null, true);
     }
 
-    // SECURE DYNAMIC RULE: Accepts any valid preview URL starting with "noteloom" and ending with "vercel.app"
-    if (/^https:\/\/noteloom(?:-frontend)?-[a-z0-9-]+\.vercel\.app$/.test(origin)) {
+    // SECURE DYNAMIC RULE: Accepts any valid preview URL starting with "eduspace" and ending with "vercel.app"
+    if (/^https:\/\/eduspace(?:-frontend)?-[a-z0-9-]+\.vercel\.app$/.test(origin)) {
       return callback(null, true);
     }
 
@@ -81,7 +81,7 @@ app.use(cors({
     }
 
     // MOBILE APP RULE: Allow Expo Go development and production mobile app custom schemes
-    if (/^(?:exp|noteloom):\/\//.test(origin)) {
+    if (/^(?:exp|eduspace):\/\//.test(origin)) {
       return callback(null, true);
     }
 

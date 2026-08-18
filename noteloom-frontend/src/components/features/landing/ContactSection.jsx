@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+﻿import React, { useState } from "react";
 import { motion } from "framer-motion";
 import { Sparkles, Shield, Users, Mail, Phone, Calendar } from "lucide-react";
 import { useTheme } from "@/context/ThemeContext.jsx";
@@ -300,7 +300,7 @@ const ContactSection = () => {
                   Send Message
                 </button>
                 <div className="flex justify-center space-x-6 mt-4 text-xs">
-                  <a href="mailto:noreply.noteloom@gmail.com" className={`flex items-center space-x-1 transition-colors duration-700 ${isDarkMode ? "text-white/35 hover:text-white/70" : "text-slate-400 hover:text-slate-600"}`}><Mail className="w-3.5 h-3.5" /><span>Email</span></a>
+                  <a href="mailto:noreply.eduspace@gmail.com" className={`flex items-center space-x-1 transition-colors duration-700 ${isDarkMode ? "text-white/35 hover:text-white/70" : "text-slate-400 hover:text-slate-600"}`}><Mail className="w-3.5 h-3.5" /><span>Email</span></a>
                   <a href="tel:+916297432182" className={`flex items-center space-x-1 transition-colors duration-700 ${isDarkMode ? "text-white/35 hover:text-white/70" : "text-slate-400 hover:text-slate-600"}`}><Phone className="w-3.5 h-3.5" /><span>Call</span></a>
                   {/* <a href="/request-demo" className={`flex items-center space-x-1 transition-colors duration-700 ${isDarkMode ? "text-white/35 hover:text-white/70" : "text-slate-400 hover:text-slate-600"}`}><Calendar className="w-3.5 h-3.5" /><span>Schedule demo</span></a> */}
                 </div>

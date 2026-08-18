@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+﻿import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { useTheme } from '../../../contexts/ThemeContext';
 import { API_BASE } from '../../../lib/constants';
@@ -51,8 +51,8 @@ export default function ITAdminAccess() {
               avatar={<Text style={styles.avatarText}>{u.name?.[0]?.toUpperCase() || 'U'}</Text>}
               title={u.name || 'User'}
               meta={`${u.email || ''} · UID ${u.uid || 'N/A'}`}
-              action={u.role === 'noteloom_admin' ? 'Admin' : 'Manager'}
-              actionColor={u.role === 'noteloom_admin' ? 'red' : 'blue'}
+              action={u.role === 'eduspace_admin' ? 'Admin' : 'Manager'}
+              actionColor={u.role === 'eduspace_admin' ? 'red' : 'blue'}
             />
           ))
         )}
